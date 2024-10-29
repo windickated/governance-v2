@@ -6,8 +6,8 @@
   import { contract } from "../lib/contract";
 
   afterUpdate(() => {
-    const storyText: HTMLDivElement = document.querySelector(".text");
-    const storyVideo: HTMLIFrameElement = document.querySelector(".video");
+    const storyText: any = document.querySelector(".text");
+    const storyVideo: any = document.querySelector(".video");
     if (
       nodeNumber &&
       !storyText.className.match("visible") &&
@@ -24,10 +24,10 @@
   _season.subscribe((number) => {
     seasonNumber = number;
   });
-  _episode.subscribe((number) => {
+  _episode.subscribe((number: any) => {
     nodeNumber = number;
   });
-  _option.subscribe((number) => {
+  _option.subscribe((number: any) => {
     selectedOption = number;
   });
 
@@ -65,8 +65,8 @@
   let formatButtonState: boolean = true; // video on, text off
   let formatButtonHover: boolean = false;
   const switcherHandle = (event: Event) => {
-    const storyText: HTMLDivElement = document.querySelector(".text");
-    const storyVideo: HTMLIFrameElement = document.querySelector(".video");
+    const storyText: any = document.querySelector(".text");
+    const storyVideo: any = document.querySelector(".video");
     if (event.type === "click") {
       if (nodeNumber) {
         formatButtonState = !formatButtonState;
@@ -129,10 +129,10 @@
 
           //inactive potentials with NO contract
           selectedNFTs.map((nft) => inactiveNFTs.push(nft));
-          $_inactivePotentials = inactiveNFTs;
+          $_inactivePotentials = inactiveNFTs as any;
 
           $_potentials = [];
-          $_option = undefined;
+          $_option = null;
 
           console.log("Inactive NFTs:", inactiveNFTs); //used nfts
         }, 750);

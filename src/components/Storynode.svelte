@@ -10,7 +10,7 @@
     if (width > 600) mobileTextVisibility = true;
     if (nodeNumber) {
       resizeOptions();
-      optionsContainer.childNodes.forEach((option: HTMLDivElement) => {
+      optionsContainer.childNodes.forEach((option: any) => {
         const optionSelector = option.childNodes[0] as HTMLImageElement;
         option.addEventListener("mouseover", () => {
           if (option.id != (selectedOption ? selectedOption.toString() : 0)) {
@@ -53,13 +53,13 @@
   let nodeNumber: number;
   let selectedOption: number;
 
-  _season.subscribe((number) => {
+  _season.subscribe((number: any) => {
     seasonNumber = number;
   });
-  _episode.subscribe((number) => {
+  _episode.subscribe((number: any) => {
     nodeNumber = number;
   });
-  _option.subscribe((number) => {
+  _option.subscribe((number: any) => {
     selectedOption = number;
   });
 
@@ -137,7 +137,7 @@
   let classMatch: boolean;
   let classValidation: HTMLParagraphElement;
   let className: string;
-  function selectOption() {
+  function selectOption(this: any) {
     if ($isEnded === false && selectedNFTs.length > 0) {
       // class validation
       if (this.dataset.class) {
@@ -162,7 +162,7 @@
       this.style.color = "#33E2E6";
       this.style.textShadow = "0 0 3px #33E2E6";
       this.style.listStyleType = "disc";
-      optionsContainer.childNodes.forEach((option: HTMLElement) => {
+      optionsContainer.childNodes.forEach((option: any) => {
         if (option.id != this.id) {
           option.style.textShadow = "none";
           option.style.listStyleType = "circle";
@@ -205,10 +205,10 @@
 
     //inactive potentials with NO contract
     selectedNFTs.map((nft) => inactiveNFTs.push(nft));
-    $_inactivePotentials = inactiveNFTs;
+    $_inactivePotentials = inactiveNFTs as never[];
 
     $_potentials = [];
-    $_option = undefined;
+    $_option = null;
 
     console.log("Inactive NFTs:", inactiveNFTs); //used nfts
   }
@@ -222,8 +222,7 @@
     class="video visible"
     title="YouTube"
     allowfullscreen
-  />
-
+  ></iframe>
   <div class="legend">
     {#if nodeNumber}
       <h1 class="header">{storyNode.title}</h1>

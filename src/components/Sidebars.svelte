@@ -21,7 +21,7 @@
   _season.subscribe((number) => {
     seasonNumber = number;
   });
-  _episode.subscribe((number) => {
+  _episode.subscribe((number: any) => {
     nodeNumber = number;
   });
 
@@ -30,7 +30,7 @@
     if (selectedNFTs.length == 0) {
       potentials.forEach((nft) => (nft.clicked = false));
       nftTiles &&
-        nftTiles.childNodes.forEach((tile: HTMLDivElement) => {
+        nftTiles.childNodes.forEach((tile: any) => {
           tile.style.backgroundColor = "rgba(22, 30, 95, 0.75)";
           tile.style.filter = "drop-shadow(0 0 0.1vw #010020)";
           tile.style.color = "inherit";
@@ -41,7 +41,7 @@
         potentials.forEach((potential) => {
           if (potential.id == inactiveNFTs[i].id) {
             potential.active = false;
-            nftTiles.childNodes.forEach((tile: HTMLDivElement) => {
+            nftTiles.childNodes.forEach((tile: any) => {
               if (tile.id == potential.id.toString()) {
                 tile.style.opacity = "0.5";
                 tile.style.pointerEvents = "none";
@@ -53,18 +53,18 @@
     }
   });
 
-  function switchSeason() {
+  function switchSeason(this: any) {
     $_season = this.value;
-    $_episode = undefined;
+    $_episode = null;
     activeEpisode(0);
   }
 
-  function switchEpisode() {
+  function switchEpisode(this: any) {
     $_episode = this.id;
   }
 
   function activeEpisode(id: number) {
-    episodes.childNodes.forEach((episode: HTMLElement) => {
+    episodes.childNodes.forEach((episode: any) => {
       if (id.toString() == episode.id) {
         episode.style.color = "#010020";
         episode.style.filter = "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
@@ -92,7 +92,7 @@
     class: string;
     clicked: boolean;
     active: boolean;
-    constructor(data, i: number) {
+    constructor(data: any, i: number) {
       this.id = i;
       this.name = data[i].name;
       this.image = data[i].image;
@@ -118,23 +118,23 @@
       `https://api.degenerousdao.com/nft/owner/${address}`
     );
     const data = await json.json();
-    const nftNumbers = data.ownedNfts.map((nft) => +nft.tokenId);
-    const metadata = [];
+    const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
+    const metadata: any = [];
     for (let i in nftNumbers) {
       const response = await fetch(
         `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
       );
       metadata[i] = await response.json();
-      potentials[i] = new nftTile(metadata, Number(i));
+      potentials[i as any] = new nftTile(metadata, Number(i));
     }
   };
 
   let nftTiles: HTMLDivElement;
-  function selectNFT() {
+  function selectNFT(this: any) {
     if (nodeNumber) {
       $_potentials = [];
       potentials[this.id].clicked = !potentials[this.id].clicked;
-      nftTiles.childNodes.forEach((tile: HTMLDivElement) => {
+      nftTiles.childNodes.forEach((tile: any) => {
         if (tile.id == this.id) {
           if (potentials[this.id].clicked) {
             tile.style.backgroundColor = "#2441BD";
@@ -148,14 +148,14 @@
         }
       });
       potentials.map((nft) => {
-        if (nft.clicked) $_potentials.push(nft);
+        if (nft.clicked) $_potentials.push(nft as never);
       });
     }
   }
 
   async function connectWallet() {
     if (!$loggedIn) {
-      await provider.getNetwork().then(async (net) => {
+      await provider.getNetwork().then(async (net: any) => {
         if (net.chainId === BigInt(network.chainId)) {
           await provider.send("eth_requestAccounts", []);
           loggedIn.set(true);
@@ -194,8 +194,8 @@
   let nftsBarPosition: number = nftBarState ? 80 : 0;
   let episodesBarPosition: number = episodesBarState ? 44 : 0;
 
-  let nftsInterval;
-  let episodesInterval;
+  let nftsInterval: any;
+  let episodesInterval: any;
 
   function closeActiveTab() {
     if (episodesBarState) handleEpisodesBar();
@@ -204,7 +204,7 @@
 
   // NFTs tab opening
   function handleNFTsBar() {
-    $_option = undefined;
+    $_option = null;
 
     if (episodesBarState) handleEpisodesBar();
 
@@ -413,7 +413,7 @@
   tabindex="0"
   class="episodes-icon"
   on:click={handleEpisodesBar}
-/>
+></span>
 
 <div class="episodes-bar" bind:this={episodesBar}>
   <p class="season-title">The Dishordian Saga</p>
@@ -454,7 +454,7 @@
   tabindex="0"
   class="nft-icon"
   on:click={handleNFTsBar}
-/>
+></span>
 
 <div class="nft-bar" bind:this={nftBar}>
   <div

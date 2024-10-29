@@ -26,11 +26,11 @@
     }
   });
 
-  _season.subscribe((number) => {
+  _season.subscribe((number: any) => {
     seasonNumber = number;
   });
 
-  _episode.subscribe((number) => {
+  _episode.subscribe((number: any) => {
     nodeNumber = number;
   });
 
@@ -93,9 +93,9 @@
   ) => {
     if (id != "omnihub") {
       //temporarily disabled Omnihub
-      const button: HTMLElement = document.getElementById(id);
-      const buttonHover: HTMLElement = document.getElementById(`${id}-hover`);
-      const buttonActive: HTMLElement = document.getElementById(`${id}-active`);
+      const button: any = document.getElementById(id);
+      const buttonHover: any = document.getElementById(`${id}-hover`);
+      const buttonActive: any = document.getElementById(`${id}-active`);
       if (!touchscreenDevice) {
         if (event.type === "click") {
           button.style.display = "none";
@@ -168,10 +168,10 @@
       <div class="{button.id} {button.size}">
         <img
           on:mouseover={() => {
-            consoleButtonsHandle(event, button.id);
+            consoleButtonsHandle(event as any, button.id);
           }}
           on:touchstart={() => {
-            consoleButtonsHandle(event, button.id);
+            consoleButtonsHandle(event as any, button.id);
           }}
           class="console-btn visible"
           id={button.id}
@@ -181,10 +181,10 @@
         />
         <img
           on:click={() => {
-            consoleButtonsHandle(event, button.id);
+            consoleButtonsHandle(event as any, button.id);
           }}
           on:mouseout={() => {
-            consoleButtonsHandle(event, button.id);
+            consoleButtonsHandle(event as any, button.id);
           }}
           class="console-btn"
           id="{button.id}-hover"
@@ -194,7 +194,7 @@
         />
         <img
           on:mouseover={() => {
-            consoleButtonsHandle(event, button.id, true);
+            consoleButtonsHandle(event as any, button.id, true);
           }}
           class="console-btn"
           id="{button.id}-active"
