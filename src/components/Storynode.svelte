@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import { afterUpdate } from "svelte";
   import { _season, _episode, _option, isEnded } from "../stores/storyNode";
   import { _potentials, _inactivePotentials } from "../stores/selectedNFTs";
@@ -10,8 +10,8 @@
     if (width > 600) mobileTextVisibility = true;
     if (nodeNumber) {
       resizeOptions();
-      optionsContainer.childNodes.forEach((option: any) => {
-        const optionSelector = option.childNodes[0] as HTMLImageElement;
+      optionsContainer.childNodes.forEach((option) => {
+        const optionSelector = option.childNodes[0];
         option.addEventListener("mouseover", () => {
           if (option.id != (selectedOption ? selectedOption.toString() : 0)) {
             option.style.textShadow = "0 0 3px #33E2E6";
@@ -47,73 +47,73 @@
     }
   });
 
-  let mobileTextVisibility: boolean = false;
+  let mobileTextVisibility = false;
 
-  let seasonNumber: number;
-  let nodeNumber: number;
-  let selectedOption: number;
+  let seasonNumber;
+  let nodeNumber;
+  let selectedOption;
 
-  _season.subscribe((number: any) => {
+  _season.subscribe((number) => {
     seasonNumber = number;
   });
-  _episode.subscribe((number: any) => {
+  _episode.subscribe((number) => {
     nodeNumber = number;
   });
-  _option.subscribe((number: any) => {
+  _option.subscribe((number) => {
     selectedOption = number;
   });
 
-  let selectedNFTs: Array<any>;
-  let inactiveNFTs: Array<any>;
+  let selectedNFTs;
+  let inactiveNFTs;
   _potentials.subscribe((array) => (selectedNFTs = array));
   _inactivePotentials.subscribe((array) => (inactiveNFTs = array));
 
   $: storyNode = {
     title: nodeNumber
       ? DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyTitle
-      : "",
+      : null,
     duration: nodeNumber ? getStoryDate() : "",
     video: nodeNumber
       ? `https://www.youtube.com/embed/${DischordianSaga[seasonNumber - 1][nodeNumber - 1].videoLink}`
-      : "",
+      : null,
     text: nodeNumber
       ? DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyText
-      : "",
+      : null,
     options: nodeNumber
       ? DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyOptions
-      : "",
+      : null,
   };
 
-  function getStoryDate(): string {
-    let dateStart: Date = new Date(
+  function getStoryDate() {
+    let dateStart = new Date(
       DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyDuration[0]
     );
-    let dateEnd: Date = new Date(
+    let dateEnd = new Date(
       DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyDuration[1]
     );
 
-    let dayStart: string = ("0" + dateStart.getDate()).slice(-2);
-    let dayEnd: string = ("0" + dateEnd.getDate()).slice(-2);
-    let monthStart: string = ("0" + (dateStart.getMonth() + 1)).slice(-2);
-    let monthEnd: string = ("0" + (dateEnd.getMonth() + 1)).slice(-2);
-    let yearStart: number = dateStart.getFullYear();
-    let yearEnd: number = dateEnd.getFullYear();
+    let dayStart = ("0" + dateStart.getDate()).slice(-2);
+    let dayEnd = ("0" + dateEnd.getDate()).slice(-2);
+    let monthStart = ("0" + (dateStart.getMonth() + 1)).slice(-2);
+    let monthEnd = ("0" + (dateEnd.getMonth() + 1)).slice(-2);
+    let yearStart = dateStart.getFullYear();
+    let yearEnd = dateEnd.getFullYear();
 
-    let fullDateStart: string = `${dayStart}.${monthStart}.${yearStart}`;
-    let fullDateEnd: string = `${dayEnd}.${monthEnd}.${yearEnd}`;
+    let fullDateStart = `${dayStart}.${monthStart}.${yearStart}`;
+    let fullDateEnd = `${dayEnd}.${monthEnd}.${yearEnd}`;
 
-    let fullDate: string = "Duration: " + fullDateStart + " - " + fullDateEnd;
+    let fullDate = "Duration: " + fullDateStart + " - " + fullDateEnd;
 
-    let dateNow: Date = new Date();
+    let dateNow = new Date();
     $isEnded = dateNow > dateEnd ? true : false;
 
     return fullDate;
   }
 
-  let width: number;
-  let optionsContainer: HTMLDivElement;
+  let width;
+  let optionsContainer;
   function resizeOptions() {
-    const optionsCounter: number =
+    const optionsCounter =
       DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyOptions.length;
     if (width >= 600) {
       if (optionsCounter >= 5) {
@@ -126,10 +126,10 @@
     }
   }
 
-  let classMatch: boolean;
-  let classValidation: HTMLParagraphElement;
-  let className: string;
-  function selectOption(this: any) {
+  let classMatch;
+  let classValidation;
+  let className;
+  function selectOption() {
     if ($isEnded === false && selectedNFTs.length > 0) {
       // class validation
       if (this.dataset.class) {
@@ -154,7 +154,7 @@
       this.style.color = "#33E2E6";
       this.style.textShadow = "0 0 3px #33E2E6";
       this.style.listStyleType = "disc";
-      optionsContainer.childNodes.forEach((option: any) => {
+      optionsContainer.childNodes.forEach((option) => {
         if (option.id != this.id) {
           option.style.textShadow = "none";
           option.style.listStyleType = "circle";
@@ -178,26 +178,24 @@
 
     //voting contract
     if (selectedNFTs.length == 1) {
-      const potentialNumber: number = selectedNFTs[0].name.slice(
+      const potentialNumber = selectedNFTs[0].name.slice(
         selectedNFTs[0].name.slice().length - 3
       );
       await (
         await contract()
       ).singleVote(nodeNumber, potentialNumber, selectedOption);
     } else {
-      const potentialNumbers: number[] = [];
+      const potentialNumbers = [];
       selectedNFTs.map((nft) => {
         potentialNumbers.push(nft.name.slice(nft.name.slice().length - 3));
       });
-      const options: number[] = new Array(potentialNumbers.length).fill(
-        selectedOption
-      );
+      const options = new Array(potentialNumbers.length).fill(selectedOption);
       await (await contract()).batchVote(nodeNumber, potentialNumbers, options);
     }
 
     //inactive potentials with NO contract
     selectedNFTs.map((nft) => inactiveNFTs.push(nft));
-    $_inactivePotentials = inactiveNFTs as never[];
+    $_inactivePotentials = inactiveNFTs;
 
     $_potentials = [];
     $_option = null;
@@ -250,7 +248,7 @@
         </button>
       {/if}
       {#if mobileTextVisibility}
-        {#each storyNode.text as paragraph}
+        {#each storyNode.text ?? [] as paragraph}
           <p class="text-paragraph">{paragraph}</p>
         {/each}
       {/if}
@@ -259,7 +257,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
     a11y-no-static-element-interactions -->
     <div class="options" bind:this={optionsContainer}>
-      {#each storyNode.options as option, index}
+      {#each storyNode.options ?? [] as option, index}
         <div
           class="option"
           id={(index + 1).toString()}
