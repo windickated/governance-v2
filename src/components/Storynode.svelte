@@ -68,15 +68,7 @@
   _potentials.subscribe((array) => (selectedNFTs = array));
   _inactivePotentials.subscribe((array) => (inactiveNFTs = array));
 
-  interface Node {
-    title: string;
-    duration: string;
-    video: string;
-    text: string[];
-    options: Array<any>;
-  }
-
-  $: storyNode = <Node>{
+  $: storyNode = {
     title: nodeNumber
       ? DischordianSaga[seasonNumber - 1][nodeNumber - 1].storyTitle
       : "",
