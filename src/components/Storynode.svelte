@@ -98,7 +98,9 @@
     <div
       class="options"
       style="
-        font-size: {optionsCounter >= 5 ? `${10 / optionsCounter}vw` : '2.5vw'}
+        font-size: {width > 600 && optionsCounter >= 5
+        ? `${10 / optionsCounter}vw`
+        : '2.5vw'}
       "
     >
       {#each $story.options as option, index}

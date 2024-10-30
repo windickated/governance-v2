@@ -1,6 +1,8 @@
 <script lang="ts">
   import { allStories, story, season, episode } from "../stores/storyNode.ts";
 
+  //  NFTs
+
   // EPISODES
   let episodes: HTMLDivElement;
 
@@ -17,7 +19,6 @@
     const episodeContainer =
       target.localName === "div" ? target : target.parentElement;
     $episode = Number(episodeContainer?.id);
-
     resetEpisodes();
     episodeContainer!.style.color = "#010020";
     episodeContainer!.style.filter =
