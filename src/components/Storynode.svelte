@@ -44,7 +44,7 @@
   };
 </script>
 
-<svelte:window bind:outerWidth={width} />
+<svelte:window bind:innerWidth={width} />
 
 <section class="story-node-wraper">
   <div class="legend">

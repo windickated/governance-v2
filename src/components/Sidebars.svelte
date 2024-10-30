@@ -1,7 +1,55 @@
 <script lang="ts">
   import { allStories, story, season, episode } from "../stores/storyNode.ts";
+  import {
+    NFT,
+    potentials,
+    selectedNFTs,
+    inactiveNFTs,
+  } from "../stores/NFTs.ts";
+  import { isLogged } from "../stores/auth.ts";
 
   //  NFTs
+  let walletContainer: HTMLDivElement;
+  let walletLegend: HTMLParagraphElement;
+  let wallet: HTMLParagraphElement;
+  let walletButton: HTMLButtonElement;
+  let networkSwitcher: HTMLButtonElement;
+
+  let walletAddress: string;
+
+  let nftTiles: HTMLDivElement;
+
+  function connectWallet() {
+    if (!$isLogged) {
+      $isLogged = true;
+      getNFTs();
+      walletAddress = "0x613f...bc2d";
+      networkSwitcher.style.display = "none";
+      walletButton.style.display = "block";
+      walletButton.innerHTML = "Disconect";
+      walletLegend.style.display = "none";
+      wallet.style.display = "block";
+    } else {
+      $isLogged = false;
+      $potentials = [];
+      walletButton.innerHTML = "Log in";
+      walletLegend.style.display = "block";
+      wallet.style.display = "none";
+    }
+  }
+
+  async function getNFTs() {
+    const testNftNumbers = [2, 4, 35, 436, 474, 585, 697];
+    const metadata: any[] = [];
+    for (let i in testNftNumbers) {
+      const response = await fetch(
+        `https://api.degenerousdao.com/nft/data/${testNftNumbers[i]}`
+      );
+      metadata[i] = await response.json();
+      $potentials[i] = new NFT(metadata, Number(i));
+    }
+    console.log($potentials);
+  }
 
   // EPISODES
   let episodes: HTMLDivElement;
@@ -309,13 +357,82 @@
   on:click={handleNFTsBar}
 ></span>
 
-<div class="nft-bar" bind:this={nftBar}></div>
+<div class="nft-bar" bind:this={nftBar}>
+  <div
+    class="wallet-container"
+    bind:this={walletContainer}
+    style="
+    background-color: {$isLogged
+      ? 'rgba(22, 30, 95, 0.75)'
+      : 'rgba(51, 226, 230, 0.5)'};
+    filter: {$isLogged
+      ? 'drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.2))'
+      : 'drop-shadow(0 0 1vw rgba(51, 226, 230, 0.5))'}
+  "
+  >
+    <p class="wallet-legend" bind:this={walletLegend}>Connect Web3 Wallet:</p>
+    <p class="wallet" bind:this={wallet}>{walletAddress}</p>
+    <button
+      class="wallet-connect"
+      bind:this={walletButton}
+      style="
+        background-color: {$isLogged ? 'rgba(51, 226, 230, 0.9)' : '#161E5F'};
+        color: {$isLogged ? '#010020' : '#33E2E6'}
+      "
+      on:click={connectWallet}
+    >
+      Log in
+    </button>
+    <button class="switch-network" bind:this={networkSwitcher}>
+      Switch network
+    </button>
+  </div>
+
+  {#if $isLogged}
+    <div class="nfts-legend">
+      <p class="nfts-total">
+        Total NFTs: {$potentials.length}
+      </p>
+      <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
+    </div>
+    {#if $potentials.length > 0}
+      <div class="nfts-container" bind:this={nftTiles}>
+        {#each $potentials as NFT}
+          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
+        a11y-no-static-element-interactions -->
+          <div class="nft" id={NFT.id.toString()}>
+            <img class="nft-image" src={NFT.image} alt={NFT.name} />
+            <p class="nft-name">{NFT.name}</p>
+            <p class="nft-class">{NFT.class}</p>
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <p class="no-nfts-title">
+        You need to have a <a
+          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+          >Potential</a
+        > to be able to vote.
+      </p>
+    {/if}
+  {/if}
+</div>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
 a11y-no-static-element-interactions -->
 <div class="bg" on:click={closeActiveTab} bind:this={BG}></div>
 
 <style>
+  button {
+    transition: all 0.15s ease-in-out;
+  }
+
+  button:hover,
+  button:active {
+    opacity: 0.9;
+    transform: scale(1.025);
+  }
+
   .nft-icon {
     position: fixed;
     z-index: 21;
@@ -438,6 +555,7 @@ a11y-no-static-element-interactions -->
     border: 0.05vw solid #33e2e6;
     border-radius: 1.5vw;
     cursor: pointer;
+    transition: all 0.15s ease-in-out;
   }
 
   .episode-image {
@@ -468,6 +586,7 @@ a11y-no-static-element-interactions -->
 
   .episode:hover {
     background-color: rgba(51, 226, 230, 0.5);
+    transform: scale(1.01);
   }
 
   /* NFTs bar */
@@ -573,11 +692,12 @@ a11y-no-static-element-interactions -->
     align-items: center;
     justify-content: space-between;
     filter: drop-shadow(0 0 0.1vw #010020);
+    transition: all 0.15s ease-in-out;
   }
 
   .nft:hover,
   .nft:active {
-    opacity: 0.9;
+    transform: scale(1.025);
   }
 
   .nft-image {
