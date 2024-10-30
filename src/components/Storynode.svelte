@@ -98,11 +98,7 @@
     <div
       class="options"
       style="
-        font-size: {width > 600
-        ? optionsCounter >= 5
-          ? `${10 / optionsCounter}vw`
-          : '2.5vw'
-        : '1.1em'}
+        font-size: {optionsCounter >= 5 ? `${10 / optionsCounter}vw` : '2.5vw'}
       "
     >
       {#each $story.options as option, index}
@@ -414,7 +410,7 @@
       top: auto;
       width: 91vw;
       height: auto;
-      font-size: 1.1em;
+      font-size: 1.1em !important;
       white-space: wrap;
       margin-left: -2vw;
       margin-bottom: 4vw;
