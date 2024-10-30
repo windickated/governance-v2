@@ -10,7 +10,6 @@
 
   let width: number;
   let mobileTextVisibility: boolean = false;
-  let optionsContainer: HTMLDivElement;
   $: optionsCounter = $story ? $story.options.length : 0;
 
   onMount(() => {
@@ -19,37 +18,30 @@
 
   $: if ($season && $episode) $story = new StoryNode($season, $episode);
 
-  $: if (optionsContainer) {
-    optionsContainer.childNodes.forEach((node: ChildNode | null) => {
-      const option = node as HTMLDivElement;
-      const optionSelector = option.childNodes[0] as HTMLImageElement;
-      option.addEventListener("pointerover", () => {
-        option.style.textShadow = "0 0 3px #33E2E6";
-        option.style.listStyleType = "disc";
-        option.style.color = "#33E2E6";
-        if (!option.dataset.class)
-          optionSelector.src = "/option-selector-hover.png";
-      });
-      option.addEventListener("pointerout", () => {
-        option.style.textShadow = "none";
-        option.style.listStyleType = "circle";
-        option.style.color = "inherit";
-        if (option.dataset.class) {
-          optionSelector.src = `/${option.dataset.class}.png`;
-        } else {
-          optionSelector.src = "/option-selector.png";
-        }
-      });
-      // option.style.textShadow = "none";
-      // option.style.listStyleType = "circle";
-      // option.style.color = "inherit";
-      // if (option.dataset.class) {
-      //   optionSelector.src = `/${option.dataset.class}.png`;
-      // } else {
-      //   optionSelector.src = "/option-selector.png";
-      // }
-    });
-  }
+  const hoverOption = (event: Event) => {
+    const target = event.target as HTMLElement;
+    const option = target.localName === "div" ? target : target.parentElement;
+    const optionSelector = option?.childNodes[0] as HTMLImageElement;
+    option!.style.textShadow = "0 0 3px #33E2E6";
+    option!.style.listStyleType = "disc";
+    option!.style.color = "#33E2E6";
+    if (!option?.dataset.class)
+      optionSelector.src = "/option-selector-hover.png";
+  };
+
+  const unhoverOption = (event: Event) => {
+    const target = event.target as HTMLElement;
+    const option = target.localName === "div" ? target : target.parentElement;
+    const optionSelector = option?.childNodes[0] as HTMLImageElement;
+    option!.style.textShadow = "none";
+    option!.style.listStyleType = "circle";
+    option!.style.color = "inherit";
+    if (option?.dataset.class) {
+      optionSelector.src = `/${option.dataset.class}.png`;
+    } else {
+      optionSelector.src = "/option-selector.png";
+    }
+  };
 </script>
 
 <svelte:window bind:outerWidth={width} />
@@ -105,7 +97,6 @@
 
     <div
       class="options"
-      bind:this={optionsContainer}
       style="
         font-size: {width > 600
         ? optionsCounter >= 5
@@ -119,6 +110,8 @@
           class="option"
           id={(index + 1).toString()}
           data-class={option.class}
+          on:pointerover={hoverOption}
+          on:pointerout={unhoverOption}
         >
           <img
             class="option-selector"
@@ -129,7 +122,7 @@
               (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
             "
           />
-          <p>{option.option}</p>
+          {option.option}
         </div>
       {/each}
     </div>
@@ -324,13 +317,6 @@
     background-position: center;
     background-size: contain;
     opacity: 0.9;
-  }
-
-  .option:hover,
-  .option:active {
-    color: #33e2e6;
-    text-shadow: 0 0 3px #33e2e6;
-    list-style-type: disc;
   }
 
   .voting-ended {
