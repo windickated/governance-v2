@@ -1,6 +1,6 @@
 <script lang="ts">
   import { displayScreen } from "../data/buttons.ts";
-  import { option } from "../stores/storyNode.ts";
+  import { selectedOption } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
 
@@ -21,7 +21,8 @@
   };
 
   // Vote button
-  $: voteIsInactive = $option && $selectedNFTs.length > 0 ? false : true; // TRUE prohibits voting
+  $: voteIsInactive =
+    $selectedOption && $selectedNFTs.length > 0 ? false : true; // TRUE prohibits voting
   let voteButtonState: boolean = true;
   let voteButtonHover: boolean = false;
 

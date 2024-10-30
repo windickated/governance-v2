@@ -4,7 +4,7 @@
     story,
     season,
     episode,
-    option,
+    selectedOption,
     votingEnded,
   } from "../stores/storyNode.ts";
   import {
@@ -15,6 +15,7 @@
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
+  import handleNftTiles from "../utils/nftTiles.ts";
 
   //  NFTs
   let walletContainer: HTMLDivElement;
@@ -58,28 +59,27 @@
     }
   }
 
-  const selectNFT = (event: Event) => {
+  function selectNFT(event: Event) {
     if (votingEnded) return;
-    const target = event.target as HTMLElement;
-    const nftTile = target.localName === "div" ? target : target.parentElement;
+    const target = event.target as HTMLDivElement;
+    const nftTile =
+      target.localName === "div"
+        ? target
+        : (target.parentElement as HTMLDivElement);
     $potentials.map((potential) => {
       if (potential.id.toString() === nftTile?.id) {
         potential.selected = !potential.selected;
         if (potential.selected) {
           $selectedNFTs.push(potential);
           $selectedNFTs = $selectedNFTs; // for Count re-render
-          nftTile.style.backgroundColor = "#2441BD";
-          nftTile.style.filter = "drop-shadow(0 0 0.5vw rgba(51, 226, 230, 1))";
-          nftTile.style.color = "#33E2E6";
+          handleNftTiles.focus(nftTile);
         } else {
           $selectedNFTs = $selectedNFTs.filter((nft) => nft !== potential);
-          nftTile.style.backgroundColor = "rgba(22, 30, 95, 0.75)";
-          nftTile.style.filter = "drop-shadow(0 0 0.1vw #010020)";
-          nftTile.style.color = "inherit";
+          handleNftTiles.blur(nftTile);
         }
       }
     });
-  };
+  }
 
   // EPISODES
   let episodes: HTMLDivElement;
@@ -93,9 +93,11 @@
   };
 
   const switchEpisode = (event: Event) => {
-    const target = event.target as HTMLElement;
+    const target = event.target as HTMLDivElement;
     const episodeContainer =
-      target.localName === "div" ? target : target.parentElement;
+      target.localName === "div"
+        ? target
+        : (target.parentElement as HTMLDivElement);
     $episode = Number(episodeContainer?.id);
     resetEpisodes();
     episodeContainer!.style.color = "#010020";

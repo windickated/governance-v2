@@ -1,7 +1,7 @@
-import { option } from "../stores/storyNode";
+import { selectedOption } from "../stores/storyNode";
 
 let _option: number | null;
-option.subscribe((nr) => _option = nr);
+selectedOption.subscribe((nr) => _option = nr);
 
 const handleOptions = {
   focus: (div: HTMLDivElement, img: HTMLImageElement) => {
@@ -21,7 +21,7 @@ const handleOptions = {
     }
   },
   reset: (state: number | null) => {
-    option.set(state);
+    selectedOption.set(state);
     Array.from(document.querySelectorAll(".option")).forEach((div: any) => {
       const img = div.children[0];
       if (_option !== Number(div.id)) handleOptions.blur(div, img);

@@ -24,7 +24,7 @@ export const story = writable<StoryNode | null>(null)
 
 export const season = writable<number>(1);
 export const episode = writable<number | null>(null);
-export const option = writable<number | null>(null);
+export const selectedOption = writable<number | null>(null);
 export let votingEnded: boolean = true;
 
 function getStoryDate(story: any): string {
