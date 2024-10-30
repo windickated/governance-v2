@@ -1,5 +1,8 @@
 <script lang="ts">
   import { displayScreen } from "../data/buttons.ts";
+  import { option } from "../stores/storyNode.ts";
+  import { selectedNFTs } from "../stores/NFTs.ts";
+  import vote from "../utils/vote.ts";
 
   // Format button
   let formatButtonState: boolean = true; // video on, text off
@@ -18,14 +21,15 @@
   };
 
   // Vote button
-  let voteIsInactive: boolean = true; // TRUE prohibits voting
+  $: voteIsInactive = $option && $selectedNFTs.length > 0 ? false : true; // TRUE prohibits voting
   let voteButtonState: boolean = true;
   let voteButtonHover: boolean = false;
 
-  const voteHandle = (event: Event) => {
+  const voteButtonHandle = (event: Event) => {
     if (!voteIsInactive && voteButtonState) {
       if (event.type === "click") {
         voteButtonState = !voteButtonState;
+        vote();
       } else if (event.type === "pointerover" || event.type === "pointerout") {
         voteButtonHover = !voteButtonHover;
       }
@@ -90,9 +94,9 @@
       class="vote"
       role="button"
       tabindex="0"
-      on:click={voteHandle}
-      on:pointerover={voteHandle}
-      on:pointerout={voteHandle}
+      on:click={voteButtonHandle}
+      on:pointerover={voteButtonHandle}
+      on:pointerout={voteButtonHandle}
     >
       <img
         class="vote-btn {!voteIsInactive

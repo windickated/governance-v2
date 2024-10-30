@@ -17,7 +17,7 @@ export class NFT {
   }
 }
 
-export let potentials = writable<NFT[]>([]);
+export const potentials = writable<NFT[]>([]);
 
-export let selectedNFTs = writable<NFT[]>([]);
-export let inactiveNFTs = writable<NFT[]>([]);
+export const selectedNFTs = writable<NFT[]>([]);
+export const inactiveNFTs = writable<NFT[]>([]);

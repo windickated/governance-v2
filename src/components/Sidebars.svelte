@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { allStories, story, season, episode } from "../stores/storyNode.ts";
+  import {
+    allStories,
+    story,
+    season,
+    episode,
+    option,
+    votingEnded,
+  } from "../stores/storyNode.ts";
   import {
     NFT,
     potentials,
@@ -7,6 +14,7 @@
     inactiveNFTs,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
+  import handleOptions from "../utils/options.ts";
 
   //  NFTs
   let walletContainer: HTMLDivElement;
@@ -48,8 +56,30 @@
       metadata[i] = await response.json();
       $potentials[i] = new NFT(metadata, Number(i));
     }
-    console.log($potentials);
   }
+
+  const selectNFT = (event: Event) => {
+    if (votingEnded) return;
+    const target = event.target as HTMLElement;
+    const nftTile = target.localName === "div" ? target : target.parentElement;
+    $potentials.map((potential) => {
+      if (potential.id.toString() === nftTile?.id) {
+        potential.selected = !potential.selected;
+        if (potential.selected) {
+          $selectedNFTs.push(potential);
+          $selectedNFTs = $selectedNFTs; // for Count re-render
+          nftTile.style.backgroundColor = "#2441BD";
+          nftTile.style.filter = "drop-shadow(0 0 0.5vw rgba(51, 226, 230, 1))";
+          nftTile.style.color = "#33E2E6";
+        } else {
+          $selectedNFTs = $selectedNFTs.filter((nft) => nft !== potential);
+          nftTile.style.backgroundColor = "rgba(22, 30, 95, 0.75)";
+          nftTile.style.filter = "drop-shadow(0 0 0.1vw #010020)";
+          nftTile.style.color = "inherit";
+        }
+      }
+    });
+  };
 
   // EPISODES
   let episodes: HTMLDivElement;
@@ -74,6 +104,7 @@
   };
 
   function resetEpisodes() {
+    handleOptions.reset(null);
     Array.from(episodes.children).forEach((node: ChildNode) => {
       const episode = node as HTMLDivElement;
       episode.style.color = "inherit";
@@ -400,7 +431,7 @@
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
         a11y-no-static-element-interactions -->
-          <div class="nft" id={NFT.id.toString()}>
+          <div class="nft" id={NFT.id.toString()} on:click={selectNFT}>
             <img class="nft-image" src={NFT.image} alt={NFT.name} />
             <p class="nft-name">{NFT.name}</p>
             <p class="nft-class">{NFT.class}</p>

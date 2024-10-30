@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
-  import { allStories, season, episode } from "../stores/storyNode.ts";
+  import { allStories, season, episode, option } from "../stores/storyNode.ts";
+  import handleOptions from "../utils/options.ts";
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
@@ -68,10 +69,16 @@
             );
             break;
           case "back":
-            if ($episode && $episode !== 1) $episode--;
+            if ($episode && $episode !== 1) {
+              $episode--;
+              handleOptions.reset(null);
+            }
             break;
           case "forward":
-            if ($episode && $episode !== allStories[$season - 1].length) $episode++;
+            if ($episode && $episode !== allStories[$season - 1].length) {
+              $episode++;
+              handleOptions.reset(null);
+            }
             break;
         }
       }, 150);

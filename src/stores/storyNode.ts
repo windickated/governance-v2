@@ -27,11 +27,6 @@ export const episode = writable<number | null>(null);
 export const option = writable<number | null>(null);
 export let votingEnded: boolean = true;
 
-export const lastNodeNumber: number[] = [
-  DischordianSaga[0].length,
-  DischordianSaga[1].length
-] // for each season
-
 function getStoryDate(story: any): string {
   let dateStart: Date = new Date(story.storyDuration[0]);
   let dateEnd: Date = new Date(story.storyDuration[1]);

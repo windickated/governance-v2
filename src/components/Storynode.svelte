@@ -5,8 +5,10 @@
     StoryNode,
     season,
     episode,
+    option,
     votingEnded,
   } from "../stores/storyNode.ts";
+  import handleOptions from "../utils/options.ts";
 
   let width: number;
   let mobileTextVisibility: boolean = false;
@@ -18,30 +20,49 @@
 
   $: if ($season && $episode) $story = new StoryNode($season, $episode);
 
-  const hoverOption = (event: Event) => {
-    const target = event.target as HTMLElement;
-    const option = target.localName === "div" ? target : target.parentElement;
-    const optionSelector = option?.childNodes[0] as HTMLImageElement;
-    option!.style.textShadow = "0 0 3px #33E2E6";
-    option!.style.listStyleType = "disc";
-    option!.style.color = "#33E2E6";
-    if (!option?.dataset.class)
-      optionSelector.src = "/option-selector-hover.png";
-  };
+  function selectOption(event: Event) {
+    const target = event.target as HTMLDivElement;
+    const optionContainer =
+      target.localName === "div"
+        ? target
+        : (target.parentElement as HTMLDivElement);
+    const optionSelector = optionContainer?.children[0] as HTMLImageElement;
+    const optionID = Number(optionContainer?.id);
+    if ($option === optionID) return;
 
-  const unhoverOption = (event: Event) => {
-    const target = event.target as HTMLElement;
-    const option = target.localName === "div" ? target : target.parentElement;
-    const optionSelector = option?.childNodes[0] as HTMLImageElement;
-    option!.style.textShadow = "none";
-    option!.style.listStyleType = "circle";
-    option!.style.color = "inherit";
-    if (option?.dataset.class) {
-      optionSelector.src = `/${option.dataset.class}.png`;
-    } else {
-      optionSelector.src = "/option-selector.png";
+    if (event.type === "pointerover")
+      handleOptions.focus(optionContainer, optionSelector);
+    if (event.type === "pointerout")
+      handleOptions.blur(optionContainer, optionSelector);
+    if (event.type === "click") {
+      handleOptions.reset(optionID);
     }
-  };
+  }
+
+  // const focusOption = (div: HTMLDivElement, img: HTMLImageElement) => {
+  //   div.style.textShadow = "0 0 3px #33E2E6";
+  //   div.style.listStyleType = "disc";
+  //   div.style.color = "#33E2E6";
+  //   if (!div.dataset.class) img.src = "/option-selector-hover.png";
+  // };
+
+  // const blurOption = (div: HTMLDivElement, img: HTMLImageElement) => {
+  //   div.style.textShadow = "none";
+  //   div.style.listStyleType = "circle";
+  //   div.style.color = "inherit";
+  //   if (div.dataset.class) {
+  //     img.src = `/${div.dataset.class}.png`;
+  //   } else {
+  //     img.src = "/option-selector.png";
+  //   }
+  // };
+
+  // const resetOptions = () => {
+  //   Array.from(document.querySelectorAll(".option")).forEach((div: any) => {
+  //     const img = div.children[0];
+  //     if ($option !== Number(div.id)) blurOption(div, img);
+  //   });
+  // };
 </script>
 
 <svelte:window bind:innerWidth={width} />
@@ -103,13 +124,17 @@
         : '2.5vw'}
       "
     >
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       {#each $story.options as option, index}
         <div
           class="option"
+          role="button"
+          tabindex="0"
           id={(index + 1).toString()}
           data-class={option.class}
-          on:pointerover={hoverOption}
-          on:pointerout={unhoverOption}
+          on:pointerover={selectOption}
+          on:pointerout={selectOption}
+          on:click={selectOption}
         >
           <img
             class="option-selector"
