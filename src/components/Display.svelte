@@ -28,8 +28,13 @@
   let formatButtonState: boolean = true; // video on, text off
   let formatButtonHover: boolean = false;
   const switcherHandle = (event: Event) => {
+    const storyText: HTMLDivElement | null = document.querySelector(".text");
+    const storyVideo: HTMLIFrameElement | null =
+      document.querySelector(".video");
     if (event.type === "click") {
       formatButtonState = !formatButtonState;
+      storyText?.classList.toggle("visible");
+      storyVideo?.classList.toggle("visible");
     } else if (event.type === "pointerover" || event.type === "pointerout") {
       formatButtonHover = !formatButtonHover;
     }

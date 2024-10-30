@@ -1,99 +1,47 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import DischordianSaga from "../data/DischordianSaga";
+  import {
+    story,
+    StoryNode,
+    season,
+    episode,
+    votingEnded,
+  } from "../stores/storyNode.ts";
 
   let width: number;
   let mobileTextVisibility: boolean = false;
   let optionsContainer: HTMLDivElement;
-  let votingEnded: boolean;
-
-  class StoryNode {
-    title: string;
-    duration: string;
-    video: string;
-    text: string[];
-    options: {
-      class: string;
-      option: string;
-    }[];
-    constructor(story: any) {
-      this.title = story.storyTitle;
-      this.duration = getStoryDate(story);
-      this.video = `https://www.youtube.com/embed/${story.videoLink}`;
-      this.text = story.storyText;
-      this.options = story.storyOptions;
-    }
-  }
-
-  const season = 1;
-  const episode = 11;
-  const testNode = DischordianSaga[season - 1][episode - 1];
-
-  const storyNode = new StoryNode(testNode);
+  $: optionsCounter = $story ? $story.options.length : 0;
 
   onMount(() => {
-    resizeOptions();
+    if (width > 600) mobileTextVisibility = true;
+    $story = new StoryNode($season, $episode);
   });
-
-  function getStoryDate(story: any): string {
-    let dateStart: Date = new Date(story.storyDuration[0]);
-    let dateEnd: Date = new Date(story.storyDuration[1]);
-
-    let dayStart: string = ("0" + dateStart.getDate()).slice(-2);
-    let dayEnd: string = ("0" + dateEnd.getDate()).slice(-2);
-    let monthStart: string = ("0" + (dateStart.getMonth() + 1)).slice(-2);
-    let monthEnd: string = ("0" + (dateEnd.getMonth() + 1)).slice(-2);
-    let yearStart: number = dateStart.getFullYear();
-    let yearEnd: number = dateEnd.getFullYear();
-
-    let fullDateStart: string = `${dayStart}.${monthStart}.${yearStart}`;
-    let fullDateEnd: string = `${dayEnd}.${monthEnd}.${yearEnd}`;
-
-    let fullDate: string = "Duration: " + fullDateStart + " - " + fullDateEnd;
-
-    let dateNow: Date = new Date();
-    votingEnded = dateNow > dateEnd ? true : false;
-
-    return fullDate;
-  }
-
-  function resizeOptions() {
-    const optionsCounter: number = storyNode.options.length;
-    if (width >= 600) {
-      if (optionsCounter >= 5) {
-        optionsContainer.style.fontSize = `${10 / optionsCounter}vw`;
-      } else {
-        optionsContainer.style.fontSize = "2.5vw";
-      }
-    } else {
-      optionsContainer.style.fontSize = "1.1em";
-    }
-  }
 </script>
 
 <svelte:window bind:outerWidth={width} />
 
 <section class="story-node-wraper">
-  <iframe
-    src={storyNode.video}
-    class="video visible"
-    title="YouTube"
-    allowfullscreen
-  ></iframe>
-
   <div class="legend">
-    {#if storyNode}
-      <h1 class="header">{storyNode.title}</h1>
+    {#if $story}
+      <h1 class="header">{$story.title}</h1>
       <h1 class="season-episode-number">
-        The Dischordian Saga: Season {season} - Episode {episode}
+        The Dischordian Saga: Season {$season} - Episode {$episode}
       </h1>
-      <h2 class="duration">{storyNode.duration}</h2>
+      <h2 class="duration">{$story.duration}</h2>
     {:else}
       <h1 class="empty-header">Select any episode from the tab</h1>
     {/if}
   </div>
 
-  {#if storyNode}
+  {#if $story}
+    <iframe
+      src={$story.video}
+      class="video visible"
+      title="YouTube"
+      allowfullscreen
+    ></iframe>
+
     <div class="text">
       {#if width <= 600}
         <button
@@ -116,14 +64,24 @@
         </button>
       {/if}
       {#if mobileTextVisibility}
-        {#each storyNode.text as paragraph}
+        {#each $story.text as paragraph}
           <p class="text-paragraph">{paragraph}</p>
         {/each}
       {/if}
     </div>
 
-    <div class="options" bind:this={optionsContainer}>
-      {#each storyNode.options as option, index}
+    <div
+      class="options"
+      bind:this={optionsContainer}
+      style="
+        font-size: {width > 600
+        ? optionsCounter >= 5
+          ? `${10 / optionsCounter}vw`
+          : '2.5vw'
+        : '1.1em'}
+      "
+    >
+      {#each $story.options as option, index}
         <div
           class="option"
           id={(index + 1).toString()}
