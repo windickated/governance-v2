@@ -30,7 +30,10 @@
     if (!voteIsInactive && voteButtonState) {
       if (event.type === "click") {
         voteButtonState = !voteButtonState;
-        vote();
+        setTimeout(() => {
+          voteButtonState = !voteButtonState;
+          vote();
+        }, 300);
       } else if (event.type === "pointerover" || event.type === "pointerout") {
         voteButtonHover = !voteButtonHover;
       }

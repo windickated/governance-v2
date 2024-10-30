@@ -17,7 +17,42 @@
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
 
-  //  NFTs
+  /* --- EPISODES --- */
+
+  let episodes: HTMLDivElement;
+
+  const switchSeason = (event: Event) => {
+    const seasonSelector = event.target as HTMLSelectElement;
+    $season = Number(seasonSelector?.value);
+    $episode = null;
+    $story = null;
+    resetEpisodes();
+  };
+
+  const switchEpisode = (event: Event) => {
+    const target = event.target as HTMLDivElement;
+    const episodeContainer =
+      target.localName === "div"
+        ? target
+        : (target.parentElement as HTMLDivElement);
+    $episode = Number(episodeContainer?.id);
+    resetEpisodes();
+    episodeContainer!.style.color = "#010020";
+    episodeContainer!.style.filter =
+      "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
+  };
+
+  function resetEpisodes() {
+    handleOptions.reset(null);
+    Array.from(episodes.children).forEach((node: ChildNode) => {
+      const episode = node as HTMLDivElement;
+      episode.style.color = "inherit";
+      episode.style.filter = "none";
+    });
+  }
+
+  /* --- NFTs --- */
+
   let walletContainer: HTMLDivElement;
   let walletLegend: HTMLParagraphElement;
   let wallet: HTMLParagraphElement;
@@ -78,39 +113,6 @@
           handleNftTiles.blur(nftTile);
         }
       }
-    });
-  }
-
-  // EPISODES
-  let episodes: HTMLDivElement;
-
-  const switchSeason = (event: Event) => {
-    const seasonSelector = event.target as HTMLSelectElement;
-    $season = Number(seasonSelector?.value);
-    $episode = null;
-    $story = null;
-    resetEpisodes();
-  };
-
-  const switchEpisode = (event: Event) => {
-    const target = event.target as HTMLDivElement;
-    const episodeContainer =
-      target.localName === "div"
-        ? target
-        : (target.parentElement as HTMLDivElement);
-    $episode = Number(episodeContainer?.id);
-    resetEpisodes();
-    episodeContainer!.style.color = "#010020";
-    episodeContainer!.style.filter =
-      "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
-  };
-
-  function resetEpisodes() {
-    handleOptions.reset(null);
-    Array.from(episodes.children).forEach((node: ChildNode) => {
-      const episode = node as HTMLDivElement;
-      episode.style.color = "inherit";
-      episode.style.filter = "none";
     });
   }
 
