@@ -411,7 +411,7 @@
       width: 91vw;
       height: auto;
       font-size: 1.1em !important;
-      white-space: wrap;
+      white-space: wrap !important;
       margin-left: -2vw;
       margin-bottom: 4vw;
       padding-top: 2vw;
