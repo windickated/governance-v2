@@ -15,8 +15,41 @@
 
   onMount(() => {
     if (width > 600) mobileTextVisibility = true;
-    $story = new StoryNode($season, $episode);
   });
+
+  $: if ($season && $episode) $story = new StoryNode($season, $episode);
+
+  $: if (optionsContainer) {
+    optionsContainer.childNodes.forEach((node: ChildNode | null) => {
+      const option = node as HTMLDivElement;
+      const optionSelector = option.childNodes[0] as HTMLImageElement;
+      option.addEventListener("pointerover", () => {
+        option.style.textShadow = "0 0 3px #33E2E6";
+        option.style.listStyleType = "disc";
+        option.style.color = "#33E2E6";
+        if (!option.dataset.class)
+          optionSelector.src = "/option-selector-hover.png";
+      });
+      option.addEventListener("pointerout", () => {
+        option.style.textShadow = "none";
+        option.style.listStyleType = "circle";
+        option.style.color = "inherit";
+        if (option.dataset.class) {
+          optionSelector.src = `/${option.dataset.class}.png`;
+        } else {
+          optionSelector.src = "/option-selector.png";
+        }
+      });
+      // option.style.textShadow = "none";
+      // option.style.listStyleType = "circle";
+      // option.style.color = "inherit";
+      // if (option.dataset.class) {
+      //   optionSelector.src = `/${option.dataset.class}.png`;
+      // } else {
+      //   optionSelector.src = "/option-selector.png";
+      // }
+    });
+  }
 </script>
 
 <svelte:window bind:outerWidth={width} />
@@ -91,6 +124,10 @@
             class="option-selector"
             src={option.class ? `/${option.class}.png` : "/option-selector.png"}
             alt="selector"
+            style="
+              height: {width > 600 &&
+              (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
+            "
           />
           <p>{option.option}</p>
         </div>
@@ -313,7 +350,7 @@
     -webkit-text-stroke: 0.2vw rgba(0, 255, 0, 0.1);
   }
 
-  .class-validation {
+  /* .class-validation {
     opacity: 0;
     position: fixed;
     text-align: center;
@@ -326,11 +363,11 @@
     filter: drop-shadow(0 0 0.5vw rgb(0, 0, 0));
     pointer-events: none;
     transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
-  }
+  } */
 
-  .class-validation strong {
+  /* .class-validation strong {
     color: rgba(255, 55, 55, 0.9);
-  }
+  } */
 
   @media screen and (max-width: 600px) {
     .video {
@@ -424,9 +461,9 @@
       margin-bottom: 0;
     }
 
-    .class-validation {
+    /* .class-validation {
       font-size: 1.5em;
       line-height: 1.5em;
-    }
+    } */
   }
 </style>

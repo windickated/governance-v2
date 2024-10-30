@@ -11,20 +11,21 @@ export class StoryNode {
     option: string;
   }[];
   constructor(s: number, e: number) {
-    this.title = DischordianSaga[s - 1][e - 1].storyTitle;
-    this.duration = getStoryDate(DischordianSaga[s - 1][e - 1]);
-    this.video = `https://www.youtube.com/embed/${DischordianSaga[s - 1][e - 1].videoLink}`;
-    this.text = DischordianSaga[s - 1][e - 1].storyText;
-    this.options = DischordianSaga[s - 1][e - 1].storyOptions;
+    this.title = allStories[s - 1][e - 1].storyTitle;
+    this.duration = getStoryDate(allStories[s - 1][e - 1]);
+    this.video = `https://www.youtube.com/embed/${allStories[s - 1][e - 1].videoLink}`;
+    this.text = allStories[s - 1][e - 1].storyText;
+    this.options = allStories[s - 1][e - 1].storyOptions;
   }
 }
 
+export const allStories = DischordianSaga;
+export const story = writable<StoryNode | null>(null)
+
 export const season = writable<number>(1);
-export const episode = writable<number>(11);
+export const episode = writable<number | null>(null);
 export const option = writable<number | null>(null);
 export let votingEnded: boolean = true;
-
-export const story = writable<StoryNode | null>(null)
 
 export const lastNodeNumber: number[] = [
   DischordianSaga[0].length,

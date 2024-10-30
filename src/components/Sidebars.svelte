@@ -1,7 +1,32 @@
 <script lang="ts">
-  import DischordianSaga from "../data/DischordianSaga";
+  import { allStories, story, season, episode } from "../stores/storyNode.ts";
 
+  // EPISODES
   let episodes: HTMLDivElement;
+
+  const switchSeason = (event: Event) => {
+    const seasonSelector = event.target as HTMLSelectElement;
+    $season = Number(seasonSelector?.value);
+    $episode = null;
+    $story = null;
+  };
+
+  const switchEpisode = (event: Event) => {
+    const target = event.target as HTMLElement;
+    const episodeContainer =
+      target.localName === "div" ? target : target.parentElement;
+    $episode = Number(episodeContainer?.id);
+
+    Array.from(episodes.children).forEach((node: ChildNode) => {
+      const episode = node as HTMLDivElement;
+      episode.style.color = "inherit";
+      episode.style.filter = "none";
+    });
+
+    episodeContainer!.style.color = "#010020";
+    episodeContainer!.style.filter =
+      "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
+  };
 
   /* --- TABS HANDLING --- */
 
@@ -239,8 +264,8 @@
 
 <div class="episodes-bar" bind:this={episodesBar}>
   <p class="season-title">The Dishordian Saga</p>
-  <select class="season">
-    {#each DischordianSaga as season, number}
+  <select class="season" on:change={switchSeason}>
+    {#each allStories as _, number}
       <option value={number + 1}>
         Season {number + 1}
       </option>
@@ -248,17 +273,19 @@
   </select>
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
   <div class="episodes-container" bind:this={episodes}>
-    {#each DischordianSaga[0] as episode}
+    {#each allStories[$season - 1] as episode}
       <div
         role="button"
         tabindex="0"
         class="episode"
         id={episode.episode.toString()}
+        on:click={switchEpisode}
       >
         <img
           class="episode-image"
           src="https://img.youtube.com/vi/{episode.videoLink}/hqdefault.jpg"
           alt="Episode {episode.episode}"
+          draggable="false"
         />
         <p class="episode-title">{episode.storyTitle}</p>
         <p class="episode-number">Episode {episode.episode}</p>
@@ -436,7 +463,6 @@ a11y-no-static-element-interactions -->
 
   .episode:hover {
     background-color: rgba(51, 226, 230, 0.5);
-    color: #33e2e6;
   }
 
   /* NFTs bar */

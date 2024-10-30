@@ -530,6 +530,14 @@ const DischordianSaga = [
         {
           class: 'Spy',
           option: `Option 5`
+        },
+        {
+          class: 'Engineer',
+          option: `Option 6`
+        },
+        {
+          class: 'Oracle',
+          option: `Option 7`
         }
       ]
     },
