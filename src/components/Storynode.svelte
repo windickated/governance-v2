@@ -11,6 +11,22 @@
   import { selectedNFTs } from "../stores/NFTs.ts";
   import handleOptions from "../utils/options.ts";
   import vote from "../utils/vote.ts";
+  import PopUpMessage from "./PopUpMessage.svelte";
+
+  let showMessage: boolean;
+  let messageNote: string;
+  let X: number;
+  let Y: number;
+
+  const handlePopUpMessage = (event: PointerEvent, note: string) => {
+    showMessage = true;
+    messageNote = note;
+    X = event.clientX;
+    Y = event.clientY;
+    setTimeout(() => {
+      showMessage = false;
+    }, 600);
+  };
 
   let width: number;
   let mobileTextVisibility: boolean = false;
@@ -37,6 +53,13 @@
     if (event.type === "pointerout")
       handleOptions.blur(optionContainer, optionSelector);
     if (event.type === "click") {
+      if (votingEnded) {
+        handlePopUpMessage(
+          event as PointerEvent,
+          "Select an <strong>active</strong> episode to vote!"
+        );
+        return;
+      }
       handleOptions.reset(optionID);
     }
 
@@ -45,6 +68,8 @@
 </script>
 
 <svelte:window bind:innerWidth={width} />
+
+<PopUpMessage {showMessage} {messageNote} {X} {Y} />
 
 <section class="story-node-wraper">
   <div class="legend">
@@ -338,25 +363,6 @@
     -webkit-text-stroke: 0.2vw rgba(0, 255, 0, 0.1);
   }
 
-  /* .class-validation {
-    opacity: 0;
-    position: fixed;
-    text-align: center;
-    width: 90vw;
-    top: 40%;
-    left: 5vw;
-    font-size: 2.5vw;
-    line-height: 5vw;
-    color: rgba(255, 55, 55, 0.8);
-    filter: drop-shadow(0 0 0.5vw rgb(0, 0, 0));
-    pointer-events: none;
-    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 0.5s;
-  } */
-
-  /* .class-validation strong {
-    color: rgba(255, 55, 55, 0.9);
-  } */
-
   @media screen and (max-width: 600px) {
     .video {
       top: 25.5vw;
@@ -448,10 +454,5 @@
       margin-top: 0;
       margin-bottom: 0;
     }
-
-    /* .class-validation {
-      font-size: 1.5em;
-      line-height: 1.5em;
-    } */
   }
 </style>

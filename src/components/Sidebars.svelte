@@ -16,6 +16,22 @@
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
+  import PopUpMessage from "./PopUpMessage.svelte";
+
+  let showMessage: boolean;
+  let messageNote: string;
+  let X: number;
+  let Y: number;
+
+  const handlePopUpMessage = (event: PointerEvent, note: string) => {
+    showMessage = true;
+    messageNote = note;
+    X = event.clientX;
+    Y = event.clientY;
+    setTimeout(() => {
+      showMessage = false;
+    }, 600);
+  };
 
   /* --- EPISODES --- */
 
@@ -95,7 +111,13 @@
   }
 
   function selectNFT(event: Event) {
-    if (votingEnded) return;
+    if (votingEnded) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        "Select an <strong>active</strong> episode to vote!"
+      );
+      return;
+    }
     const target = event.target as HTMLDivElement;
     const nftTile =
       target.localName === "div"
@@ -340,6 +362,8 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
+
+<PopUpMessage {showMessage} {messageNote} {X} {Y} />
 
 <!-- --- Episodes tab --- -->
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
