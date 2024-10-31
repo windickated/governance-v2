@@ -46,6 +46,7 @@
         : (target.parentElement as HTMLDivElement);
     const optionSelector = optionContainer?.children[0] as HTMLImageElement;
     const optionID = Number(optionContainer?.id);
+    let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
     if (event.type === "pointerover")
@@ -56,7 +57,26 @@
       if (votingEnded) {
         handlePopUpMessage(
           event as PointerEvent,
-          "Select an <strong>active</strong> episode to vote!"
+          "Voting for this episode is ended."
+        );
+        return;
+      }
+      if ($selectedNFTs.length === 0) {
+        handlePopUpMessage(
+          event as PointerEvent,
+          "Select any Potential to vote!"
+        );
+        return;
+      }
+      if (optionContainer.dataset.class) {
+        $selectedNFTs.forEach((nft) => {
+          if (optionContainer.dataset.class != nft.class) classMatch = false;
+        });
+      }
+      if (!classMatch) {
+        handlePopUpMessage(
+          event as PointerEvent,
+          `This option is only for the ${optionContainer.dataset.class} class!`
         );
         return;
       }

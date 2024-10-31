@@ -111,10 +111,15 @@
   }
 
   function selectNFT(event: Event) {
+    if ($selectedOption) handleOptions.reset(null);
+    if (!$episode) {
+      handlePopUpMessage(event as PointerEvent, "Select an episode to vote!");
+      return;
+    }
     if (votingEnded) {
       handlePopUpMessage(
         event as PointerEvent,
-        "Select an <strong>active</strong> episode to vote!"
+        "Voting for this episode is ended."
       );
       return;
     }
