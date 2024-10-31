@@ -102,6 +102,7 @@
         ? target
         : (target.parentElement as HTMLDivElement);
     $potentials.map((potential) => {
+      if (!potential.active) return;
       if (potential.id.toString() === nftTile?.id) {
         potential.selected = !potential.selected;
         if (potential.selected) {

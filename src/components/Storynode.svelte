@@ -8,7 +8,9 @@
     selectedOption,
     votingEnded,
   } from "../stores/storyNode.ts";
+  import { selectedNFTs } from "../stores/NFTs.ts";
   import handleOptions from "../utils/options.ts";
+  import vote from "../utils/vote.ts";
 
   let width: number;
   let mobileTextVisibility: boolean = false;
@@ -37,6 +39,8 @@
     if (event.type === "click") {
       handleOptions.reset(optionID);
     }
+
+    if (width < 600 && $selectedOption && $selectedNFTs.length > 0) vote();
   }
 </script>
 
