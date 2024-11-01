@@ -65,6 +65,10 @@
       episode.style.color = "inherit";
       episode.style.filter = "none";
     });
+    $selectedNFTs = [];
+    Array.from(document.querySelectorAll(".nft")).forEach((div: any) => {
+      handleNftTiles.blur(div);
+    });
   }
 
   /* --- NFTs --- */
