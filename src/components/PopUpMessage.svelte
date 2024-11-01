@@ -52,6 +52,7 @@
     transition: opacity ease-in-out 0.3s;
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(0.5vw);
+    -webkit-backdrop-filter: blur(0.5vw);
   }
 
   @media screen and (max-width: 600px) {
