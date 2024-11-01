@@ -29,4 +29,6 @@ export default function vote() {
 
   console.log('Inactive NFTs: ');
   console.log(_inactiveNFTs);
+
+  alert('Voted.')
 }
