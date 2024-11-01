@@ -42,11 +42,10 @@
     text-align: center;
     position: fixed;
     font-size: 2vw;
-    line-height: 2vw;
+    line-height: 2.5vw;
     padding: 1vw 2vw;
     border: 0.1vw solid rgba(255, 55, 55, 0.25);
     border-radius: 2.5vw;
-    white-space: nowrap;
     color: rgb(255, 55, 55);
     text-shadow: 0 0 1vw #010020;
     pointer-events: none;
@@ -64,7 +63,6 @@
       border-radius: 1em;
       text-shadow: 0 0 1em #010020;
       backdrop-filter: blur(0.5em);
-      white-space: wrap;
     }
   }
 </style>

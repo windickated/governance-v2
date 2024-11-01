@@ -7,12 +7,7 @@
     selectedOption,
     votingEnded,
   } from "../stores/storyNode.ts";
-  import {
-    NFT,
-    potentials,
-    selectedNFTs,
-    inactiveNFTs,
-  } from "../stores/NFTs.ts";
+  import { NFT, potentials, selectedNFTs } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
