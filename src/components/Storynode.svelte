@@ -148,30 +148,34 @@
         : '2.5vw'}
       "
     >
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      {#each $story.options as option, index}
-        <div
-          class="option"
-          role="button"
-          tabindex="0"
-          id={(index + 1).toString()}
-          data-class={option.class}
-          on:pointerover={selectOption}
-          on:pointerout={selectOption}
-          on:click={selectOption}
-        >
-          <img
-            class="option-selector"
-            src={option.class ? `/${option.class}.png` : "/option-selector.png"}
-            alt="selector"
-            style="
-              height: {width > 600 &&
-              (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
-            "
-          />
-          {option.option}
-        </div>
-      {/each}
+      {#key $episode}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        {#each $story.options as option, index}
+          <div
+            class="option"
+            role="button"
+            tabindex="0"
+            id={(index + 1).toString()}
+            data-class={option.class}
+            on:pointerover={selectOption}
+            on:pointerout={selectOption}
+            on:click={selectOption}
+          >
+            <img
+              class="option-selector"
+              src={option.class
+                ? `/${option.class}.png`
+                : "/option-selector.png"}
+              alt="selector"
+              style="
+                height: {width > 600 &&
+                (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
+              "
+            />
+            {option.option}
+          </div>
+        {/each}
+      {/key}
     </div>
 
     <span class="voting-ended {votingEnded ? '' : 'voting-active'}">
