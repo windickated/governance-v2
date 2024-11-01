@@ -88,7 +88,9 @@
 
 <svelte:window bind:outerWidth={width} />
 
-<div class="console-panel" bind:this={consoleBar}>
+<div class="console-panel" bind:this={consoleBar} style="
+{width <= 600 && !$episode ? 'position: fixed; bottom: 0;' : ''}
+">
   <div class="console-buttons">
     {#each consolePanel.buttons as button}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
