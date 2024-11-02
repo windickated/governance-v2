@@ -1,4 +1,5 @@
-import { writable } from "svelte/store"
+import { writable } from "svelte/store";
+import { provider } from "../lib/ethers";
 
 export class NFT {
   id: number;
@@ -13,7 +14,7 @@ export class NFT {
     this.image = data[i].image;
     this.class = data[i].attributes[5].value;
     this.selected = false;
-    this.active = i === 2 || i === 5 ? false : true; // deactivating some for testing
+    this.active = i === 2 || i === 4 ? false : true; // deactivating some for testing
   }
 }
 
@@ -22,16 +23,24 @@ export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const inactiveNFTs = writable<NFT[]>([]);
 
+export const walletAddress = writable<string>('');
+
 export async function getNFTs() {
-  const testNftNumbers = [2, 4, 35, 436, 474, 585, 697]; // temp
+  const address = await (await provider.getSigner()).getAddress();
+    walletAddress.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+    const json = await fetch(
+      `https://api.degenerousdao.com/nft/owner/${address}`
+    );
+    const data = await json.json();
+    const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
   let potentialNFTs: NFT[] = [];
   const metadata: any[] = [];
-  for (let i in testNftNumbers) {
+  for (let i in nftNumbers) {
     const response = await fetch(
-      `https://api.degenerousdao.com/nft/data/${testNftNumbers[i]}`
+      `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
     );
-    metadata[i] = await response.json();
-    potentialNFTs[i] = new NFT(metadata, Number(i));
+    metadata[Number(i)] = await response.json();
+    potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
   }
   potentials.set(potentialNFTs);
 
