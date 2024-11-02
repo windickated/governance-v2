@@ -7,15 +7,13 @@
     selectedOption,
     votingEnded,
   } from "../stores/storyNode.ts";
-  import { NFT, potentials, selectedNFTs } from "../stores/NFTs.ts";
+  import { potentials, selectedNFTs, getNFTs } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
   import PopUpMessage from "./PopUpMessage.svelte";
   import Modal from "./Modal.svelte";
   import { showModal } from "../stores/modal.ts";
-
-  let selectedNftTile: HTMLDivElement;
 
   let showMessage: boolean;
   let messageNote: string;
@@ -81,6 +79,7 @@
   let walletAddress: string;
 
   let nftTiles: HTMLDivElement;
+  let selectedNftTile: HTMLDivElement;
 
   function connectWallet() {
     if (!$isLogged) {
@@ -101,31 +100,8 @@
     }
   }
 
-  async function getNFTs() {
-    const testNftNumbers = [2, 4, 35, 436, 474, 585, 697];
-    const metadata: any[] = [];
-    for (let i in testNftNumbers) {
-      const response = await fetch(
-        `https://api.degenerousdao.com/nft/data/${testNftNumbers[i]}`
-      );
-      metadata[i] = await response.json();
-      $potentials[i] = new NFT(metadata, Number(i));
-    }
-  }
-
   function selectNFT(event: Event) {
     if ($selectedOption) handleOptions.reset(null);
-    if (!$episode) {
-      handlePopUpMessage(event as PointerEvent, "Select any episode to vote!");
-      return;
-    }
-    if (votingEnded) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        "Voting for this episode is ended."
-      );
-      return;
-    }
     const target = event.target as HTMLDivElement;
     const nftTile =
       target.localName === "div"
@@ -136,6 +112,20 @@
         if (!potential.active) {
           $showModal = true;
           selectedNftTile = nftTile;
+          return;
+        }
+        if (!$episode) {
+          handlePopUpMessage(
+            event as PointerEvent,
+            "Select any episode to vote!"
+          );
+          return;
+        }
+        if (votingEnded) {
+          handlePopUpMessage(
+            event as PointerEvent,
+            "Voting for this episode is ended."
+          );
           return;
         }
         potential.selected = !potential.selected;
@@ -470,15 +460,22 @@
     </div>
     {#if $potentials.length > 0}
       <div class="nfts-container" bind:this={nftTiles}>
-        {#each $potentials as NFT}
-          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
-        a11y-no-static-element-interactions -->
-          <div class="nft" id={NFT.id.toString()} on:click={selectNFT}>
-            <img class="nft-image" src={NFT.image} alt={NFT.name} />
-            <p class="nft-name">{NFT.name}</p>
-            <p class="nft-class">{NFT.class}</p>
-          </div>
-        {/each}
+        {#key $potentials}
+          {#each $potentials as NFT}
+            <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
+          a11y-no-static-element-interactions -->
+            <div
+              class="nft"
+              id={NFT.id.toString()}
+              on:click={selectNFT}
+              style={!NFT.active ? "opacity: 0.5;" : ""}
+            >
+              <img class="nft-image" src={NFT.image} alt={NFT.name} />
+              <p class="nft-name">{NFT.name}</p>
+              <p class="nft-class">{NFT.class}</p>
+            </div>
+          {/each}
+        {/key}
       </div>
     {:else}
       <p class="no-nfts-title">

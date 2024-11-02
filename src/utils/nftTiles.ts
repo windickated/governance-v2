@@ -1,4 +1,3 @@
-import { readable } from "svelte/store";
 import { NFT, potentials, selectedNFTs, inactiveNFTs } from "../stores/NFTs";
 
 let _potentials: NFT[];
@@ -40,6 +39,15 @@ const handleNftTiles = {
   },
   undoVote: (tile: HTMLDivElement) => {
     console.log('Undo vote of #' + tile.id);
+    _potentials.map((potential) => {
+      if (potential.id == Number(tile.id)) potential.active = true;
+    })
+    let filteredOutArr = _inactiveNFTs.filter(potential => potential.id != Number(tile.id));
+    tile.style.opacity = '1';
+    potentials.set(_potentials);
+    inactiveNFTs.set(filteredOutArr);
+    console.log('Inactive NFTs: ');
+    console.log(filteredOutArr);
   }
 }
 

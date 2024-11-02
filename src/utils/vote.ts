@@ -25,6 +25,7 @@ export default function vote() {
   console.log(_selectedNFTs);
 
   handleOptions.reset(null);
+  
   handleNftTiles.reset();
 
   console.log('Inactive NFTs: ');
