@@ -70,7 +70,11 @@
       }
       if (optionContainer.dataset.class) {
         $selectedNFTs.forEach((nft) => {
-          if (optionContainer.dataset.class != nft.class) classMatch = false;
+          if (
+            optionContainer.dataset.class != nft.class &&
+            nft.class != "Ne-Yon"
+          )
+            classMatch = false;
         });
       }
       if (!classMatch) {

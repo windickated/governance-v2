@@ -1,6 +1,6 @@
 <script lang="ts">
   import { displayScreen } from "../data/buttons.ts";
-  import { selectedOption } from "../stores/storyNode.ts";
+  import { episode, selectedOption } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
 
@@ -12,6 +12,7 @@
     const storyVideo: HTMLIFrameElement | null =
       document.querySelector(".video");
     if (event.type === "click") {
+      if (!$episode) return;
       formatButtonState = !formatButtonState;
       storyText?.classList.toggle("visible");
       storyVideo?.classList.toggle("visible");
