@@ -460,22 +460,20 @@
     </div>
     {#if $potentials.length > 0}
       <div class="nfts-container" bind:this={nftTiles}>
-        {#key $potentials}
-          {#each $potentials as NFT}
-            <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
-          a11y-no-static-element-interactions -->
-            <div
-              class="nft"
-              id={NFT.id.toString()}
-              on:click={selectNFT}
-              style={!NFT.active ? "opacity: 0.5;" : ""}
-            >
-              <img class="nft-image" src={NFT.image} alt={NFT.name} />
-              <p class="nft-name">{NFT.name}</p>
-              <p class="nft-class">{NFT.class}</p>
-            </div>
-          {/each}
-        {/key}
+        {#each $potentials as NFT}
+          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
+        a11y-no-static-element-interactions -->
+          <div
+            class="nft"
+            id={NFT.id.toString()}
+            on:click={selectNFT}
+            style={!NFT.active ? "opacity: 0.5;" : ""}
+          >
+            <img class="nft-image" src={NFT.image} alt={NFT.name} />
+            <p class="nft-name">{NFT.name}</p>
+            <p class="nft-class">{NFT.class}</p>
+          </div>
+        {/each}
       </div>
     {:else}
       <p class="no-nfts-title">
