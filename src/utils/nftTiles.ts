@@ -20,9 +20,6 @@ const handleNftTiles = {
     tile.style.filter = "drop-shadow(0 0 0.1vw #010020)";
     tile.style.color = "inherit";
   },
-  deactivate: (tile: HTMLDivElement) => {
-    tile.style.opacity = '0.5';
-  },
   reset: () => {
     _potentials.map((potential) => {
       if (potential.selected) {
@@ -37,9 +34,12 @@ const handleNftTiles = {
     Array.from(document.querySelectorAll(".nft")).forEach((div: any) => {
       if (inactiveIDs.includes(div.id)) {
         handleNftTiles.blur(div);
-        handleNftTiles.deactivate(div);
+        div.style.opacity = '0.5';
       }
     });
+  },
+  undoVote: (tile: HTMLDivElement) => {
+    console.log('Undo vote of #' + tile.id);
   }
 }
 

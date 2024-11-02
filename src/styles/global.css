@@ -79,8 +79,34 @@ img {
 }
 
 button {
-  font-family: 'PT Serif Caption', serif;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
   cursor: pointer;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5vw;
+  padding: 0.5vw;
+  font-size: 1.5vw;
+  background-color: rgba(56, 117, 250, 0.5);
+  border: 0.1vw solid rgba(51, 226, 230, 0.5);
+  border-radius: 1vw;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+button:hover,
+button:active {
+  background-color: rgba(56, 117, 250, 0.9);
+  border-color: rgba(51, 226, 230, 0.9);
+  filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
+  transform: scale(1.05);
+}
+
+.blur {
+  -webkit-backdrop-filter: blur(1rem);
+  backdrop-filter: blur(1rem);
 }
 
 

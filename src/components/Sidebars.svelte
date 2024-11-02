@@ -12,6 +12,10 @@
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
   import PopUpMessage from "./PopUpMessage.svelte";
+  import Modal from "./Modal.svelte";
+  import { showModal } from "../stores/modal.ts";
+
+  let selectedNftTile: HTMLDivElement;
 
   let showMessage: boolean;
   let messageNote: string;
@@ -128,8 +132,12 @@
         ? target
         : (target.parentElement as HTMLDivElement);
     $potentials.map((potential) => {
-      if (!potential.active) return;
       if (potential.id.toString() === nftTile?.id) {
+        if (!potential.active) {
+          $showModal = true;
+          selectedNftTile = nftTile;
+          return;
+        }
         potential.selected = !potential.selected;
         if (potential.selected) {
           $selectedNFTs.push(potential);
@@ -368,6 +376,7 @@
 <svelte:window bind:outerWidth={width} />
 
 <PopUpMessage {showMessage} {messageNote} {X} {Y} />
+<Modal {selectedNftTile} />
 
 <!-- --- Episodes tab --- -->
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -747,7 +756,7 @@ a11y-no-static-element-interactions -->
     height: 23vw;
     background-color: rgba(22, 30, 95, 0.75);
     margin: 1vw;
-    border: 0.05vw solid #33e2e6;
+    border: 0.05vw solid rgba(51, 226, 230, 0.75);
     border-radius: 1.5vw;
     padding-bottom: 1vw;
     cursor: pointer;

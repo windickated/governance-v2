@@ -30,6 +30,7 @@
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight} />
 
 <span
+  class="blur"
   bind:this={message}
   style="opacity: {showMessage
     ? '1'
@@ -51,8 +52,6 @@
     pointer-events: none;
     transition: opacity ease-in-out 0.3s;
     background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(0.5vw);
-    -webkit-backdrop-filter: blur(0.5vw);
   }
 
   @media screen and (max-width: 600px) {
@@ -63,7 +62,6 @@
       border-width: 0.1em;
       border-radius: 1em;
       text-shadow: 0 0 1em #010020;
-      backdrop-filter: blur(0.5em);
     }
   }
 </style>

@@ -13,7 +13,7 @@ export class NFT {
     this.image = data[i].image;
     this.class = data[i].attributes[5].value;
     this.selected = false;
-    this.active = true;
+    this.active = false;
   }
 }
 
