@@ -7,13 +7,24 @@
     selectedOption,
     votingEnded,
   } from "../stores/storyNode.ts";
-  import { potentials, selectedNFTs, getNFTs } from "../stores/NFTs.ts";
+  import {
+    potentials,
+    selectedNFTs,
+    getNFTs,
+    walletAddress,
+  } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
   import PopUpMessage from "./PopUpMessage.svelte";
   import Modal from "./Modal.svelte";
   import { showModal } from "../stores/modal.ts";
+  import {
+    provider,
+    metamask_init,
+    switch_network,
+    network,
+  } from "../lib/ethers";
 
   let showMessage: boolean;
   let messageNote: string;
@@ -76,21 +87,27 @@
   let walletButton: HTMLButtonElement;
   let networkSwitcher: HTMLButtonElement;
 
-  let walletAddress: string;
-
   let nftTiles: HTMLDivElement;
   let selectedNftTile: HTMLDivElement;
 
-  function connectWallet() {
+  async function connectWallet() {
     if (!$isLogged) {
-      $isLogged = true;
-      getNFTs();
-      walletAddress = "0x613f...bc2d";
-      networkSwitcher.style.display = "none";
-      walletButton.style.display = "block";
-      walletButton.innerHTML = "Disconect";
-      walletLegend.style.display = "none";
-      wallet.style.display = "block";
+      await provider.getNetwork().then(async (net) => {
+        if (net.chainId === BigInt(network.chainId)) {
+          await provider.send("eth_requestAccounts", []);
+          $isLogged = true;
+          networkSwitcher.style.display = "none";
+          walletButton.style.display = "block";
+          walletButton.innerHTML = "Disconect";
+          walletLegend.style.display = "none";
+          wallet.style.display = "block";
+          getNFTs();
+        } else {
+          walletLegend.innerHTML = "You're on a wrong network!";
+          walletButton.style.display = "none";
+          networkSwitcher.style.display = "block";
+        }
+      });
     } else {
       $isLogged = false;
       $potentials = [];
@@ -433,28 +450,48 @@
       : 'drop-shadow(0 0 1vw rgba(51, 226, 230, 0.5))'}
   "
   >
-    <p class="wallet-legend" bind:this={walletLegend}>Connect Web3 Wallet:</p>
-    <p class="wallet" bind:this={wallet}>{walletAddress}</p>
-    <button
-      class="wallet-connect"
-      bind:this={walletButton}
-      style="
+    {#await metamask_init()}
+      <p class="wallet-legend">Loading Web3 Wallet...</p>
+    {:then provider_exists}
+      {#if provider_exists}
+        <p class="wallet-legend" bind:this={walletLegend}>
+          Connect Web3 Wallet:
+        </p>
+        <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
+        <button
+          class="wallet-connect"
+          bind:this={walletButton}
+          style="
         background-color: {$isLogged ? 'rgba(51, 226, 230, 0.9)' : '#161E5F'};
         color: {$isLogged ? '#010020' : '#33E2E6'}
       "
-      on:click={connectWallet}
-    >
-      Log in
-    </button>
-    <button class="switch-network" bind:this={networkSwitcher}>
-      Switch network
-    </button>
+          on:click={connectWallet}
+        >
+          Log in
+        </button>
+        <button
+          class="switch-network"
+          bind:this={networkSwitcher}
+          on:click={switch_network}
+        >
+          Switch network
+        </button>
+      {:else}
+        <p class="wallet-legend">Install Web3 Wallet.</p>
+      {/if}
+    {:catch}
+      <p class="wallet-legend">Error Loading Web3 Wallet.</p>
+    {/await}
   </div>
 
   {#if $isLogged}
     <div class="nfts-legend">
       <p class="nfts-total">
-        Total NFTs: {$potentials.length}
+        {#await getNFTs()}
+          Loading NFTs...
+        {:then}
+          Total NFTs: {$potentials.length}
+        {/await}
       </p>
       <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
     </div>
