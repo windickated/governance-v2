@@ -827,7 +827,7 @@ a11y-no-static-element-interactions -->
 
   @media screen and (max-width: 600px) {
     .nft-icon {
-      width: 90vw;
+      width: 70vw;
       height: 12vw;
       top: 0;
       filter: drop-shadow(0 0.5vw 1vw #010020);
@@ -835,7 +835,7 @@ a11y-no-static-element-interactions -->
     }
 
     .episodes-icon {
-      width: 31.6vw;
+      width: 40vw;
       height: 12vw;
       filter: drop-shadow(0 0.5vw 1vw #010020);
       background-image: url("/episodesMobileOpen.avif");
