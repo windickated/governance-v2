@@ -3,6 +3,22 @@
   import { consolePanel } from "../data/buttons.ts";
   import { allStories, season, episode } from "../stores/storyNode.ts";
   import handleOptions from "../utils/options.ts";
+  import PopUpMessage from "./PopUpMessage.svelte";
+
+  let showMessage: boolean;
+  let messageNote: string;
+  let X: number;
+  let Y: number;
+
+  const handlePopUpMessage = (event: PointerEvent, note: string) => {
+    showMessage = true;
+    messageNote = note;
+    X = event.clientX;
+    Y = event.clientY;
+    setTimeout(() => {
+      showMessage = false;
+    }, 600);
+  };
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
@@ -69,13 +85,33 @@
             );
             break;
           case "back":
-            if ($episode && $episode !== 1) {
+            if (!$episode) {
+              handlePopUpMessage(
+                event as PointerEvent,
+                "There is no episode selected!"
+              );
+            } else if ($episode === 1) {
+              handlePopUpMessage(
+                event as PointerEvent,
+                "This is the first episode."
+              );
+            } else if ($episode) {
               $episode--;
               handleOptions.reset(null);
             }
             break;
           case "forward":
-            if ($episode && $episode !== allStories[$season - 1].length) {
+            if (!$episode) {
+              handlePopUpMessage(
+                event as PointerEvent,
+                "There is no episode selected!"
+              );
+            } else if ($episode === allStories[$season - 1].length) {
+              handlePopUpMessage(
+                event as PointerEvent,
+                "This is the last episode."
+              );
+            } else if ($episode) {
               $episode++;
               handleOptions.reset(null);
             }
@@ -87,6 +123,8 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
+
+<PopUpMessage {showMessage} {messageNote} {X} {Y} />
 
 <div class="console-panel" bind:this={consoleBar} style="
 {width <= 600 && !$episode ? 'position: fixed; bottom: 0;' : ''}
