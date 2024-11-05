@@ -13,9 +13,10 @@
   let storyNodes: any;
 
   onMount(async () => {
+    if (!(await metamask_init())) return;
+
     const legend = document.querySelector(".empty-header");
 
-    if (!(await metamask_init())) return;
     storyNodes = await get_nodes();
     console.log(storyNodes);
 
@@ -40,7 +41,7 @@
 
 {#await metamask_init()}
   <div class="blur loading">
-    <h1>Loading Web3 user info...</h1>
+    <h1>Loading Web3 info...</h1>
   </div>
 {:then provider_exists}
   {#if provider_exists}
@@ -121,11 +122,11 @@
 
   main {
     opacity: 0;
-    animation: 0.3s show 1s ease-out forwards;
+    animation: 1s show 1s ease-out forwards;
   }
 
   #welcome {
-    animation: hide 1s ease-in-out forwards;
+    animation: 0.5s hide 0.5s ease-in-out forwards;
   }
 
   @media only screen and (max-width: 600px) {
@@ -158,7 +159,7 @@
 
   @keyframes hide {
     to {
-      transform: scale(2);
+      transform: scale(3);
       opacity: 0;
     }
   }

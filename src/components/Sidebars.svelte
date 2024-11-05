@@ -512,8 +512,8 @@ a11y-no-static-element-interactions -->
     z-index: 21;
     top: 0;
     right: 0;
-    height: 7.5vw;
-    width: 15vw;
+    height: 6vw;
+    width: 18vw;
     filter: drop-shadow(-0.1vw 0.1vw 0.5vw #010020);
     cursor: pointer;
     background-image: url("/sideIconPCOpen.avif");
@@ -527,8 +527,8 @@ a11y-no-static-element-interactions -->
     z-index: 19;
     top: 0;
     left: 0;
-    height: 7.5vw;
-    width: 20vw;
+    height: 6vw;
+    width: 16.6vw;
     filter: drop-shadow(0.1vw 0.1vw 0.5vw #010020);
     cursor: pointer;
     background-image: url("/episodesPCOpen.avif");
