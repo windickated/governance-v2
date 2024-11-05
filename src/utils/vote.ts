@@ -5,7 +5,7 @@ import handleNftTiles from "../utils/nftTiles.ts";
 import { contract } from "../lib/contract";
 
 let _season: number;
-let _episode: number | null;
+let _episode: number;
 let _option: number | null;
 
 let _selectedNFTs: NFT[];

@@ -1,50 +1,65 @@
-import { writable } from "svelte/store"
-import DischordianSaga from "../data/DischordianSaga.ts"
+import { writable } from "svelte/store";
+import { contract } from "../lib/contract.ts";
 
-export class StoryNode {
-  title: string;
+export type StoryNode = {
+  title: string | undefined;
+  episodeName: string | undefined;
+  description: string;
+  image_url: string;
+  video_url: string;
+  endTimestamp: number;
+  ended: boolean;
   duration: string;
-  video: string;
-  text: string[];
-  options: {
-    class: string;
+  votes_options: {
     option: string;
   }[];
-  constructor(s: number, e: number) {
-    this.title = allStories[s - 1][e - 1].storyTitle;
-    this.duration = getStoryDate(allStories[s - 1][e - 1]);
-    this.video = `https://www.youtube.com/embed/${allStories[s - 1][e - 1].videoLink}`;
-    this.text = allStories[s - 1][e - 1].storyText;
-    this.options = allStories[s - 1][e - 1].storyOptions;
-  }
-}
+};
 
-export const allStories = DischordianSaga;
 export const story = writable<StoryNode | null>(null)
 
 export const season = writable<number>(1);
-export const episode = writable<number | null>(null);
+export const episode = writable<number>(-1);
 export const selectedOption = writable<number | null>(null);
-export let votingEnded: boolean = true;
 
-function getStoryDate(story: any): string {
-  let dateStart: Date = new Date(story.storyDuration[0]);
-  let dateEnd: Date = new Date(story.storyDuration[1]);
+export const get_nodes = async () => {
+  const count = await (await contract()).getStoryNodesCount();
+  const nodes = [];
 
-  let dayStart: string = ("0" + dateStart.getDate()).slice(-2);
-  let dayEnd: string = ("0" + dateEnd.getDate()).slice(-2);
-  let monthStart: string = ("0" + (dateStart.getMonth() + 1)).slice(-2);
-  let monthEnd: string = ("0" + (dateEnd.getMonth() + 1)).slice(-2);
-  let yearStart: number = dateStart.getFullYear();
-  let yearEnd: number = dateEnd.getFullYear();
+  for (let i = 0; i < count; i++) {
+    let ipfs_uri = await (await contract()).storyNodeMetadata(i);
+    if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
+      ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
+    }
+    const json = await fetch(`https://ipfs.degenerousdao.com/ipfs/${ipfs_uri.slice(7)}`);
+    nodes.push(await json.json());
+    const {endTimestamp} = await (await contract()).storyNodes(i);
+    nodes[nodes.length - 1].endTimestamp = Number(endTimestamp);
+    nodes[nodes.length - 1].ended = Number(endTimestamp) * 1000 < (new Date()).getTime();
+    nodes[nodes.length - 1].duration = getDuration(endTimestamp);
+    nodes[nodes.length - 1].episodeName = nodes[nodes.length - 1].title?.replace("The Dischordian Saga: ", "").split(" - Episode ")[0];
+    nodes[nodes.length - 1].image_url = `https://img.youtube.com/vi/${nodes[nodes.length - 1].video_url.split('/')[nodes[nodes.length - 1].video_url.split('/').length - 1].replace('?', '')}/hqdefault.jpg`;
+    nodes[nodes.length - 1].votes_options.map((opt: {option: string}) => {
+      if (opt.option[2] == ' ') opt.option = opt.option.slice(2);
+    })
+  }
+  return nodes as StoryNode[];
+};
 
-  let fullDateStart: string = `${dayStart}.${monthStart}.${yearStart}`;
-  let fullDateEnd: string = `${dayEnd}.${monthEnd}.${yearEnd}`;
+function getDuration(timestamp: number): string {
+  const dateStart: Date = new Date((Number(timestamp) - 3 * 24 * 60 * 60) * 1000);
+  const dateEnd: Date = new Date(Number(timestamp) * 1000);
 
-  let fullDate: string = "Duration: " + fullDateStart + " - " + fullDateEnd;
+  const dayStart: string = ("0" + dateStart.getDate()).slice(-2);
+  const dayEnd: string = ("0" + dateEnd.getDate()).slice(-2);
+  const monthStart: string = ("0" + (dateStart.getMonth() + 1)).slice(-2);
+  const monthEnd: string = ("0" + (dateEnd.getMonth() + 1)).slice(-2);
+  const yearStart: number = dateStart.getFullYear();
+  const yearEnd: number = dateEnd.getFullYear();
 
-  let dateNow: Date = new Date();
-  votingEnded = dateNow > dateEnd ? true : false;
+  const fullDateStart: string = `${dayStart}.${monthStart}.${yearStart}`;
+  const fullDateEnd: string = `${dayEnd}.${monthEnd}.${yearEnd}`;
 
-  return fullDate;
+  const duration: string = "Duration: " + fullDateStart + " - " + fullDateEnd;
+
+  return duration;
 }

@@ -2,41 +2,27 @@
   import { onMount } from "svelte";
   import {
     story,
-    StoryNode,
+    type StoryNode,
     season,
     episode,
     selectedOption,
-    votingEnded,
   } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
   import handleOptions from "../utils/options.ts";
   import vote from "../utils/vote.ts";
-  import PopUpMessage from "./PopUpMessage.svelte";
 
-  let showMessage: boolean;
-  let messageNote: string;
-  let X: number;
-  let Y: number;
-
-  const handlePopUpMessage = (event: PointerEvent, note: string) => {
-    showMessage = true;
-    messageNote = note;
-    X = event.clientX;
-    Y = event.clientY;
-    setTimeout(() => {
-      showMessage = false;
-    }, 600);
-  };
+  export let storyNodes: StoryNode[];
+  export let handlePopUpMessage: Function;
 
   let width: number;
   let mobileTextVisibility: boolean = false;
-  $: optionsCounter = $story ? $story.options.length : 0;
+  $: optionsCounter = $story ? $story.votes_options.length : 0;
 
   onMount(() => {
     if (width > 600) mobileTextVisibility = true;
   });
 
-  $: if ($season && $episode) $story = new StoryNode($season, $episode);
+  $: if (storyNodes && $episode !== -1) $story = storyNodes[$episode];
 
   function selectOption(event: Event) {
     const target = event.target as HTMLDivElement;
@@ -54,7 +40,7 @@
     if (event.type === "pointerout")
       handleOptions.blur(optionContainer, optionSelector);
     if (event.type === "click") {
-      if (votingEnded) {
+      if (storyNodes[$episode].ended) {
         handlePopUpMessage(
           event as PointerEvent,
           "Voting for this episode is ended."
@@ -93,24 +79,25 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<PopUpMessage {showMessage} {messageNote} {X} {Y} />
-
 <section class="story-node-wraper">
-  <div class="legend">
+  <div class="legend blur">
     {#if $story}
-      <h1 class="header">{$story.title}</h1>
+      <h1 class="header">
+        {$story.episodeName}
+      </h1>
       <h1 class="season-episode-number">
-        The Dischordian Saga: Season {$season} - Episode {$episode}
+        The Dischordian Saga: Season {$season} - Episode {$episode + 1}
       </h1>
       <h2 class="duration">{$story.duration}</h2>
     {:else}
-      <h1 class="empty-header">Select any episode from the tab</h1>
+      <h1 class="empty-header">Loading episodes...</h1>
+      <!-- <h1 class="empty-header">Select any episode from the tab</h1> -->
     {/if}
   </div>
 
   {#if $story}
     <iframe
-      src={$story.video}
+      src={$story.video_url}
       class="video visible"
       title="YouTube"
       allowfullscreen
@@ -127,20 +114,20 @@
             ? "border-bottom: 0.1vw solid rgba(51, 226, 230, 0.5)"
             : ""}
         >
-          <p>
-            {(mobileTextVisibility ? "Hide" : "Show") + " story text"}
-          </p>
+          {(mobileTextVisibility ? "Hide" : "Show") + " story text"}
           <img
             style={mobileTextVisibility ? "transform: rotate(180deg)" : ""}
             src="/dropdown.png"
             alt={mobileTextVisibility ? "Hide" : "Show"}
           />
         </button>
-      {/if}
-      {#if mobileTextVisibility}
-        {#each $story.text as paragraph}
-          <p class="text-paragraph">{paragraph}</p>
-        {/each}
+        {#if mobileTextVisibility}
+          <div class="text-wrapper">
+            {$story.description}
+          </div>
+        {/if}
+      {:else}
+        {$story.description}
       {/if}
     </div>
 
@@ -154,36 +141,39 @@
     >
       {#key $episode}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
-        {#each $story.options as option, index}
+        {#each $story.votes_options as option, index}
           <div
             class="option"
             role="button"
             tabindex="0"
             id={(index + 1).toString()}
-            data-class={option.class}
+            data-class=""
             on:pointerover={selectOption}
             on:pointerout={selectOption}
             on:click={selectOption}
           >
             <img
               class="option-selector"
-              src={option.class
-                ? `/${option.class}.png`
-                : "/option-selector.png"}
+              src={"/option-selector.png"}
               alt="selector"
               style="
                 height: {width > 600 &&
                 (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
               "
             />
+            <!-- src={option.class
+                ? `/${option.class}.png`
+                : "/option-selector.png"} -->
             {option.option}
           </div>
         {/each}
       {/key}
     </div>
 
-    <span class="voting-ended {votingEnded ? '' : 'voting-active'}">
-      {votingEnded ? "Voting ended" : "Voting active"}
+    <span
+      class="voting-ended {storyNodes[$episode].ended ? '' : 'voting-active'}"
+    >
+      {storyNodes[$episode].ended ? "Voting ended" : "Voting active"}
     </span>
   {/if}
 </section>
@@ -208,9 +198,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(1, 0, 32, 0.6);
-    -webkit-backdrop-filter: blur(1vw);
-    backdrop-filter: blur(1vw);
+    background-color: rgba(22, 30, 95, 0.75);
+    filter: drop-shadow(0 0 1vw rgb(1, 0, 32));
     margin-top: 2vw;
     margin-bottom: -4vw;
     padding: 1.5vw;
@@ -266,6 +255,7 @@
     border-radius: auto;
     color: #bebebe;
     display: none;
+    white-space: pre-wrap;
   }
 
   .story-text-visibility {
@@ -279,18 +269,20 @@
     font-size: 1.1em;
     color: rgba(51, 226, 230, 0.5);
     -webkit-text-stroke: 0.25vw rgba(51, 226, 230, 0.25);
-    background-color: rgba(1, 0, 32, 0.25);
+    background-color: rgba(1, 0, 32, 0.75);
     outline: none;
     border: none;
+  }
+
+  .story-text-visibility:hover,
+  .story-text-visibility:active {
+    transform: none;
+    filter: none;
   }
 
   .story-text-visibility > img {
     width: 5%;
     opacity: 0.5;
-  }
-
-  .text-paragraph {
-    padding-bottom: 2vw;
   }
 
   .visible {
@@ -428,21 +420,22 @@
       width: auto;
       left: auto;
       overflow-y: auto;
+      overflow-x: hidden;
       height: auto;
       font-size: 1em;
       line-height: 1.75em;
       margin-bottom: 2vw;
       background-color: rgba(22, 30, 95, 0.75);
-      -webkit-backdrop-filter: blur(2vw);
-      backdrop-filter: blur(2vw);
+      filter: drop-shadow(0 0 1vw rgb(1, 0, 32));
       border: 0.1vw solid rgba(51, 226, 230, 0.5);
       border-radius: 2.5vw;
       padding: 0;
       display: block;
     }
 
-    .text-paragraph {
-      padding: 1.5vw 4vw 1.5vw 4vw;
+    .text-wrapper {
+      padding-inline: 1em;
+      padding-block: 0;
     }
 
     .options {
@@ -455,9 +448,7 @@
       margin-left: -2vw;
       margin-bottom: 4vw;
       padding-top: 2vw;
-      background-color: rgba(1, 0, 32, 0.6);
-      -webkit-backdrop-filter: blur(1vw);
-      backdrop-filter: blur(1vw);
+      background-color: rgba(1, 0, 32, 0.85);
       border: 0.1vw solid rgba(51, 226, 230, 0.5);
       border-radius: 2.5vw;
       padding-top: 2vw;
@@ -467,6 +458,7 @@
     .option {
       gap: 0.75em;
       margin-bottom: 0.5em;
+      padding-right: 0.5em;
     }
 
     .option:last-child {

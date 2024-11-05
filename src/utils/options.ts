@@ -14,11 +14,7 @@ const handleOptions = {
     div.style.textShadow = "none";
     div.style.listStyleType = "circle";
     div.style.color = "inherit";
-    if (div.dataset.class) {
-      img.src = `/${div.dataset.class}.png`;
-    } else {
-      img.src = "/option-selector.png";
-    }
+    if (!div.dataset.class) img.src = "/option-selector.png";
   },
   reset: (state: number | null) => {
     selectedOption.set(state);

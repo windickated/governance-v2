@@ -1,17 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Display from "../components/Display.svelte";
-import Console from "../components/Console.svelte";
-import Sidebars from "../components/Sidebars.svelte";
-import Storynode from "../components/Storynode.svelte";
+import GovernanceHub from "../components/index.svelte";
 ---
 
 <Layout>
-  <Display client:load />
-
-  <Storynode client:load />
-
-  <Console client:load />
-
-  <Sidebars client:load />
+  <GovernanceHub client:load />
 </Layout>

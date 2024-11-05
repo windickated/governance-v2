@@ -1,11 +1,9 @@
 <script lang="ts">
   import {
-    allStories,
     story,
     season,
     episode,
     selectedOption,
-    votingEnded,
   } from "../stores/storyNode.ts";
   import {
     potentials,
@@ -16,30 +14,12 @@
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
-  import PopUpMessage from "./PopUpMessage.svelte";
   import Modal from "./Modal.svelte";
   import { showModal } from "../stores/modal.ts";
-  import {
-    provider,
-    metamask_init,
-    switch_network,
-    network,
-  } from "../lib/ethers";
+  import { provider, switch_network, network } from "../lib/ethers";
 
-  let showMessage: boolean;
-  let messageNote: string;
-  let X: number;
-  let Y: number;
-
-  const handlePopUpMessage = (event: PointerEvent, note: string) => {
-    showMessage = true;
-    messageNote = note;
-    X = event.clientX;
-    Y = event.clientY;
-    setTimeout(() => {
-      showMessage = false;
-    }, 600);
-  };
+  export let storyNodes: any;
+  export let handlePopUpMessage: any;
 
   /* --- EPISODES --- */
 
@@ -48,7 +28,7 @@
   const switchSeason = (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
     $season = Number(seasonSelector?.value);
-    $episode = null;
+    $episode = -1;
     $story = null;
     resetEpisodes();
   };
@@ -138,7 +118,7 @@
           );
           return;
         }
-        if (votingEnded) {
+        if (storyNodes[$episode].ended) {
           handlePopUpMessage(
             event as PointerEvent,
             "Voting for this episode is ended."
@@ -382,7 +362,6 @@
 
 <svelte:window bind:outerWidth={width} />
 
-<PopUpMessage {showMessage} {messageNote} {X} {Y} />
 <Modal {selectedNftTile} />
 
 <!-- --- Episodes tab --- -->
@@ -396,35 +375,37 @@
 ></span>
 
 <div class="episodes-bar" bind:this={episodesBar}>
-  <p class="season-title">The Dishordian Saga</p>
-  <select class="season" on:change={switchSeason}>
-    {#each allStories as _, number}
-      <option value={number + 1}>
-        Season {number + 1}
-      </option>
-    {/each}
-  </select>
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-  <div class="episodes-container" bind:this={episodes}>
-    {#each allStories[$season - 1] as episode}
-      <div
-        role="button"
-        tabindex="0"
-        class="episode"
-        id={episode.episode.toString()}
-        on:click={switchEpisode}
-      >
-        <img
-          class="episode-image"
-          src="https://img.youtube.com/vi/{episode.videoLink}/hqdefault.jpg"
-          alt="Episode {episode.episode}"
-          draggable="false"
-        />
-        <p class="episode-title">{episode.storyTitle}</p>
-        <p class="episode-number">Episode {episode.episode}</p>
-      </div>
-    {/each}
-  </div>
+  {#if storyNodes}
+    <p class="season-title">The Dishordian Saga</p>
+    <select class="season" on:change={switchSeason}>
+      <option value="1">Season 1</option>
+    </select>
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+    <div class="episodes-container" bind:this={episodes}>
+      {#each storyNodes as episode, number}
+        <div
+          role="button"
+          tabindex="0"
+          class="episode"
+          id={number.toString()}
+          on:click={switchEpisode}
+        >
+          <img
+            class="episode-image"
+            src={episode.image_url}
+            alt="Episode {number + 1}"
+            draggable="false"
+          />
+          <p class="episode-title">
+            {episode.episodeName}
+          </p>
+          <p class="episode-number">Episode {number + 1}</p>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <p class="season-title">Loading Franchise...</p>
+  {/if}
 </div>
 
 <!-- --- NFTs tab --- -->
@@ -450,38 +431,26 @@
       : 'drop-shadow(0 0 1vw rgba(51, 226, 230, 0.5))'}
   "
   >
-    {#await metamask_init()}
-      <p class="wallet-legend">Loading Web3 Wallet...</p>
-    {:then provider_exists}
-      {#if provider_exists}
-        <p class="wallet-legend" bind:this={walletLegend}>
-          Connect Web3 Wallet:
-        </p>
-        <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
-        <button
-          class="wallet-connect"
-          bind:this={walletButton}
-          style="
+    <p class="wallet-legend" bind:this={walletLegend}>Connect Web3 Wallet:</p>
+    <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
+    <button
+      class="wallet-connect"
+      bind:this={walletButton}
+      style="
         background-color: {$isLogged ? 'rgba(51, 226, 230, 0.9)' : '#161E5F'};
         color: {$isLogged ? '#010020' : '#33E2E6'}
       "
-          on:click={connectWallet}
-        >
-          Log in
-        </button>
-        <button
-          class="switch-network"
-          bind:this={networkSwitcher}
-          on:click={switch_network}
-        >
-          Switch network
-        </button>
-      {:else}
-        <p class="wallet-legend">Install Web3 Wallet.</p>
-      {/if}
-    {:catch}
-      <p class="wallet-legend">Error Loading Web3 Wallet.</p>
-    {/await}
+      on:click={connectWallet}
+    >
+      Log in
+    </button>
+    <button
+      class="switch-network"
+      bind:this={networkSwitcher}
+      on:click={switch_network}
+    >
+      Switch network
+    </button>
   </div>
 
   {#if $isLogged}
@@ -619,9 +588,7 @@ a11y-no-static-element-interactions -->
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(1vw);
-    backdrop-filter: blur(1vw);
+    background-color: rgba(0, 0, 0, 0.75);
   }
 
   /* EPISODES bar */
