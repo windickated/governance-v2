@@ -18,7 +18,6 @@
     const legend = document.querySelector(".empty-header");
 
     storyNodes = await get_nodes();
-    console.log(storyNodes);
 
     legend!.innerHTML = "Select any episode from the tab";
   });
@@ -41,7 +40,7 @@
 
 {#await metamask_init()}
   <div class="blur loading">
-    <h1>Loading Web3 info...</h1>
+    <h1>Loading Web3 data...</h1>
   </div>
 {:then provider_exists}
   {#if provider_exists}
@@ -122,11 +121,11 @@
 
   main {
     opacity: 0;
-    animation: 1s show 1s ease-out forwards;
+    animation: 1s show 0.5s ease-out forwards;
   }
 
   #welcome {
-    animation: 0.5s hide 0.5s ease-in-out forwards;
+    animation: 0.75s hide 0.25s ease-in-out forwards;
   }
 
   @media only screen and (max-width: 600px) {

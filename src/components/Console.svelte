@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
-  import { episode } from "../stores/storyNode.ts";
+  import { episode, selectedOption } from "../stores/storyNode.ts";
   import handleOptions from "../utils/options.ts";
 
   export let handlePopUpMessage: any;
@@ -78,11 +78,11 @@
             } else if ($episode === 0) {
               handlePopUpMessage(
                 event as PointerEvent,
-                "This is the first episode."
+                "You selected the first episode of this season."
               );
             } else {
               $episode--;
-              handleOptions.reset(null);
+              if ($selectedOption) handleOptions.reset(null);
             }
             break;
           case "forward":
@@ -94,11 +94,11 @@
             } else if ($episode === 15) {
               handlePopUpMessage(
                 event as PointerEvent,
-                "This is the last episode."
+                "You selected the last episode of this season."
               );
             } else {
               $episode++;
-              handleOptions.reset(null);
+              if ($selectedOption) handleOptions.reset(null);
             }
             break;
         }

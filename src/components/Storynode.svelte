@@ -10,6 +10,7 @@
   import { selectedNFTs } from "../stores/NFTs.ts";
   import handleOptions from "../utils/options.ts";
   import vote from "../utils/vote.ts";
+  import handleNftTiles from "../utils/nftTiles.ts";
 
   export let storyNodes: StoryNode[];
   export let handlePopUpMessage: Function;
@@ -43,7 +44,7 @@
       if (storyNodes[$episode].ended) {
         handlePopUpMessage(
           event as PointerEvent,
-          "Voting for this episode is ended."
+          "Voting period for this episode is ended."
         );
         return;
       }

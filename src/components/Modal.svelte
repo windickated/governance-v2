@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <button class="close-button" on:click={closeDialog}>❌</button>
+    <!-- <button class="close-button" on:click={closeDialog}>❌</button> -->
   </div>
 </dialog>
 
@@ -84,7 +84,7 @@
     border-radius: 0.5vw;
   }
 
-  .close-button {
+  /* .close-button {
     position: absolute;
     top: 0;
     right: 0;
@@ -98,7 +98,7 @@
   .close-button:hover,
   .close-button:active {
     background-color: rgba(45, 90, 216, 0.9);
-  }
+  } */
 
   button {
     gap: 1vw;
@@ -109,7 +109,7 @@
   h1 {
     text-align: center;
     font-size: 2vw;
-    line-height: 2vw;
+    line-height: 3vw;
     padding-inline: 3vw;
   }
 
@@ -118,8 +118,8 @@
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;
-    gap: 3vw;
-    padding: 1vw 3vw;
+    gap: 2vw;
+    padding-block: 0.5vw;
   }
 
   .confirm > div {
@@ -158,15 +158,15 @@
 
   @media only screen and (max-width: 600px) {
     dialog {
-      max-width: 95vw;
+      max-width: 80vw;
     }
 
-    .close-button {
+    /* .close-button {
       margin: 1em;
       padding: 0.25em;
       font-size: 1.2em;
       line-height: 1.2em;
-    }
+    } */
 
     h1 {
       font-size: 1.2em;
@@ -175,20 +175,14 @@
 
     button {
       gap: 1em;
-      padding: 0.5em;
-      font-size: 1em;
-      line-height: 1.6em;
+      padding: 1em 1.5em;
+      font-size: 1.25em;
+      line-height: 1.25em;
     }
 
     .confirm {
-      gap: 1em;
-      padding: 1em;
-    }
-
-    .confirm {
-      max-width: 80vw;
       gap: 1.5em;
-      padding: 1em 2em;
+      padding-block: 0.5em;
     }
 
     .confirm h1 {
@@ -202,8 +196,9 @@
     }
 
     .confirm button {
-      padding: 0.5vw 2vw;
-      font-size: 1.2em;
+      padding: 0 1.5em;
+      font-size: 1.5em;
+      line-height: 1.5em;
     }
   }
 

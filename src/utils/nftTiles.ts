@@ -1,12 +1,12 @@
-import { NFT, potentials, selectedNFTs, inactiveNFTs } from "../stores/NFTs";
+import { NFT, potentials, selectedNFTs } from "../stores/NFTs";
+import { episode } from "../stores/storyNode";
+import { contract } from "../lib/contract";
 
 let _potentials: NFT[];
-let _selectedNFTs: NFT[];
-let _inactiveNFTs: NFT[];
+let _episode: number;
 
 potentials.subscribe((arr) => _potentials = arr);
-selectedNFTs.subscribe((arr) => _selectedNFTs = arr);
-inactiveNFTs.subscribe((arr) => _inactiveNFTs = arr);
+episode.subscribe((number) => _episode = number);
 
 const handleNftTiles = {
   focus: (tile: HTMLDivElement) => {
@@ -20,35 +20,18 @@ const handleNftTiles = {
     tile.style.color = "inherit";
   },
   reset: () => {
-    _potentials.map((potential) => {
+    _potentials.map(async (potential) => {
       if (potential.selected) {
         potential.selected = false;
-        potential.active = false;
-        _inactiveNFTs.push(potential);
       }
     })
     selectedNFTs.set([]);
-    inactiveNFTs.set(_inactiveNFTs);
-    const inactiveIDs = _inactiveNFTs.map((nft) => nft.id);
-    Array.from(document.querySelectorAll(".nft")).forEach((div: any) => {
-      if (inactiveIDs.includes(div.id)) {
-        handleNftTiles.blur(div);
-        div.style.opacity = '0.5';
-      }
-    });
+    potentials.set(_potentials);
   },
   undoVote: (tile: HTMLDivElement) => {
     console.log('Undo vote of #' + tile.id);
-    _potentials.map((potential) => {
-      if (potential.id == Number(tile.id)) potential.active = true;
-    })
-    let filteredOutArr = _inactiveNFTs.filter(potential => potential.id != Number(tile.id));
-    tile.style.opacity = '1';
-    potentials.set(_potentials);
-    inactiveNFTs.set(filteredOutArr);
-    console.log('Inactive NFTs: ');
-    console.log(filteredOutArr);
-  }
+    // contract.undoVote(_episode, tile.id);
+  },
 }
 
 export default handleNftTiles;
