@@ -12,6 +12,7 @@
     getNFTs,
     nftVote,
     walletAddress,
+    hasPotential,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
@@ -74,9 +75,10 @@
         if (net.chainId === BigInt(network.chainId)) {
           await provider.send("eth_requestAccounts", []);
           $isLogged = true;
+          if (!$hasPotential) $hasPotential = true;
           networkSwitcher.style.display = "none";
           walletButton.style.display = "block";
-          walletButton.innerHTML = "Disconect";
+          walletButton.innerHTML = "Disconnect";
           walletLegend.style.display = "none";
           wallet.style.display = "block";
           getNFTs();
@@ -89,7 +91,7 @@
     } else {
       $isLogged = false;
       $potentials = [];
-      walletButton.innerHTML = "Log in";
+      walletButton.innerHTML = "Sign in";
       walletLegend.style.display = "block";
       wallet.style.display = "none";
     }
@@ -447,7 +449,7 @@
       "
       on:click={connectWallet}
     >
-      Log in
+      Sign in
     </button>
     <button
       class="switch-network"
@@ -490,10 +492,16 @@
       </div>
     {:else}
       <p class="no-nfts-title">
-        You need to have a <a
-          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
-          >Potential</a
-        > to be able to vote.
+        {#if $hasPotential === true}
+          Please sign the transaction in your wallet to proceed.
+        {:else if $hasPotential === false}
+          Your wallet doesn't have any <a
+            href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+            >Potential</a
+          >... You're not allowed to enter the Galactic Governance Hub.
+        {:else}
+          The transaction was rejected. Try again if you want to enter.
+        {/if}
       </p>
     {/if}
   {/if}
@@ -902,7 +910,7 @@ a11y-no-static-element-interactions -->
     .switch-network {
       font-size: inherit;
       width: 38vw;
-      height: 10vw;
+      height: 8vw;
     }
 
     .nfts-legend {

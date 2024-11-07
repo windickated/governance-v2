@@ -46,7 +46,7 @@
     Y = event.clientY;
     setTimeout(() => {
       showMessage = false;
-    }, 600);
+    }, 650);
   };
 </script>
 

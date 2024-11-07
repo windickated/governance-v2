@@ -38,8 +38,6 @@
         >
       </div>
     </div>
-
-    <!-- <button class="close-button" on:click={closeDialog}>❌</button> -->
   </div>
 </dialog>
 
@@ -83,22 +81,6 @@
     );
     border-radius: 0.5vw;
   }
-
-  /* .close-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 1vw;
-    padding: 1vw;
-    font-size: 2vw;
-    line-height: 2vw;
-    background-color: rgba(22, 30, 95, 0.9);
-  }
-
-  .close-button:hover,
-  .close-button:active {
-    background-color: rgba(45, 90, 216, 0.9);
-  } */
 
   button {
     gap: 1vw;
@@ -160,13 +142,6 @@
     dialog {
       max-width: 80vw;
     }
-
-    /* .close-button {
-      margin: 1em;
-      padding: 0.25em;
-      font-size: 1.2em;
-      line-height: 1.2em;
-    } */
 
     h1 {
       font-size: 1.2em;
