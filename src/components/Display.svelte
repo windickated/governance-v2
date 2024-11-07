@@ -4,7 +4,7 @@
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
 
-  export let handlePopUpMessage: any;
+  export let handlePopUpMessage: Function;
 
   // Format button
   let formatButtonState: boolean = true; // video on, text off

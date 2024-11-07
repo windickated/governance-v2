@@ -23,7 +23,18 @@
     if (width > 600) mobileTextVisibility = true;
   });
 
-  $: if (storyNodes && $episode !== -1) $story = storyNodes[$episode];
+  $: if (storyNodes) {
+    if ($episode !== -1) {
+      $story = storyNodes[$episode];
+    } else {
+      $story = null;
+    }
+    $selectedNFTs = [];
+    Array.from(document.querySelectorAll(".nft")).forEach((div: Node) => {
+      const nftTile = div as HTMLDivElement;
+      handleNftTiles.blur(nftTile);
+    });
+  }
 
   function selectOption(event: Event) {
     const target = event.target as HTMLDivElement;
@@ -92,7 +103,6 @@
       <h2 class="duration">{$story.duration}</h2>
     {:else}
       <h1 class="empty-header">Loading episodes...</h1>
-      <!-- <h1 class="empty-header">Select any episode from the tab</h1> -->
     {/if}
   </div>
 

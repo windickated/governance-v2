@@ -8,17 +8,29 @@
   import { onMount } from "svelte";
 
   import { metamask_init } from "../lib/ethers";
-  import { get_nodes } from "../stores/storyNode";
+  import { type StoryNode, get_nodes } from "../stores/storyNode";
 
-  let storyNodes: any;
+  let storyNodes: StoryNode[];
 
   onMount(async () => {
     if (!(await metamask_init())) return;
 
     const legend = document.querySelector(".empty-header");
+    const pulseKeyframes = new KeyframeEffect(
+      legend,
+      [{ opacity: "0" }, { opacity: "0.5" }, { opacity: "0" }],
+      {
+        duration: 3000,
+        easing: "linear",
+        iterations: Infinity,
+      }
+    );
+    const pulseAnimation = new Animation(pulseKeyframes);
+    pulseAnimation.play();
 
     storyNodes = await get_nodes();
 
+    pulseAnimation.cancel();
     legend!.innerHTML = "Select any episode from the tab";
   });
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    type StoryNode,
     story,
     season,
     episode,
@@ -19,8 +20,8 @@
   import { showModal } from "../stores/modal.ts";
   import { provider, switch_network, network } from "../lib/ethers";
 
-  export let storyNodes: any;
-  export let handlePopUpMessage: any;
+  export let storyNodes: StoryNode[];
+  export let handlePopUpMessage: Function;
 
   /* --- EPISODES --- */
 
@@ -31,7 +32,6 @@
     $season = Number(seasonSelector?.value);
     $episode = -1;
     $story = null;
-    resetEpisodes();
   };
 
   const switchEpisode = (event: Event) => {
@@ -41,22 +41,19 @@
         ? target
         : (target.parentElement as HTMLDivElement);
     $episode = Number(episodeContainer?.id);
-    resetEpisodes();
-    episodeContainer!.style.color = "#010020";
-    episodeContainer!.style.filter =
-      "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
+    handleOptions.reset(null);
   };
 
-  function resetEpisodes() {
-    if ($selectedOption) handleOptions.reset(null);
+  $: if ($episode !== -1) {
     Array.from(episodes.children).forEach((node: ChildNode) => {
       const episode = node as HTMLDivElement;
-      episode.style.color = "inherit";
-      episode.style.filter = "none";
-    });
-    $selectedNFTs = [];
-    Array.from(document.querySelectorAll(".nft")).forEach((div: any) => {
-      handleNftTiles.blur(div);
+      if ($episode == Number(episode.id)) {
+        episode!.style.color = "#010020";
+        episode!.style.filter = "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
+      } else {
+        episode.style.color = "inherit";
+        episode.style.filter = "none";
+      }
     });
   }
 
@@ -115,7 +112,7 @@
           );
           return;
         }
-        if (!storyNodes[$episode].ended) {
+        if (storyNodes[$episode].ended) {
           if (vote !== 0)
             handlePopUpMessage(
               event as PointerEvent,
@@ -412,7 +409,7 @@
       {/each}
     </div>
   {:else}
-    <p class="season-title">Loading Franchise...</p>
+    <p class="season-title loading">Loading Franchise</p>
   {/if}
 </div>
 
@@ -809,6 +806,11 @@ a11y-no-static-element-interactions -->
     color: white;
   }
 
+  .loading:after {
+    content: "";
+    animation: dots 2s linear infinite;
+  }
+
   @media screen and (max-width: 600px) {
     .nft-icon {
       width: 70vw;
@@ -942,6 +944,26 @@ a11y-no-static-element-interactions -->
     .nft-vote {
       font-size: 0.9em;
       line-height: 1.5em;
+    }
+  }
+
+  @keyframes dots {
+    0%,
+    10% {
+      content: "";
+    }
+    30% {
+      content: ".";
+    }
+    50% {
+      content: "..";
+    }
+    70% {
+      content: "...";
+    }
+    90%,
+    100% {
+      content: "";
     }
   }
 </style>

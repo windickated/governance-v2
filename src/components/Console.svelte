@@ -4,7 +4,7 @@
   import { episode, selectedOption } from "../stores/storyNode.ts";
   import handleOptions from "../utils/options.ts";
 
-  export let handlePopUpMessage: any;
+  export let handlePopUpMessage: Function;
 
   let touchscreenDevice: boolean = false;
   onMount(() => {

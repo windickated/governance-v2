@@ -18,9 +18,10 @@ const handleOptions = {
   },
   reset: (state: number | null) => {
     selectedOption.set(state);
-    Array.from(document.querySelectorAll(".option")).forEach((div: any) => {
-      const img = div.children[0];
-      if (_option !== Number(div.id)) handleOptions.blur(div, img);
+    Array.from(document.querySelectorAll(".option")).forEach((div: Node) => {
+      const option = div as HTMLDivElement;
+      const img = option.children[0] as HTMLImageElement;
+      if (_option !== Number(option.id)) handleOptions.blur(option, img);
     });
   }
 }
