@@ -12,7 +12,7 @@
     getNFTs,
     nftVote,
     walletAddress,
-    hasPotential,
+    transactionInfo,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
@@ -74,14 +74,17 @@
       await provider.getNetwork().then(async (net) => {
         if (net.chainId === BigInt(network.chainId)) {
           await provider.send("eth_requestAccounts", []);
+          let reject: boolean = false;
+          await getNFTs().then((res) => {
+            if (res === null) reject = true;
+          });
+          if (reject) return;
           $isLogged = true;
-          if (!$hasPotential) $hasPotential = true;
           networkSwitcher.style.display = "none";
           walletButton.style.display = "block";
           walletButton.innerHTML = "Disconnect";
           walletLegend.style.display = "none";
           wallet.style.display = "block";
-          getNFTs();
         } else {
           walletLegend.innerHTML = "You're on a wrong network!";
           walletButton.style.display = "none";
@@ -492,18 +495,16 @@
       </div>
     {:else}
       <p class="no-nfts-title">
-        {#if $hasPotential === true}
-          Please sign the transaction in your wallet to proceed.
-        {:else if $hasPotential === false}
-          Your wallet doesn't have any <a
-            href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
-            >Potential</a
-          >... You're not allowed to enter the Galactic Governance Hub.
-        {:else}
-          The transaction was rejected. Try again if you want to enter.
-        {/if}
+        Your wallet doesn't have any <a
+          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+          >Potential</a
+        >... You're not allowed to enter the Galactic Governance Hub.
       </p>
     {/if}
+  {:else if $transactionInfo}
+    <p class="transaction-info">
+      {$transactionInfo}
+    </p>
   {/if}
 </div>
 
@@ -742,7 +743,8 @@ a11y-no-static-element-interactions -->
     white-space: nowrap;
   }
 
-  .no-nfts-title {
+  .no-nfts-title,
+  .transaction-info {
     width: 80%;
     text-align: center;
     font-size: 2vw;
@@ -922,7 +924,8 @@ a11y-no-static-element-interactions -->
       font-size: inherit;
     }
 
-    .no-nfts-title {
+    .no-nfts-title,
+    .transaction-info {
       font-size: 1em;
       line-height: 1.6em;
       margin-block: 2em;

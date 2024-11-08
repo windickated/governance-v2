@@ -20,26 +20,31 @@ export class NFT {
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const walletAddress = writable<string>('');
-export const hasPotential = writable<boolean | null>(true);
+export const transactionInfo = writable<string | null>(null);
 
-const message: string = `
+const message = (address: string): string => { 
+return `
 Only Potential holders can enter the Galactic Governance Hub!
 
-Sign this message to prove you're a Potentials NFT holder.
+Sign this message with your wallet
+${address}
+to prove you're a Potentials NFT holder.
 
 It will not cause a blockchain transaction, nor any gas fees.
-`;
+`;}
 
 export async function getNFTs() {
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
   walletAddress.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
   try {
-    await signer.signMessage(message);
+    transactionInfo.set('Please sign the transaction in your wallet to proceed.');
+    await signer.signMessage(message(address));
   } catch (error) {
-    hasPotential.set(null);
-    return;
+    transactionInfo.set('The transaction was rejected. Try again if you want to enter.');
+    return null;
   }
+  transactionInfo.set(null);
   const json = await fetch(
     `https://api.degenerousdao.com/nft/owner/${address}`
   );
@@ -55,7 +60,6 @@ export async function getNFTs() {
     potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
   }
   potentials.set(potentialNFTs);
-  if (potentialNFTs.length < 1) hasPotential.set(false);
 }
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
