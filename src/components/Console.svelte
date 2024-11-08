@@ -1,24 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
-  import { allStories, season, episode } from "../stores/storyNode.ts";
+  import { episode, selectedOption } from "../stores/storyNode.ts";
   import handleOptions from "../utils/options.ts";
-  import PopUpMessage from "./PopUpMessage.svelte";
 
-  let showMessage: boolean;
-  let messageNote: string;
-  let X: number;
-  let Y: number;
-
-  const handlePopUpMessage = (event: PointerEvent, note: string) => {
-    showMessage = true;
-    messageNote = note;
-    X = event.clientX;
-    Y = event.clientY;
-    setTimeout(() => {
-      showMessage = false;
-    }, 600);
-  };
+  export let handlePopUpMessage: Function;
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
@@ -35,8 +21,7 @@
     id: string,
     isClicked: boolean = false
   ) => {
-    if (id != "omnihub") {
-      //temporarily disabled Omnihub
+    if (id != "omnihub") { //temporarily disabled Omnihub
       const button: HTMLElement | null = document.getElementById(id);
       const buttonHover: HTMLElement | null = document.getElementById(`${id}-hover`);
       const buttonActive: HTMLElement | null = document.getElementById(`${id}-active`);
@@ -85,35 +70,35 @@
             );
             break;
           case "back":
-            if (!$episode) {
+            if ($episode === -1) {
               handlePopUpMessage(
                 event as PointerEvent,
                 "There is no episode selected!"
               );
-            } else if ($episode === 1) {
+            } else if ($episode === 0) {
               handlePopUpMessage(
                 event as PointerEvent,
-                "This is the first episode."
+                "You selected the first episode of this season."
               );
-            } else if ($episode) {
+            } else {
               $episode--;
-              handleOptions.reset(null);
+              if ($selectedOption) handleOptions.reset(null);
             }
             break;
           case "forward":
-            if (!$episode) {
+            if ($episode === -1) {
               handlePopUpMessage(
                 event as PointerEvent,
                 "There is no episode selected!"
               );
-            } else if ($episode === allStories[$season - 1].length) {
+            } else if ($episode === 15) {
               handlePopUpMessage(
                 event as PointerEvent,
-                "This is the last episode."
+                "You selected the last episode of this season."
               );
-            } else if ($episode) {
+            } else {
               $episode++;
-              handleOptions.reset(null);
+              if ($selectedOption) handleOptions.reset(null);
             }
             break;
         }
@@ -124,16 +109,14 @@
 
 <svelte:window bind:outerWidth={width} />
 
-<PopUpMessage {showMessage} {messageNote} {X} {Y} />
-
 <div class="console-panel" bind:this={consoleBar} style="
-{width <= 600 && !$episode ? 'position: fixed; bottom: 0;' : ''}
+{width <= 600 && $episode === -1 ? 'position: fixed; bottom: 0;' : ''}
 ">
   <div class="console-buttons">
     {#each consolePanel.buttons as button}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
       <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-      <div class="{button.id} {button.size}">
+      <div class="{button.id} {button.size}" role="button" tabindex="0">
         <img
           on:mouseover={() => {
             consoleButtonsHandle(event as Event, button.id);
