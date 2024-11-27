@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
+    storyNodes,
     story,
-    type StoryNode,
     season,
     episode,
     selectedOption,
@@ -12,7 +12,6 @@
   import vote from "../utils/vote.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
 
-  export let storyNodes: StoryNode[];
   export let handlePopUpMessage: Function;
 
   let width: number;
@@ -23,9 +22,9 @@
     if (width > 600) mobileTextVisibility = true;
   });
 
-  $: if (storyNodes) {
+  $: if ($storyNodes.length > 0) {
     if ($episode !== -1) {
-      $story = storyNodes[$episode];
+      $story = $storyNodes[$episode];
     } else {
       $story = null;
     }
@@ -52,7 +51,7 @@
     if (event.type === "pointerout")
       handleOptions.blur(optionContainer, optionSelector);
     if (event.type === "click") {
-      if (storyNodes[$episode].ended) {
+      if ($storyNodes[$episode].ended) {
         handlePopUpMessage(
           event as PointerEvent,
           "Voting period for this episode is ended."
@@ -182,9 +181,9 @@
     </div>
 
     <span
-      class="voting-ended {storyNodes[$episode].ended ? '' : 'voting-active'}"
+      class="voting-ended {$storyNodes[$episode].ended ? '' : 'voting-active'}"
     >
-      {storyNodes[$episode].ended ? "Voting ended" : "Voting active"}
+      {$storyNodes[$episode].ended ? "Voting ended" : "Voting active"}
     </span>
   {/if}
 </section>

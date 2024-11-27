@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
-  import { episode, selectedOption } from "../stores/storyNode.ts";
+  import { storyNodes, episode, selectedOption } from "../stores/storyNode.ts";
   import handleOptions from "../utils/options.ts";
 
   export let handlePopUpMessage: Function;
@@ -21,10 +21,15 @@
     id: string,
     isClicked: boolean = false
   ) => {
-    if (id != "omnihub") { //temporarily disabled Omnihub
+    if (id != "omnihub") {
+      //temporarily disabled Omnihub
       const button: HTMLElement | null = document.getElementById(id);
-      const buttonHover: HTMLElement | null = document.getElementById(`${id}-hover`);
-      const buttonActive: HTMLElement | null = document.getElementById(`${id}-active`);
+      const buttonHover: HTMLElement | null = document.getElementById(
+        `${id}-hover`
+      );
+      const buttonActive: HTMLElement | null = document.getElementById(
+        `${id}-active`
+      );
       if (!touchscreenDevice) {
         if (event.type === "click") {
           button!.style.display = "none";
@@ -91,7 +96,7 @@
                 event as PointerEvent,
                 "There is no episode selected!"
               );
-            } else if ($episode === 15) {
+            } else if ($episode === $storyNodes.length - 1) {
               handlePopUpMessage(
                 event as PointerEvent,
                 "You selected the last episode of this season."
@@ -109,9 +114,13 @@
 
 <svelte:window bind:outerWidth={width} />
 
-<div class="console-panel" bind:this={consoleBar} style="
+<div
+  class="console-panel"
+  bind:this={consoleBar}
+  style="
 {width <= 600 && $episode === -1 ? 'position: fixed; bottom: 0;' : ''}
-">
+"
+>
   <div class="console-buttons">
     {#each consolePanel.buttons as button}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->

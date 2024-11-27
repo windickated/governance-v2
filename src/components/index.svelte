@@ -8,9 +8,7 @@
   import { onMount } from "svelte";
 
   import { metamask_init } from "../lib/ethers";
-  import { type StoryNode, get_nodes } from "../stores/storyNode";
-
-  let storyNodes: StoryNode[];
+  import { storyNodes, get_nodes } from "../stores/storyNode";
 
   onMount(async () => {
     if (!(await metamask_init())) return;
@@ -28,10 +26,14 @@
     const pulseAnimation = new Animation(pulseKeyframes);
     pulseAnimation.play();
 
-    storyNodes = await get_nodes();
-
-    pulseAnimation.cancel();
-    legend!.innerHTML = "Select any episode from the tab";
+    try {
+      $storyNodes = await get_nodes();
+      pulseAnimation.cancel();
+      legend!.innerHTML = "Select any episode from the tab";
+    } catch (error) {
+      alert("Please sign in your wallet to load Story Nodes.");
+      console.log(error);
+    }
   });
 
   let showMessage: boolean;
@@ -61,9 +63,9 @@
     </div>
     <main>
       <Display {handlePopUpMessage} />
-      <Storynode {storyNodes} {handlePopUpMessage} />
+      <Storynode {handlePopUpMessage} />
       <Console {handlePopUpMessage} />
-      <Sidebars {storyNodes} {handlePopUpMessage} />
+      <Sidebars {handlePopUpMessage} />
 
       <PopUpMessage {showMessage} {messageNote} {X} {Y} />
     </main>

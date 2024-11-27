@@ -15,9 +15,11 @@ export type StoryNode = {
   }[];
 };
 
+export const storyNodes = writable<StoryNode[]>([]);
+
 export const story = writable<StoryNode | null>(null)
 
-export const season = writable<number>(1);
+export const season = writable<number>(2);
 export const episode = writable<number>(-1);
 export const selectedOption = writable<number | null>(null);
 
@@ -30,7 +32,9 @@ export const get_nodes = async () => {
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
       ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
     }
-    const json = await fetch(`https://ipfs.degenerousdao.com/ipfs/${ipfs_uri.slice(7)}`);
+    console.log(`Episode ${(i + 1)}: ` + ipfs_uri);
+    const slicedURI = ipfs_uri.match('ipfs://') ? ipfs_uri.slice(7) : ipfs_uri;
+    const json = await fetch(`https://ipfs.degenerousdao.com/ipfs/${slicedURI}`);
     nodes.push(await json.json());
     const {endTimestamp} = await (await contract()).storyNodes(i);
     nodes[nodes.length - 1].endTimestamp = Number(endTimestamp);

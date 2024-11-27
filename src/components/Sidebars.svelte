@@ -1,10 +1,11 @@
 <script lang="ts">
   import {
-    type StoryNode,
+    storyNodes,
     story,
     season,
     episode,
     selectedOption,
+    get_nodes,
   } from "../stores/storyNode.ts";
   import {
     potentials,
@@ -21,18 +22,23 @@
   import { showModal } from "../stores/modal.ts";
   import { provider, switch_network, network } from "../lib/ethers";
 
-  export let storyNodes: StoryNode[];
   export let handlePopUpMessage: Function;
 
   /* --- EPISODES --- */
 
   let episodes: HTMLDivElement;
 
-  const switchSeason = (event: Event) => {
+  const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
     $season = Number(seasonSelector?.value);
     $episode = -1;
     $story = null;
+    $storyNodes = [];
+    try {
+      $storyNodes = await get_nodes();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const switchEpisode = (event: Event) => {
@@ -117,7 +123,7 @@
           );
           return;
         }
-        if (storyNodes[$episode].ended) {
+        if ($storyNodes[$episode].ended) {
           if (vote !== 0)
             handlePopUpMessage(
               event as PointerEvent,
@@ -385,14 +391,15 @@
 ></span>
 
 <div class="episodes-bar" bind:this={episodesBar}>
-  {#if storyNodes}
-    <p class="season-title">The Dishordian Saga</p>
-    <select class="season" on:change={switchSeason}>
-      <option value="1">Season 1</option>
-    </select>
+  <p class="season-title">The Dishordian Saga</p>
+  <select class="season" on:change={switchSeason}>
+    <option value="1">Season 1</option>
+    <option value="2" selected={true}>Season 2</option>
+  </select>
+  {#if $storyNodes.length > 0}
     <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
     <div class="episodes-container" bind:this={episodes}>
-      {#each storyNodes as episode, number}
+      {#each $storyNodes as episode, number}
         <div
           role="button"
           tabindex="0"
@@ -414,7 +421,7 @@
       {/each}
     </div>
   {:else}
-    <p class="season-title loading">Loading Franchise</p>
+    <p class="season-title loading">Loading Season {$season}</p>
   {/if}
 </div>
 
