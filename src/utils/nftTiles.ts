@@ -27,11 +27,7 @@ const handleNftTiles = {
     })
     selectedNFTs.set([]);
     potentials.set(_potentials);
-  },
-  undoVote: (tile: HTMLDivElement) => {
-    console.log('Undo vote of #' + tile.id);
-    // contract.undoVote(_episode, tile.id);
-  },
+  }
 }
 
 export default handleNftTiles;

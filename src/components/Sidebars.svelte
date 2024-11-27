@@ -18,8 +18,6 @@
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import handleNftTiles from "../utils/nftTiles.ts";
-  import Modal from "./Modal.svelte";
-  import { showModal } from "../stores/modal.ts";
   import { provider, switch_network, network } from "../lib/ethers";
 
   export let handlePopUpMessage: Function;
@@ -73,7 +71,6 @@
   let networkSwitcher: HTMLButtonElement;
 
   let nftTiles: HTMLDivElement;
-  let selectedNftTile: HTMLDivElement;
 
   async function connectWallet() {
     if (!$isLogged) {
@@ -123,27 +120,24 @@
           );
           return;
         }
-        // if ($storyNodes[$episode].ended) {
-        //   if (vote !== 0)
-        //     handlePopUpMessage(
-        //       event as PointerEvent,
-        //       `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option.`
-        //     );
-        //   else
-        //     handlePopUpMessage(
-        //       event as PointerEvent,
-        //       "This Potential missed voting."
-        //     );
-        //   return;
-        // }
+        if ($storyNodes[$episode].ended) {
+          if (vote !== 0)
+            handlePopUpMessage(
+              event as PointerEvent,
+              `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option.`
+            );
+          else
+            handlePopUpMessage(
+              event as PointerEvent,
+              "This Potential missed voting."
+            );
+          return;
+        }
         if (vote !== 0 && !potential.selected) {
           handlePopUpMessage(
             event as PointerEvent,
             `This Potential will change his decision.`
           );
-          // $showModal = true;
-          // selectedNftTile = nftTile;
-          // return;
         }
         potential.selected = !potential.selected;
         if (potential.selected) {
@@ -381,8 +375,6 @@
 </script>
 
 <svelte:window bind:outerWidth={width} />
-
-<Modal {selectedNftTile} />
 
 <!-- --- Episodes tab --- -->
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->

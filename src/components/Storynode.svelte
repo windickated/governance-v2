@@ -51,13 +51,13 @@
     if (event.type === "pointerout")
       handleOptions.blur(optionContainer, optionSelector);
     if (event.type === "click") {
-      // if ($storyNodes[$episode].ended) {
-      //   handlePopUpMessage(
-      //     event as PointerEvent,
-      //     "Voting period for this episode is ended."
-      //   );
-      //   return;
-      // }
+      if ($storyNodes[$episode].ended) {
+        handlePopUpMessage(
+          event as PointerEvent,
+          "Voting period for this episode is ended."
+        );
+        return;
+      }
       if ($selectedNFTs.length === 0) {
         handlePopUpMessage(
           event as PointerEvent,
