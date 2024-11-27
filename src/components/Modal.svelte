@@ -26,7 +26,7 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div on:click|stopPropagation>
     <div class="confirm">
-      <h1>Do you want to undo this Potential's decision?</h1>
+      <h1>Do you want to change this Potential's decision?</h1>
       <div>
         <button class="no-btn" on:click={closeDialog}>NO</button>
         <button

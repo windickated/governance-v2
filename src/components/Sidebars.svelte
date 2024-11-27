@@ -123,23 +123,27 @@
           );
           return;
         }
-        if ($storyNodes[$episode].ended) {
-          if (vote !== 0)
-            handlePopUpMessage(
-              event as PointerEvent,
-              `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option.`
-            );
-          else
-            handlePopUpMessage(
-              event as PointerEvent,
-              "This Potential missed voting."
-            );
-          return;
-        }
-        if (vote !== 0) {
-          $showModal = true;
-          selectedNftTile = nftTile;
-          return;
+        // if ($storyNodes[$episode].ended) {
+        //   if (vote !== 0)
+        //     handlePopUpMessage(
+        //       event as PointerEvent,
+        //       `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option.`
+        //     );
+        //   else
+        //     handlePopUpMessage(
+        //       event as PointerEvent,
+        //       "This Potential missed voting."
+        //     );
+        //   return;
+        // }
+        if (vote !== 0 && !potential.selected) {
+          handlePopUpMessage(
+            event as PointerEvent,
+            `This Potential will change his decision.`
+          );
+          // $showModal = true;
+          // selectedNftTile = nftTile;
+          // return;
         }
         potential.selected = !potential.selected;
         if (potential.selected) {
@@ -479,26 +483,30 @@
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
-        {#each $potentials as NFT}
-          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
+        {#key $selectedOption}
+          {#each $potentials as NFT}
+            <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
           a11y-no-static-element-interactions -->
-          {#await nftVote($episode, NFT.id) then vote}
-            <div
-              class="nft"
-              id={NFT.id.toString()}
-              on:click={selectNFT}
-              style={vote > 0 ? "opacity: 0.5;" : ""}
-              data-vote={vote}
-            >
-              <img class="nft-image" src={NFT.image} alt={NFT.name} />
-              <p class="nft-name">{NFT.name}</p>
-              <p class="nft-class">{NFT.class}</p>
-              {#if vote > 0}
-                <p class="nft-vote">Selected option: <strong>{vote}</strong></p>
-              {/if}
-            </div>
-          {/await}
-        {/each}
+            {#await nftVote($episode, NFT.id) then vote}
+              <div
+                class="nft"
+                id={NFT.id.toString()}
+                on:click={selectNFT}
+                style={vote > 0 ? "opacity: 0.5;" : ""}
+                data-vote={vote}
+              >
+                <img class="nft-image" src={NFT.image} alt={NFT.name} />
+                <p class="nft-name">{NFT.name}</p>
+                <p class="nft-class">{NFT.class}</p>
+                {#if vote > 0}
+                  <p class="nft-vote">
+                    Selected option: <strong>{vote}</strong>
+                  </p>
+                {/if}
+              </div>
+            {/await}
+          {/each}
+        {/key}
       </div>
     {:else}
       <p class="no-nfts-title">
