@@ -1,6 +1,5 @@
 import { NFT, potentials, selectedNFTs } from "../stores/NFTs";
 import { episode } from "../stores/storyNode";
-import { contract } from "../lib/contract";
 
 let _potentials: NFT[];
 let _episode: number;

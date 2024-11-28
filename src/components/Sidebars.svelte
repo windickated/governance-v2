@@ -152,6 +152,12 @@
     });
   }
 
+  const forceTilesReRender = () => {
+    $potentials = $potentials;
+    handleOptions.reset(null);
+    handleNftTiles.reset();
+  };
+
   /* --- TABS HANDLING --- */
 
   let width: number;
@@ -178,8 +184,6 @@
   // NFTs tab opening
   function handleNFTsBar() {
     if (episodesBarState) handleEpisodesBar();
-
-    // $potentials = $potentials; // force re-render NFTs
 
     if (!nftBarState) {
       if (width <= 600) {
@@ -473,34 +477,37 @@
       <div class="nfts-legend">
         <p class="nfts-total">
           Total NFTs: {$potentials.length}
+          <button class="refresh-button" on:click={forceTilesReRender}>
+            <img src="/refresh.png" alt="Refresh" />
+          </button>
         </p>
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
-        {#key $potentials}
-          {#each $potentials as NFT}
-            <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
+        <!-- {#key $potentials} -->
+        {#each $potentials as NFT}
+          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
             a11y-no-static-element-interactions -->
-            {#await nftVote($episode, NFT.id) then vote}
-              <div
-                class="nft"
-                id={NFT.id.toString()}
-                on:click={selectNFT}
-                style={vote > 0 ? "opacity: 0.5;" : ""}
-                data-vote={vote}
-              >
-                <img class="nft-image" src={NFT.image} alt={NFT.name} />
-                <p class="nft-name">{NFT.name}</p>
-                <p class="nft-class">{NFT.class}</p>
-                {#if vote > 0}
-                  <p class="nft-vote">
-                    Selected option: <strong>{vote}</strong>
-                  </p>
-                {/if}
-              </div>
-            {/await}
-          {/each}
-        {/key}
+          {#await nftVote($episode, NFT.id) then vote}
+            <div
+              class="nft"
+              id={NFT.id.toString()}
+              on:click={selectNFT}
+              style={vote > 0 ? "opacity: 0.5;" : ""}
+              data-vote={vote}
+            >
+              <img class="nft-image" src={NFT.image} alt={NFT.name} />
+              <p class="nft-name">{NFT.name}</p>
+              <p class="nft-class">{NFT.class}</p>
+              {#if vote > 0}
+                <p class="nft-vote">
+                  Selected option: <strong>{vote}</strong>
+                </p>
+              {/if}
+            </div>
+          {/await}
+        {/each}
+        <!-- {/key} -->
       </div>
     {:else}
       <p class="no-nfts-title">
@@ -750,6 +757,15 @@ a11y-no-static-element-interactions -->
     padding-right: 5vw;
     font-size: 2vw;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+  }
+
+  .refresh-button {
+    width: 3vw;
+    background-color: transparent !important;
+    border: none !important;
   }
 
   .no-nfts-title,
@@ -931,6 +947,11 @@ a11y-no-static-element-interactions -->
     .nfts-total,
     .nfts-selected {
       font-size: inherit;
+      gap: 0.5em;
+    }
+
+    .refresh-button {
+      width: 5vw;
     }
 
     .no-nfts-title,
