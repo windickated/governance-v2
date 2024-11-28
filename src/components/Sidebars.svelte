@@ -179,6 +179,8 @@
   function handleNFTsBar() {
     if (episodesBarState) handleEpisodesBar();
 
+    // $potentials = $potentials; // force re-render NFTs
+
     if (!nftBarState) {
       if (width <= 600) {
         nftsInterval = setInterval(() => {
@@ -410,7 +412,7 @@
             draggable="false"
           />
           <p class="episode-title">
-            {episode.episodeName}
+            {episode.season ? episode.title : episode.episodeName}
           </p>
           <p class="episode-number">Episode {number + 1}</p>
         </div>
@@ -475,10 +477,10 @@
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
-        {#key $selectedOption}
+        {#key $potentials}
           {#each $potentials as NFT}
             <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
-          a11y-no-static-element-interactions -->
+            a11y-no-static-element-interactions -->
             {#await nftVote($episode, NFT.id) then vote}
               <div
                 class="nft"

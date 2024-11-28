@@ -2,6 +2,7 @@ import { writable } from "svelte/store";
 import { contract } from "../lib/contract.ts";
 
 export type StoryNode = {
+  season?: number;
   title: string | undefined;
   episodeName: string | undefined;
   description: string;
@@ -12,6 +13,7 @@ export type StoryNode = {
   duration: string;
   votes_options: {
     option: string;
+    class?: string;
   }[];
 };
 
@@ -32,19 +34,22 @@ export const get_nodes = async () => {
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
       ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
     }
-    console.log(`Episode ${(i + 1)}: ` + ipfs_uri);
     const slicedURI = ipfs_uri.match('ipfs://') ? ipfs_uri.slice(7) : ipfs_uri;
     const json = await fetch(`https://ipfs.degenerousdao.com/ipfs/${slicedURI}`);
     nodes.push(await json.json());
     const {endTimestamp} = await (await contract()).storyNodes(i);
     nodes[nodes.length - 1].endTimestamp = Number(endTimestamp);
     nodes[nodes.length - 1].ended = Number(endTimestamp) * 1000 < (new Date()).getTime();
-    nodes[nodes.length - 1].duration = getDuration(endTimestamp);
-    nodes[nodes.length - 1].episodeName = nodes[nodes.length - 1].title?.replace("The Dischordian Saga: ", "").split(" - Episode ")[0];
-    nodes[nodes.length - 1].image_url = `https://img.youtube.com/vi/${nodes[nodes.length - 1].video_url.split('/')[nodes[nodes.length - 1].video_url.split('/').length - 1].replace('?', '')}/hqdefault.jpg`;
-    nodes[nodes.length - 1].votes_options.map((opt: {option: string}) => {
-      if (opt.option[2] == ' ') opt.option = opt.option.slice(2);
-    })
+    nodes[nodes.length - 1].duration = getDuration(endTimestamp.toString());
+    if (nodes[nodes.length - 1].season) {
+      nodes[nodes.length - 1].image_url = `https://img.youtube.com/vi/${nodes[nodes.length - 1].video_url}/hqdefault.jpg`;
+    } else {
+      nodes[nodes.length - 1].image_url = `https://img.youtube.com/vi/${nodes[nodes.length - 1].video_url.split('/')[nodes[nodes.length - 1].video_url.split('/').length - 1].replace('?', '')}/hqdefault.jpg`;
+      nodes[nodes.length - 1].episodeName = nodes[nodes.length - 1].title?.replace("The Dischordian Saga: ", "").split(" - Episode ")[0];
+      nodes[nodes.length - 1].votes_options.map((opt: {option: string}) => {
+        if (opt.option[2] == ' ') opt.option = opt.option.slice(2);
+      })
+    }
   }
   return nodes as StoryNode[];
 };

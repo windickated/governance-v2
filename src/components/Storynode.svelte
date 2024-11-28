@@ -107,7 +107,9 @@
 
   {#if $story}
     <iframe
-      src={$story.video_url}
+      src={$story.season
+        ? `https://www.youtube.com/embed/${$story.video_url}`
+        : $story.video_url}
       class="video visible"
       title="YouTube"
       allowfullscreen
@@ -149,35 +151,30 @@
         : '2.5vw'}
       "
     >
-      {#key $episode}
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        {#each $story.votes_options as option, index}
-          <div
-            class="option"
-            role="button"
-            tabindex="0"
-            id={(index + 1).toString()}
-            data-class=""
-            on:pointerover={selectOption}
-            on:pointerout={selectOption}
-            on:click={selectOption}
-          >
-            <img
-              class="option-selector"
-              src={"/option-selector.png"}
-              alt="selector"
-              style="
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      {#each $story.votes_options as option, index}
+        <div
+          class="option"
+          role="button"
+          tabindex="0"
+          id={(index + 1).toString()}
+          data-class={option.class}
+          on:pointerover={selectOption}
+          on:pointerout={selectOption}
+          on:click={selectOption}
+        >
+          <img
+            class="option-selector"
+            src={option.class ? `/${option.class}.png` : "/option-selector.png"}
+            alt="selector"
+            style="
                 height: {width > 600 &&
-                (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
+              (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
               "
-            />
-            <!-- src={option.class
-                ? `/${option.class}.png`
-                : "/option-selector.png"} -->
-            {option.option}
-          </div>
-        {/each}
-      {/key}
+          />
+          {option.option}
+        </div>
+      {/each}
     </div>
 
     <span
