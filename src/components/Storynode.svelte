@@ -94,7 +94,7 @@
   <div class="legend blur">
     {#if $story}
       <h1 class="header">
-        {$story.episodeName}
+        {$story.season ? $story.title : $story.episodeName}
       </h1>
       <h1 class="season-episode-number">
         The Dischordian Saga: Season {$season} - Episode {$episode + 1}
