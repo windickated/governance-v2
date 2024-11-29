@@ -1,26 +1,13 @@
-# Builder Stage
-FROM node:23-alpine AS builder
+FROM docker.io/oven/bun:latest
 
-# Install dependencies required for `node-gyp`
-RUN apk add --no-cache python3 make g++
+ENV PUBLIC_BACKEND=/api
 
-# Set the working directory inside the container
 WORKDIR /app
+COPY package.json .
+COPY bun.lockb .
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+RUN bun install
 
-# Install dependencies
-RUN npm install
+COPY . /app
 
-# copy public files
-COPY public ./app/public
-
-# Copy the rest of the application code to the working directory
-COPY . .
-
-# Build the Next.js application
-RUN npm run build
-
-# Start the Next.js application
-CMD ["npm", "start"]
+RUN bun run build
