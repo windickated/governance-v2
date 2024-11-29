@@ -10,7 +10,6 @@
   import { selectedNFTs } from "../stores/NFTs.ts";
   import handleOptions from "../utils/options.ts";
   import vote from "../utils/vote.ts";
-  import handleNftTiles from "../utils/nftTiles.ts";
 
   export let handlePopUpMessage: Function;
 
@@ -29,10 +28,6 @@
       $story = null;
     }
     $selectedNFTs = [];
-    Array.from(document.querySelectorAll(".nft")).forEach((div: Node) => {
-      const nftTile = div as HTMLDivElement;
-      handleNftTiles.blur(nftTile);
-    });
   }
 
   function selectOption(event: Event) {

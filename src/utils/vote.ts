@@ -1,15 +1,16 @@
 import { episode, selectedOption } from "../stores/storyNode";
-import { NFT, selectedNFTs } from "../stores/NFTs";
+import { potentials, NFT, selectedNFTs } from "../stores/NFTs";
 import handleOptions from "../utils/options.ts";
-import handleNftTiles from "../utils/nftTiles.ts";
 import { contract } from "../lib/contract";
 
 let _episode: number;
 let _option: number | null;
+let _potentials: NFT[];
 let _selectedNFTs: NFT[];
 
 episode.subscribe((nr) => _episode = nr);
 selectedOption.subscribe((nr) => _option = nr);
+potentials.subscribe((arr) => _potentials = arr);
 selectedNFTs.subscribe((arr) => _selectedNFTs = arr);
 
 export default async function vote() {
@@ -28,6 +29,13 @@ export default async function vote() {
     );
     await (await contract()).batchVote(_episode, potentialNumbers, options);
   }
+  // reset Options & NFT tiles
   handleOptions.reset(null);
-  handleNftTiles.reset();
+  _potentials.map(async (potential) => {
+    if (potential.selected) {
+      potential.selected = false;
+    }
+  })
+  selectedNFTs.set([]);
+  potentials.set(_potentials);
 }

@@ -17,7 +17,6 @@
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
-  import handleNftTiles from "../utils/nftTiles.ts";
   import { provider, switch_network, network } from "../lib/ethers";
 
   export let handlePopUpMessage: Function;
@@ -71,6 +70,7 @@
   let networkSwitcher: HTMLButtonElement;
 
   let nftTiles: HTMLDivElement;
+  $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
 
   async function connectWallet() {
     if (!$isLogged) {
@@ -143,10 +143,8 @@
         if (potential.selected) {
           $selectedNFTs.push(potential);
           $selectedNFTs = $selectedNFTs; // for Count re-render
-          handleNftTiles.focus(nftTile);
         } else {
           $selectedNFTs = $selectedNFTs.filter((nft) => nft !== potential);
-          handleNftTiles.blur(nftTile);
         }
       }
     });
@@ -154,8 +152,8 @@
 
   const forceTilesReRender = () => {
     $potentials = $potentials;
-    handleOptions.reset(null);
-    handleNftTiles.reset();
+    // handleOptions.reset(null);
+    // handleNftTiles.reset();
   };
 
   /* --- TABS HANDLING --- */
@@ -186,6 +184,7 @@
     if (episodesBarState) handleEpisodesBar();
 
     if (!nftBarState) {
+      $potentials = $potentials; // force re-render NFTs
       if (width <= 600) {
         nftsInterval = setInterval(() => {
           slideBarMobile(true, "nfts");
@@ -493,7 +492,9 @@
               class="nft"
               id={NFT.id.toString()}
               on:click={selectNFT}
-              style={vote > 0 ? "opacity: 0.5;" : ""}
+              style={selectedIDs.flat().includes(NFT.id)
+                ? `background-color: #2441BD; filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 1)); color = #33E2E6; opacity: ${vote > 0 ? "0.5" : "1"};`
+                : `opacity: ${vote > 0 ? "0.5" : "1"}`}
               data-vote={vote}
             >
               <img class="nft-image" src={NFT.image} alt={NFT.name} />
