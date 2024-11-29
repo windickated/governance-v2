@@ -27,6 +27,7 @@
     pulseAnimation.play();
 
     try {
+      legend!.innerHTML = "Loading episodes...";
       $storyNodes = await get_nodes();
       pulseAnimation.cancel();
       legend!.innerHTML = "Select any episode from the tab";

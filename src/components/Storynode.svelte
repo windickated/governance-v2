@@ -96,7 +96,7 @@
       </h1>
       <h2 class="duration">{$story.duration}</h2>
     {:else}
-      <h1 class="empty-header">Loading episodes...</h1>
+      <h1 class="empty-header">Select any episode from the tab</h1>
     {/if}
   </div>
 
