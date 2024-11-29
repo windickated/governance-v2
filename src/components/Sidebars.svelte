@@ -150,12 +150,6 @@
     });
   }
 
-  const forceTilesReRender = () => {
-    $potentials = $potentials;
-    // handleOptions.reset(null);
-    // handleNftTiles.reset();
-  };
-
   /* --- TABS HANDLING --- */
 
   let width: number;
@@ -476,7 +470,12 @@
       <div class="nfts-legend">
         <p class="nfts-total">
           Total NFTs: {$potentials.length}
-          <button class="refresh-button" on:click={forceTilesReRender}>
+          <button
+            class="refresh-button"
+            on:click={() => {
+              $potentials = $potentials;
+            }}
+          >
             <img src="/refresh.png" alt="Refresh" />
           </button>
         </p>
