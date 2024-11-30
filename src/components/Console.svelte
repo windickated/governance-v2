@@ -186,6 +186,7 @@
     justify-content: center;
     position: absolute;
     top: 0;
+    width: 100vw;
   }
 
   .console-btn {

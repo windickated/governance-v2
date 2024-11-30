@@ -183,6 +183,7 @@
   }
 
   .display-bg {
+    width: 95vw;
     z-index: -10;
     position: absolute;
     top: 0;
