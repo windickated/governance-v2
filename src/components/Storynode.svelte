@@ -343,6 +343,12 @@
       rgba(0, 0, 0, 0)
     );
     border-radius: 0.5vw;
+    cursor: pointer;
+  }
+
+  .options::-webkit-scrollbar-thumb:hover,
+  .options::-webkit-scrollbar-thumb:active {
+    background: rgba(51, 226, 230, 0.5);
   }
 
   .option {
