@@ -200,12 +200,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(22, 30, 95, 0.75);
-    filter: drop-shadow(0 0 1vw rgb(1, 0, 32));
+    background-color: #01204e;
+    border: 0.1vw solid #203962;
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.5);
     margin-top: 2vw;
     margin-bottom: -4vw;
     padding: 1.5vw;
-    border: 0.1vw solid rgba(51, 226, 230, 0.5);
     border-radius: 2.5vw;
   }
 
@@ -214,7 +214,7 @@
     text-align: center;
     padding: 1vw 0;
     color: #33e2e6;
-    opacity: 0.5;
+    opacity: 0.75;
   }
 
   .header,

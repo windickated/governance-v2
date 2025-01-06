@@ -387,6 +387,11 @@
 
 <div class="episodes-bar" bind:this={episodesBar}>
   <p class="season-title">The Dishordian Saga</p>
+  <button
+    class="loredex"
+    on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
+    >Dive into LOREDEX</button
+  >
   <select class="season" on:change={switchSeason}>
     <option value="1">Season 1</option>
     <option value="2" selected={true}>Season 2</option>
@@ -431,27 +436,12 @@
 ></span>
 
 <div class="nft-bar" bind:this={nftBar}>
-  <div
-    class="wallet-container"
-    bind:this={walletContainer}
-    style="
-    background-color: {$isLogged
-      ? 'rgba(22, 30, 95, 0.75)'
-      : 'rgba(51, 226, 230, 0.5)'};
-    filter: {$isLogged
-      ? 'drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.2))'
-      : 'drop-shadow(0 0 1vw rgba(51, 226, 230, 0.5))'}
-  "
-  >
+  <div class="wallet-container" bind:this={walletContainer}>
     <p class="wallet-legend" bind:this={walletLegend}>Connect Wallet:</p>
     <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
     <button
       class="wallet-connect"
       bind:this={walletButton}
-      style="
-        background-color: {$isLogged ? 'rgba(51, 226, 230, 0.9)' : '#161E5F'};
-        color: {$isLogged ? '#010020' : '#33E2E6'}
-      "
       on:click={connectWallet}
     >
       Sign in
@@ -482,7 +472,6 @@
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
-        <!-- {#key $potentials} -->
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
             a11y-no-static-element-interactions -->
@@ -507,7 +496,6 @@
             </div>
           {/await}
         {/each}
-        <!-- {/key} -->
       </div>
     {:else}
       <p class="no-nfts-title">
@@ -529,16 +517,6 @@ a11y-no-static-element-interactions -->
 <div class="bg" on:click={closeActiveTab} bind:this={BG}></div>
 
 <style>
-  button {
-    transition: all 0.15s ease-in-out;
-  }
-
-  button:hover,
-  button:active {
-    opacity: 0.9;
-    transform: scale(1.025);
-  }
-
   .nft-icon {
     position: fixed;
     z-index: 21;
@@ -596,6 +574,8 @@ a11y-no-static-element-interactions -->
     width: 40vw;
     display: flex;
     flex-flow: column nowrap;
+    align-items: center;
+    gap: 2vw;
     background-image: url("/sideBorder.avif");
     background-size: contain;
     background-repeat: no-repeat;
@@ -605,7 +585,7 @@ a11y-no-static-element-interactions -->
     backdrop-filter: blur(1vw);
     filter: drop-shadow(-0.1vw 0.1vw 0.5vw #010020);
     overflow-y: scroll;
-    padding: 1vw 2vw;
+    padding: 2vw;
   }
 
   .nft-bar::-webkit-scrollbar,
@@ -624,37 +604,46 @@ a11y-no-static-element-interactions -->
   }
 
   /* EPISODES bar */
-
   .season-title {
     text-align: center;
-    padding: 2vw;
     font-size: 2.5vw;
+    line-height: 2.5vw;
     color: rgba(51, 226, 230, 0.9);
-    filter: drop-shadow(0 0 1vw 5vw #33e2e6);
+    text-shadow: 0 0 0.1vw rgb(51, 226, 230);
+  }
+
+  .loredex {
+    width: 35vw;
+    font-size: 2vw;
+    padding: 0.5vw 1vw;
+    line-height: 3vw;
+    border-radius: 1.5vw;
   }
 
   .season {
     width: 35vw;
-    margin-inline: auto;
-    margin-top: 1vw;
-    margin-bottom: 2vw;
     text-align: center;
     font-size: 2vw;
-    padding: 1vw 0;
+    padding: 0.75vw 0;
     line-height: 3vw;
     color: rgba(1, 0, 32, 0.9);
     outline: none;
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
-    border-radius: 2vw;
+    border-radius: 1.5vw;
     background-color: rgba(51, 226, 230, 0.5);
     cursor: pointer;
+  }
+
+  .episodes-container {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    gap: 2vw;
   }
 
   .episode {
     width: 37vw;
     padding: 0.5vw;
-    margin: 1vw;
-    margin-bottom: 2vw;
     background-color: rgba(51, 226, 230, 0.4);
     border: 0.05vw solid #33e2e6;
     border-radius: 1.5vw;
@@ -697,18 +686,15 @@ a11y-no-static-element-interactions -->
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(51, 226, 230, 0.5);
-    filter: drop-shadow(0 0 1vw rgba(51, 226, 230, 0.5));
+    background-color: #06347f;
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
     margin: 3vw 5vw 1vw 5vw;
     padding: 1vw 2vw;
-    border: 0.05vw solid #33e2e6;
     border-radius: 1.5vw;
   }
 
   .wallet-legend {
-    color: #010020;
     font-size: 2.5vw;
-    filter: drop-shadow(0 0 0.05vw #010020);
     text-align: right;
     padding-right: 2.5vw;
   }
@@ -717,28 +703,16 @@ a11y-no-static-element-interactions -->
     display: none;
     padding: 0 3vw;
     font-size: 2vw;
-    color: rgba(51, 226, 230, 1);
-    background-color: rgba(51, 226, 230, 0.2);
-    border: 0.05vw solid #33e2e6;
-    border-radius: 1vw;
     line-height: 3.5vw;
-  }
-
-  .wallet-connect,
-  .switch-network {
-    height: 3.5vw;
-    width: 18vw;
-    border: 0.05vw solid #33e2e6;
+    color: rgba(51, 226, 230, 1);
+    background-color: #16217b;
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
+    box-shadow: inset 0 0 0.5vw #010020;
     border-radius: 1vw;
-    font-size: 2vw;
-    background-color: #161e5f;
-    color: #33e2e6;
   }
 
   .switch-network {
     display: none;
-    background-color: rgba(36, 65, 189, 0.9);
-    color: inherit;
   }
 
   .nfts-legend {
@@ -768,6 +742,15 @@ a11y-no-static-element-interactions -->
     border: none !important;
   }
 
+  .refresh-button img {
+    height: 2vw;
+  }
+
+  .refresh-button:hover,
+  .refresh-button:active {
+    transform: scale(1.05);
+  }
+
   .no-nfts-title,
   .transaction-info {
     width: 80%;
@@ -786,55 +769,71 @@ a11y-no-static-element-interactions -->
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     padding: 1vw 2vw;
+    gap: 1vw;
   }
 
   .nft {
-    position: relative;
-    box-sizing: border-box;
-    width: 17vw;
-    background-color: rgba(22, 30, 95, 0.75);
-    margin: 1vw;
-    border: 0.05vw solid rgba(51, 226, 230, 0.75);
-    border-radius: 1.5vw;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    filter: drop-shadow(0 0 0.1vw #010020);
-    transition: all 0.15s ease-in-out;
-    padding-bottom: 0.5vw;
+    justify-content: space-between;
+    width: 18vw;
+    background-color: rgba(36, 65, 189, 0.75);
+    color: rgba(255, 255, 255, 0.6);
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
+    border-radius: 1.5vw;
+    box-shadow: 0 0 0.5vw #010020;
+    cursor: pointer;
+    text-decoration: none;
+    flex: none;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .nft:hover,
   .nft:active {
-    transform: scale(1.025);
+    background-color: rgba(45, 90, 216, 0.9);
+    color: rgba(51, 226, 230, 0.9);
+    box-shadow: 0 0.5vw 0.5vw #010020;
+    transform: scale(1.025) translateY(-0.5vw);
   }
 
   .nft-image {
     object-fit: cover;
-    height: 16vw;
+    aspect-ratio: 1/1;
     width: 95%;
+    height: 17.5vw;
     margin: 2.5%;
-    border: 0.05vw solid #33e2e6;
+    margin-bottom: 0;
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
     border-radius: 1vw;
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.9);
+    cursor: pointer;
   }
 
   .nft-name {
+    text-align: center;
+    padding: 1vw;
     font-size: 2vw;
-    line-height: 3vw;
+    line-height: 2vw;
+    text-shadow: 0 0 1vw rgba(1, 0, 32, 0.4);
+    cursor: pointer;
   }
 
   .nft-class {
     font-size: 1.5vw;
-    line-height: 2.5vw;
+    line-height: 1.5vw;
     opacity: 0.75;
+    padding-bottom: 1vw;
   }
 
   .nft-vote {
     font-size: 1.2vw;
-    line-height: 2.5vw;
+    line-height: 1.2vw;
     opacity: 0.5;
+    padding-bottom: 1vw;
   }
 
   .nft-vote strong {
@@ -867,6 +866,7 @@ a11y-no-static-element-interactions -->
       display: flex;
       flex-flow: column nowrap;
       align-items: center;
+      gap: 1em;
       width: 100vw;
       height: 80%;
       top: -80%;
@@ -877,25 +877,35 @@ a11y-no-static-element-interactions -->
     }
 
     .season-title {
+      padding-top: 1em;
       font-size: 1.5em;
-      line-height: 3em;
-      padding: 0;
+      line-height: 1.5em;
+    }
+
+    .loredex {
+      width: 80vw;
+      font-size: 1.2em;
+      line-height: 1.5em;
+      padding: 0.5em;
+      border-radius: 1em;
     }
 
     .season {
       width: 80vw;
       font-size: 1.2em;
       line-height: 1.5em;
-      margin: 0;
-      margin-bottom: 1em;
+      padding: 0.5em;
+      border-radius: 1em;
+    }
+
+    .episodes-container {
+      gap: 1em;
     }
 
     .episode {
       width: 86vw;
       padding: 0.25em;
       padding-bottom: 0.5em;
-      margin-top: 0;
-      margin-bottom: 1em;
       border-radius: 1em;
     }
 
@@ -922,6 +932,7 @@ a11y-no-static-element-interactions -->
       width: 80vw;
       height: auto;
       padding: 0.5em 1em;
+      border-radius: 1em;
     }
 
     .wallet-legend {
@@ -929,15 +940,10 @@ a11y-no-static-element-interactions -->
     }
 
     .wallet {
-      font-size: inherit;
-      padding: 2vw 3vw;
-    }
-
-    .wallet-connect,
-    .switch-network {
-      font-size: inherit;
-      width: 38vw;
-      height: 8vw;
+      font-size: 1em;
+      line-height: 1.75em;
+      padding: 0.25em 1em;
+      border-radius: 0.5em;
     }
 
     .nfts-legend {
@@ -954,6 +960,10 @@ a11y-no-static-element-interactions -->
       width: 5vw;
     }
 
+    .refresh-button img {
+      height: 1em;
+    }
+
     .no-nfts-title,
     .transaction-info {
       font-size: 1em;
@@ -961,20 +971,23 @@ a11y-no-static-element-interactions -->
       margin-block: 2em;
     }
 
+    .nfts-container {
+      gap: 1em;
+    }
+
     .nft {
-      width: 46vw;
-      padding-bottom: 0.5em;
+      width: 40vw;
       border-radius: 1em;
     }
 
     .nft-image {
-      height: 40vw;
+      height: 38vw;
       border-radius: 0.75em;
     }
 
     .nft-name {
-      font-size: 1.1em;
-      line-height: 1.75em;
+      font-size: 1em;
+      line-height: 1.5em;
     }
 
     .nft-class {
