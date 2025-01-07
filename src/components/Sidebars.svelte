@@ -150,6 +150,65 @@
     });
   }
 
+  let selectCondition: string;
+  const selectNFTs = () => {
+    if ($episode === -1) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        "There is no episode selected!"
+      );
+      return;
+    }
+    if ($storyNodes[$episode].ended) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        "Voting for this episode is finished."
+      );
+      return;
+    }
+    if (selectCondition === "All") {
+      $potentials.map((potential) => {
+        if (!potential.selected) {
+          potential.selected = true;
+          $selectedNFTs.push(potential);
+        }
+      });
+    } else if (selectCondition === "Remaining") {
+      $potentials.map(async (potential) => {
+        if (!potential.selected) {
+          await nftVote($episode, potential.id).then((vote) => {
+            if (Number(vote) === 0) {
+              potential.selected = true;
+              $selectedNFTs.push(potential);
+            }
+          });
+        }
+        $selectedNFTs = $selectedNFTs;
+        return;
+      });
+    } else if (selectCondition) {
+      $potentials.map((potential) => {
+        if (!potential.selected) {
+          if (potential.class == selectCondition) {
+            potential.selected = true;
+            $selectedNFTs.push(potential);
+          }
+        }
+      });
+    }
+    $selectedNFTs = $selectedNFTs;
+  };
+
+  const undoSelection = () => {
+    $potentials.map((potential) => {
+      if (potential.selected) {
+        potential.selected = false;
+        $selectedNFTs = $selectedNFTs.filter((nft) => nft !== potential);
+      }
+    });
+    $selectedNFTs = $selectedNFTs;
+  };
+
   /* --- TABS HANDLING --- */
 
   let width: number;
@@ -471,6 +530,24 @@
         </p>
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
+      <div class="nfts-controls">
+        <div class="nfts-selector">
+          <button on:click={selectNFTs}>Select</button>
+          <select bind:value={selectCondition}>
+            <option>All</option>
+            <option selected>Remaining</option>
+            <option>Assassin</option>
+            <option>Soldier</option>
+            <option>Spy</option>
+            <option>Engineer</option>
+            <option>Oracle</option>
+          </select>
+          <button on:click={undoSelection} disabled={$selectedNFTs.length === 0}
+            >Unselect</button
+          >
+        </div>
+        <button on:click={() => {}}>Approve all Potentials</button>
+      </div>
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
@@ -481,7 +558,7 @@
               id={NFT.id.toString()}
               on:click={selectNFT}
               style={selectedIDs.flat().includes(NFT.id)
-                ? `background-color: #2441BD; filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 1)); color = #33E2E6; opacity: ${vote > 0 ? "0.5" : "1"};`
+                ? `background-color: #2441BD; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1;`
                 : `opacity: ${vote > 0 ? "0.5" : "1"}`}
               data-vote={vote}
             >
@@ -558,7 +635,7 @@ a11y-no-static-element-interactions -->
     background-image: url("/sideBorder.avif");
     background-size: contain;
     background-repeat: no-repeat;
-    background-color: rgba(1, 0, 32, 0.5);
+    background-color: rgba(1, 0, 32, 0.25);
     -webkit-backdrop-filter: blur(1vw);
     backdrop-filter: blur(1vw);
     filter: drop-shadow(-0.1vw 0.1vw 0.5vw #010020);
@@ -579,7 +656,7 @@ a11y-no-static-element-interactions -->
     background-image: url("/sideBorder.avif");
     background-size: contain;
     background-repeat: no-repeat;
-    background-color: rgba(1, 0, 32, 0.5);
+    background-color: rgba(1, 0, 32, 0.25);
     background-position: right;
     -webkit-backdrop-filter: blur(1vw);
     backdrop-filter: blur(1vw);
@@ -686,9 +763,11 @@ a11y-no-static-element-interactions -->
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #06347f;
+    background-color: rgba(36, 65, 189, 0.75);
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
-    margin: 3vw 5vw 1vw 5vw;
+    box-shadow: 0 0.5vw 0.5vw #010020;
+    margin-block: 3vw 1vw;
+    margin-inline: 5vw;
     padding: 1vw 2vw;
     border-radius: 1.5vw;
   }
@@ -705,9 +784,8 @@ a11y-no-static-element-interactions -->
     font-size: 2vw;
     line-height: 3.5vw;
     color: rgba(51, 226, 230, 1);
-    background-color: #16217b;
+    background-color: rgba(22, 30, 95, 0.9);
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
-    box-shadow: inset 0 0 0.5vw #010020;
     border-radius: 1vw;
   }
 
@@ -719,16 +797,52 @@ a11y-no-static-element-interactions -->
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
+    padding-inline: 7.5vw;
+  }
+
+  .nfts-controls {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1vw;
+    margin-block: 1vw;
+    margin-inline: 5vw;
+    background-color: rgba(36, 65, 189, 0.75);
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
+    box-shadow: 0 0.5vw 0.5vw #010020;
+    padding: 1vw 2vw;
+    border-radius: 1.5vw;
+  }
+
+  .nfts-selector {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
+  }
+
+  .nfts-selector select {
+    font-size: 1.5vw;
+    line-height: 3vw;
+    padding-block: 0.75vw;
+    width: 15vw;
+    text-align: center;
+    outline: none;
+    border: 0.1vw solid rgba(51, 226, 230, 0.5);
+    border-radius: 1vw;
+    cursor: pointer;
+    /* color: rgba(1, 0, 32, 0.9); */
+    /* background-color: rgba(51, 226, 230, 0.5); */
+    color: rgba(51, 226, 230, 0.9);
+    background-color: rgba(22, 30, 95, 0.9);
   }
 
   .nfts-total,
   .nfts-selected {
     color: #33e2e6;
     -webkit-text-stroke: 0.1vw #33e2e6;
-    padding-top: 2.5vw;
-    padding-bottom: 1vw;
-    padding-left: 5vw;
-    padding-right: 5vw;
     font-size: 2vw;
     white-space: nowrap;
     display: flex;
@@ -932,7 +1046,7 @@ a11y-no-static-element-interactions -->
       width: 80vw;
       height: auto;
       padding: 0.5em 1em;
-      border-radius: 1em;
+      border-radius: 0.5em;
     }
 
     .wallet-legend {
@@ -969,6 +1083,26 @@ a11y-no-static-element-interactions -->
       font-size: 1em;
       line-height: 1.6em;
       margin-block: 2em;
+    }
+
+    .nfts-controls {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      border-radius: 0.5em;
+      padding: 0.5em;
+    }
+
+    .nfts-selector {
+      gap: 0.5em;
+    }
+
+    .nfts-selector select {
+      font-size: 1em;
+      line-height: 1.5em;
+      padding-block: 0.5em;
+      width: 40vw;
+      border-radius: 0.5em;
     }
 
     .nfts-container {

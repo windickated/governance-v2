@@ -32,7 +32,9 @@
       pulseAnimation.cancel();
       legend!.innerHTML = "Select any episode from the tab";
     } catch (error) {
-      alert("Please sign in your wallet to load Story Nodes.");
+      alert(
+        "Please sign in your wallet and make sure you're on Base network to load Story Nodes."
+      );
       console.log(error);
     }
   });

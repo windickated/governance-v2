@@ -238,6 +238,7 @@
     -webkit-text-stroke: 0.03vw #33e2e6;
     filter: drop-shadow(0 0 0.1vw #33e2e6);
     color: #bebebe;
+    padding-bottom: 1vw;
   }
 
   .text {
@@ -400,6 +401,7 @@
     .legend {
       margin-bottom: 0.5em;
       padding: 1em 0.75em;
+      background-color: rgba(1, 0, 32, 0.85);
     }
 
     .empty-header {
@@ -439,6 +441,12 @@
       border-radius: 2.5vw;
       padding: 0;
       display: block;
+    }
+
+    .text button img {
+      height: 1em;
+      width: 1.5em;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
 
     .text-wrapper {
