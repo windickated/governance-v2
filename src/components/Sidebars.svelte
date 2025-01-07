@@ -14,6 +14,7 @@
     nftVote,
     walletAddress,
     transactionInfo,
+    listedNumbers,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
@@ -71,6 +72,7 @@
   let wallet: HTMLParagraphElement;
   let walletButton: HTMLButtonElement;
   let networkSwitcher: HTMLButtonElement;
+  let nftsSelector: HTMLSelectElement;
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
@@ -90,7 +92,8 @@
           walletButton.style.display = "block";
           walletButton.innerHTML = "Disconnect";
           walletLegend.style.display = "none";
-          wallet.style.display = "block";
+          if (width > 600) wallet.style.display = "block";
+          nftsSelector.style.display = "flex";
         } else {
           walletLegend.innerHTML = "You're on a wrong network!";
           walletButton.style.display = "none";
@@ -103,6 +106,7 @@
       walletButton.innerHTML = "Sign in";
       walletLegend.style.display = "block";
       wallet.style.display = "none";
+      nftsSelector.style.display = "none";
     }
   }
 
@@ -116,6 +120,13 @@
     const vote = Number(nftTile.dataset.vote);
     $potentials.map((potential) => {
       if (potential.id.toString() === nftTile?.id) {
+        if ($listedNumbers.includes(nftTile?.id)) {
+          handlePopUpMessage(
+            event as PointerEvent,
+            "Delist this Potential to vote!"
+          );
+          return;
+        }
         if ($episode === -1) {
           handlePopUpMessage(
             event as PointerEvent,
@@ -154,12 +165,13 @@
   }
 
   let selectCondition: string;
-  const selectNFTs = () => {
+  const selectMultipleNFTs = () => {
     if ($episode === -1) {
       handlePopUpMessage(
         event as PointerEvent,
         "There is no episode selected!"
       );
+      if (selectCondition) selectCondition = "";
       return;
     }
     if ($storyNodes[$episode].ended) {
@@ -167,18 +179,20 @@
         event as PointerEvent,
         "Voting for this episode is finished."
       );
+      if (selectCondition) selectCondition = "";
       return;
     }
+    undoSelection();
     if (selectCondition === "All") {
       $potentials.map((potential) => {
-        if (!potential.selected) {
+        if (!potential.selected && !$listedNumbers.includes(potential.id)) {
           potential.selected = true;
           $selectedNFTs.push(potential);
         }
       });
     } else if (selectCondition === "Remaining") {
       $potentials.map(async (potential) => {
-        if (!potential.selected) {
+        if (!potential.selected && !$listedNumbers.includes(potential.id)) {
           await nftVote($episode, potential.id).then((vote) => {
             if (Number(vote) === 0) {
               potential.selected = true;
@@ -191,7 +205,7 @@
       });
     } else if (selectCondition) {
       $potentials.map((potential) => {
-        if (!potential.selected) {
+        if (!potential.selected && !$listedNumbers.includes(potential.id)) {
           if (potential.class == selectCondition) {
             potential.selected = true;
             $selectedNFTs.push(potential);
@@ -200,6 +214,7 @@
       });
     }
     $selectedNFTs = $selectedNFTs;
+    if ($selectedNFTs.length == 0) selectCondition = "";
   };
 
   const undoSelection = () => {
@@ -497,10 +512,41 @@
   on:click={handleNFTsBar}
 ></span>
 
+<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role a11y_click_events_have_key_events -->
 <div class="nft-bar" bind:this={nftBar}>
   <div class="wallet-container" bind:this={walletContainer}>
     <p class="wallet-legend" bind:this={walletLegend}>Connect Wallet:</p>
     <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
+    <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
+      {#if width > 600}
+        <p>Select Potentials:</p>
+      {/if}
+      <select
+        class="nfts-selector"
+        bind:value={selectCondition}
+        on:change={selectMultipleNFTs}
+      >
+        <option value="" selected disabled hidden>Select</option>
+        <option value="All">All</option>
+        <option value="Remaining">Remaining</option>
+        <option value="Assassin">Assassin</option>
+        <option value="Soldier">Soldier</option>
+        <option value="Spy">Spy</option>
+        <option value="Engineer">Engineer</option>
+        <option value="Oracle">Oracle</option>
+      </select>
+      <img
+        class="reset-selection"
+        src="/reset.png"
+        alt="Undo selection"
+        role="button"
+        tabindex="0"
+        on:click={() => {
+          undoSelection();
+          selectCondition = "";
+        }}
+      />
+    </div>
     <button
       class="wallet-connect"
       bind:this={walletButton}
@@ -533,24 +579,6 @@
         </p>
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
-      <div class="nfts-controls">
-        <div class="nfts-selector">
-          <button on:click={selectNFTs}>Select</button>
-          <select bind:value={selectCondition}>
-            <option>All</option>
-            <option selected>Remaining</option>
-            <option>Assassin</option>
-            <option>Soldier</option>
-            <option>Spy</option>
-            <option>Engineer</option>
-            <option>Oracle</option>
-          </select>
-          <button on:click={undoSelection} disabled={$selectedNFTs.length === 0}
-            >Unselect</button
-          >
-        </div>
-        <button on:click={() => {}} disabled>Approve all Potentials</button>
-      </div>
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
@@ -562,7 +590,9 @@
               on:click={selectNFT}
               style={selectedIDs.flat().includes(NFT.id)
                 ? `background-color: #2441BD; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1;`
-                : `opacity: ${vote > 0 ? "0.5" : "1"}`}
+                : $listedNumbers.includes(NFT.id)
+                  ? "background-color: rgb(22, 30, 95);"
+                  : `opacity: ${vote > 0 ? "0.5" : "1"}`}
               data-vote={vote}
             >
               <img class="nft-image" src={NFT.image} alt={NFT.name} />
@@ -571,6 +601,14 @@
               {#if vote > 0}
                 <p class="nft-vote">
                   Selected option: <strong>{vote}</strong>
+                </p>
+              {/if}
+              {#if $listedNumbers.includes(NFT.id)}
+                <p class="nft-vote">
+                  Listed
+                  {#if width > 600}
+                    on marketplace
+                  {/if}
                 </p>
               {/if}
             </div>
@@ -786,8 +824,8 @@ a11y-no-static-element-interactions -->
   .wallet {
     display: none;
     padding: 0 3vw;
-    font-size: 2vw;
-    line-height: 3.5vw;
+    font-size: 1.5vw;
+    line-height: 3vw;
     color: rgba(51, 226, 230, 1);
     background-color: rgba(22, 30, 95, 0.9);
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
@@ -805,30 +843,16 @@ a11y-no-static-element-interactions -->
     padding-inline: 7.5vw;
   }
 
-  .nfts-controls {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1vw;
-    margin-block: 1vw;
-    margin-inline: 5vw;
-    background-color: rgba(36, 65, 189, 0.75);
-    border: 0.1vw solid rgba(51, 226, 230, 0.5);
-    box-shadow: 0 0.5vw 0.5vw #010020;
-    padding: 1vw 2vw;
-    border-radius: 1.5vw;
-  }
-
-  .nfts-selector {
-    display: flex;
+  .nfts-selector-wrapper {
+    display: none;
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
     gap: 1vw;
+    font-size: 1.5vw;
   }
 
-  .nfts-selector select {
+  .nfts-selector {
     font-size: 1.5vw;
     line-height: 3vw;
     padding-block: 0.75vw;
@@ -842,6 +866,17 @@ a11y-no-static-element-interactions -->
     /* background-color: rgba(51, 226, 230, 0.5); */
     color: rgba(51, 226, 230, 0.9);
     background-color: rgba(22, 30, 95, 0.9);
+  }
+
+  .reset-selection {
+    width: 2vw;
+    cursor: pointer;
+  }
+
+  .reset-selection:hover,
+  .reset-selection:active {
+    filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
+    transform: scale(1.05);
   }
 
   .nfts-total,
@@ -949,6 +984,7 @@ a11y-no-static-element-interactions -->
   }
 
   .nft-vote {
+    text-align: center;
     font-size: 1.2vw;
     line-height: 1.2vw;
     opacity: 0.5;
@@ -1090,24 +1126,22 @@ a11y-no-static-element-interactions -->
       margin-block: 2em;
     }
 
-    .nfts-controls {
-      justify-content: center;
-      flex-wrap: wrap;
+    .nfts-selector-wrapper {
+      font-size: 1em;
       gap: 0.5em;
-      border-radius: 0.5em;
-      padding: 0.5em;
+      flex-direction: row-reverse;
     }
 
     .nfts-selector {
-      gap: 0.5em;
-    }
-
-    .nfts-selector select {
       font-size: 1em;
       line-height: 1.5em;
       padding-block: 0.5em;
       width: 40vw;
       border-radius: 0.5em;
+    }
+
+    .reset-selection {
+      width: 1em;
     }
 
     .nfts-container {

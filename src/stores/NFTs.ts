@@ -19,6 +19,7 @@ export class NFT {
 
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
+export const listedNumbers = writable<Array<number>>([]);
 export const walletAddress = writable<string>('');
 export const transactionInfo = writable<string | null>(null);
 
@@ -60,6 +61,19 @@ export async function getNFTs() {
     potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
   }
   potentials.set(potentialNFTs);
+
+  let listedNFTs: number[];
+  const options = {
+    method: 'GET',
+    headers: {accept: 'application/json', 'x-api-key': 'c6a6c088d5e34ca2a018f44673697f01'}
+  };
+  await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
+    .then(res => res.json())
+    .then(res => {
+      listedNFTs = res.listings.map((listing: any) => listing.protocol_data.parameters.offer[0].identifierOrCriteria);
+      listedNumbers.set(Array.from(new Set(listedNFTs)));
+    })
+    .catch(err => console.error(err));
 }
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
