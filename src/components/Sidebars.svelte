@@ -53,10 +53,13 @@
       const episode = node as HTMLDivElement;
       if ($episode == Number(episode.id)) {
         episode!.style.color = "#010020";
-        episode!.style.filter = "drop-shadow(0 0 1vw rgba(51, 226, 230, 0.8))";
+        episode!.style.boxShadow =
+          "inset 0 0 0.5vw rgba(51, 226, 230, 0.5), 0 0 0.5vw rgb(51, 226, 230)";
+        episode!.style.backgroundColor = "rgba(51, 226, 230, 0.75)";
       } else {
         episode.style.color = "inherit";
-        episode.style.filter = "none";
+        episode.style.boxShadow = "inset 0 0 0.5vw #010020";
+        episode.style.backgroundColor = "rgba(51, 226, 230, 0.5)";
       }
     });
   }
@@ -546,7 +549,7 @@
             >Unselect</button
           >
         </div>
-        <button on:click={() => {}}>Approve all Potentials</button>
+        <button on:click={() => {}} disabled>Approve all Potentials</button>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
@@ -721,19 +724,21 @@ a11y-no-static-element-interactions -->
   .episode {
     width: 37vw;
     padding: 0.5vw;
-    background-color: rgba(51, 226, 230, 0.4);
-    border: 0.05vw solid #33e2e6;
+    background-color: rgba(51, 226, 230, 0.5);
+    box-shadow:
+      inset 0 0 0.5vw #010020,
+      0 0 0.5vw #010020;
     border-radius: 1.5vw;
     cursor: pointer;
-    transition: all 0.15s ease-in-out;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .episode-image {
     object-fit: cover;
-    border: 0.05vw solid #33e2e6;
     border-radius: 1vw;
     width: 100%;
     height: 20vw;
+    box-shadow: 0 0 0.5vw rgba(51, 226, 230, 0.5);
   }
 
   .episode-title {
@@ -753,7 +758,7 @@ a11y-no-static-element-interactions -->
   }
 
   .episode:hover {
-    background-color: rgba(51, 226, 230, 0.5);
+    filter: brightness(125%);
     transform: scale(1.01);
   }
 
