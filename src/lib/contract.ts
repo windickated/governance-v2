@@ -50,3 +50,19 @@ export const contract = async (): Promise<any> => {
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
     return contract.connect(await provider.getSigner());
 }
+
+const potentials_contract = "0x111e0861baa9d479cff55d542e5a9e4205012bbe";
+const potentials_abi = [
+    "function setApprovalForAll(address operator, bool approved) external"
+]
+
+const potentialsContract = async (): Promise<any> => {
+    const contract = new ethers.Contract(potentials_contract, potentials_abi, provider);
+    return contract.connect(await provider.getSigner());
+}
+
+export const approveNFTs = async () => {
+  const signer = await provider.getSigner();
+  const address = await signer.getAddress();
+  return await (await potentialsContract()).setApprovalForAll(address, true);
+}

@@ -19,6 +19,7 @@
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import { provider, switch_network, network } from "../lib/ethers";
+  import { approveNFTs } from "../lib/contract";
 
   export let handlePopUpMessage: Function;
 
@@ -577,8 +578,14 @@
             <img src="/refresh.png" alt="Refresh" />
           </button>
         </p>
+        {#if width > 600}
+          <button on:click={approveNFTs}>Approve Potentials</button>
+        {/if}
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
+      {#if width <= 600}
+        <button on:click={approveNFTs}>Approve Potentials Collection</button>
+      {/if}
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
@@ -1088,6 +1095,7 @@ a11y-no-static-element-interactions -->
       height: auto;
       padding: 0.5em 1em;
       border-radius: 0.5em;
+      gap: 0.5em;
     }
 
     .wallet-legend {
