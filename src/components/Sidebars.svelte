@@ -19,7 +19,8 @@
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
   import { provider, switch_network, network } from "../lib/ethers";
-  import { approveNFTs } from "../lib/contract";
+  import { showModal } from "../stores/modal";
+  import Modal from "./Modal.svelte";
 
   export let handlePopUpMessage: Function;
 
@@ -71,7 +72,6 @@
   let walletContainer: HTMLDivElement;
   let walletLegend: HTMLParagraphElement;
   let wallet: HTMLParagraphElement;
-  let walletButton: HTMLButtonElement;
   let networkSwitcher: HTMLButtonElement;
   let nftsSelector: HTMLSelectElement;
 
@@ -90,21 +90,17 @@
           if (reject) return;
           $isLogged = true;
           networkSwitcher.style.display = "none";
-          walletButton.style.display = "block";
-          walletButton.innerHTML = "Disconnect";
           walletLegend.style.display = "none";
           if (width > 600) wallet.style.display = "block";
           nftsSelector.style.display = "flex";
         } else {
           walletLegend.innerHTML = "You're on a wrong network!";
-          walletButton.style.display = "none";
           networkSwitcher.style.display = "block";
         }
       });
     } else {
       $isLogged = false;
       $potentials = [];
-      walletButton.innerHTML = "Sign in";
       walletLegend.style.display = "block";
       wallet.style.display = "none";
       nftsSelector.style.display = "none";
@@ -548,20 +544,34 @@
         }}
       />
     </div>
-    <button
-      class="wallet-connect"
-      bind:this={walletButton}
-      on:click={connectWallet}
-    >
-      Sign in
-    </button>
-    <button
-      class="switch-network"
-      bind:this={networkSwitcher}
-      on:click={switch_network}
-    >
-      Switch network
-    </button>
+    <div class="sign-button-wrapper">
+      {#if $isLogged}
+        <img
+          class="delegate-button"
+          role="button"
+          tabindex="0"
+          src="/delegate.png"
+          alt="Delegate"
+          on:click={() => ($showModal = true)}
+        />
+      {/if}
+      <button class="wallet-connect" on:click={connectWallet}>
+        <img
+          src="/sign-{$isLogged ? 'out' : 'in'}.png"
+          alt="Sign {$isLogged ? 'out' : 'in'}"
+        />
+        {#if width > 600}
+          Sign {$isLogged ? "out" : "in"}
+        {/if}
+      </button>
+      <button
+        class="switch-network"
+        bind:this={networkSwitcher}
+        on:click={switch_network}
+      >
+        Switch network
+      </button>
+    </div>
   </div>
 
   {#if $isLogged}
@@ -578,14 +588,8 @@
             <img src="/refresh.png" alt="Refresh" />
           </button>
         </p>
-        {#if width > 600}
-          <button on:click={approveNFTs}>Approve Potentials</button>
-        {/if}
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
-      {#if width <= 600}
-        <button on:click={approveNFTs}>Approve Potentials Collection</button>
-      {/if}
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
           <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
@@ -636,6 +640,8 @@
     </p>
   {/if}
 </div>
+
+<Modal />
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
 a11y-no-static-element-interactions -->
@@ -818,8 +824,18 @@ a11y-no-static-element-interactions -->
     box-shadow: 0 0.5vw 0.5vw #010020;
     margin-block: 3vw 1vw;
     margin-inline: 5vw;
-    padding: 1vw 2vw;
+    padding: 1vw;
     border-radius: 1.5vw;
+  }
+
+  .wallet-connect {
+    color: #dedede;
+  }
+
+  .wallet-connect img {
+    width: 2.5vw;
+    height: auto;
+    filter: drop-shadow(0 0 0.25vw #010020);
   }
 
   .wallet-legend {
@@ -859,6 +875,28 @@ a11y-no-static-element-interactions -->
     font-size: 1.5vw;
   }
 
+  .sign-button-wrapper {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
+  }
+
+  .delegate-button {
+    height: 2vw;
+    width: auto;
+    filter: drop-shadow(0 0 0.25vw #010020);
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+
+  .delegate-button:hover,
+  .delegate-button:active {
+    filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
+    transform: scale(1.05);
+  }
+
   .nfts-selector {
     font-size: 1.5vw;
     line-height: 3vw;
@@ -876,8 +914,9 @@ a11y-no-static-element-interactions -->
   }
 
   .reset-selection {
-    width: 2vw;
+    width: 1.5vw;
     cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .reset-selection:hover,
@@ -905,6 +944,7 @@ a11y-no-static-element-interactions -->
 
   .refresh-button img {
     height: 2vw;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .refresh-button:hover,
@@ -1109,6 +1149,20 @@ a11y-no-static-element-interactions -->
       border-radius: 0.5em;
     }
 
+    .wallet-connect {
+      padding-inline: 0.5em;
+    }
+
+    .wallet-connect img {
+      width: 2em;
+      min-height: 2em;
+    }
+
+    .delegate-button {
+      width: 1.5em;
+      min-height: 1.5em;
+    }
+
     .nfts-legend {
       width: 90vw;
     }
@@ -1138,6 +1192,10 @@ a11y-no-static-element-interactions -->
       font-size: 1em;
       gap: 0.5em;
       flex-direction: row-reverse;
+    }
+
+    .sign-button-wrapper {
+      gap: 1em;
     }
 
     .nfts-selector {

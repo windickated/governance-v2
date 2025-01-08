@@ -61,8 +61,10 @@ const potentialsContract = async (): Promise<any> => {
     return contract.connect(await provider.getSigner());
 }
 
-export const approveNFTs = async () => {
-  const signer = await provider.getSigner();
-  const address = await signer.getAddress();
+export const checkAddress = (address: string) => {
+    return ethers.isAddress(address);
+}
+
+export const approveNFTs = async (address: string) => {
   return await (await potentialsContract()).setApprovalForAll(address, true);
 }
