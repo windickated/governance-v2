@@ -198,8 +198,8 @@
           });
         }
         $selectedNFTs = $selectedNFTs;
-        return;
       });
+      return;
     } else if (selectCondition) {
       $potentials.map((potential) => {
         if (!potential.selected && !$listedNumbers.includes(potential.id)) {
