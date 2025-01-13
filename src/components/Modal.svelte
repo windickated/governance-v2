@@ -12,7 +12,7 @@
   } else if (!$showModal) closeDialog();
 
   const closeDialog = () => {
-    $showModal = null;
+    $showModal = false;
     dialog?.close();
   };
 </script>
@@ -184,9 +184,11 @@
     }
 
     input {
-      width: 70vw;
+      width: 80vw;
+      max-width: 75vw;
       font-size: 1.25em;
       line-height: 1.5em;
+      white-space: wrap;
     }
 
     .validation {

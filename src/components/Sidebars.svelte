@@ -73,7 +73,7 @@
   let walletLegend: HTMLParagraphElement;
   let wallet: HTMLParagraphElement;
   let networkSwitcher: HTMLButtonElement;
-  let nftsSelector: HTMLSelectElement;
+  let nftsSelector: HTMLDivElement;
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
@@ -117,7 +117,7 @@
     const vote = Number(nftTile.dataset.vote);
     $potentials.map((potential) => {
       if (potential.id.toString() === nftTile?.id) {
-        if ($listedNumbers.includes(nftTile?.id)) {
+        if ($listedNumbers.includes(Number(nftTile?.id))) {
           handlePopUpMessage(
             event as PointerEvent,
             "Delist this Potential to vote!"
@@ -701,7 +701,7 @@ a11y-no-static-element-interactions -->
     z-index: 18;
     top: 0;
     left: -44vw;
-    height: 100%;
+    height: 95%;
     width: 40vw;
     display: flex;
     flex-flow: column nowrap;
@@ -716,7 +716,8 @@ a11y-no-static-element-interactions -->
     backdrop-filter: blur(1vw);
     filter: drop-shadow(-0.1vw 0.1vw 0.5vw #010020);
     overflow-y: scroll;
-    padding: 2vw;
+    padding-inline: 2vw;
+    padding-block: 2.5%;
   }
 
   .nft-bar::-webkit-scrollbar,
