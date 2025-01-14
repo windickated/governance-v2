@@ -1,6 +1,6 @@
 import { writable } from "svelte/store";
 import { provider } from "../lib/ethers";
-import { contract } from "../lib/contract";
+import { contract, checkNftBatches, claimNFTs } from "../lib/contract";
 
 export class NFT {
   id: number;
@@ -8,12 +8,14 @@ export class NFT {
   image: string;
   class: string;
   selected: boolean;
+  delegated: string | null
   constructor(data: any, i: number) {
     this.id = data[i].name.match(/\d+/)[0];
     this.name = data[i].name;
     this.image = data[i].image;
     this.class = data[i].attributes[5].value;
     this.selected = false;
+    this.delegated = null;
   }
 }
 
@@ -38,6 +40,7 @@ export async function getNFTs() {
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
   walletAddress.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+  // walletAddress.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
   try {
     transactionInfo.set('Please sign the transaction in your wallet to proceed.');
     await signer.signMessage(message(address));
@@ -51,7 +54,7 @@ export async function getNFTs() {
   );
   const data = await json.json();
   const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
-  let potentialNFTs: NFT[] = [];
+  const potentialNFTs: NFT[] = [];
   const metadata: any[] = [];
   for (let i in nftNumbers) {
     const response = await fetch(
@@ -62,6 +65,37 @@ export async function getNFTs() {
   }
   potentials.set(potentialNFTs);
 
+  // check delegated Potentials
+  const allNFTs = await checkNftBatches();
+  const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
+  const ownersList = filteredNFTs.map(nft => nft.owner)
+  const filteredOwners = Array.from(new Set(ownersList));
+  console.log(filteredOwners.length + ' unique NFT owners.');
+
+  filteredOwners.map(async (owner: any) => {
+    if (await claimNFTs(owner, address)) {
+      const maskedAddress = owner.slice(0, 6) + "..." + owner.slice(owner.length - 4);
+      console.log('Received delegated Potentials from: ' + maskedAddress);
+      const json = await fetch(
+        `https://api.degenerousdao.com/nft/owner/${owner}`
+      );
+      const data = await json.json();
+      const delegatedNftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
+      const metadata: any[] = [];
+      for (let i in delegatedNftNumbers) {
+        const response = await fetch(
+          `https://api.degenerousdao.com/nft/data/${delegatedNftNumbers[i]}`
+        );
+        metadata[Number(i)] = await response.json();
+        potentialNFTs[potentialNFTs.length] = new NFT(metadata, Number(i));
+        potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
+      }
+      console.log(potentialNFTs)
+      potentials.set(potentialNFTs);
+    }
+  });
+
+  // check listed Potentials
   let listedNFTs: number[];
   const options = {
     method: 'GET',

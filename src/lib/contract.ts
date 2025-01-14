@@ -1,3 +1,6 @@
+import { createPublicClient, http } from 'viem'
+import { base } from 'viem/chains'
+
 import { ethers } from "ethers";
 import { provider } from "./ethers";
 import { season } from "../stores/storyNode";
@@ -51,10 +54,38 @@ export const contract = async (): Promise<any> => {
     return contract.connect(await provider.getSigner());
 }
 
+// POTENTIALS
+
 const potentials_contract = "0x111e0861baa9d479cff55d542e5a9e4205012bbe";
 const potentials_abi = [
-    "function setApprovalForAll(address operator, bool approved) external"
+    {
+        name: 'setApprovalForAll',
+        inputs: [{type: 'address'}, {type: 'bool'}],
+        type: 'function'
+    },
+    {
+        name: 'ownerOf',
+        inputs: [{type: 'uint256'}],
+        outputs: [{type: 'address'}],
+        stateMutability: 'view',
+        type: 'function'
+    },
+    {
+        name: 'isApprovedForAll',
+        inputs: [{type: 'address'}, {type: 'address'}],
+        outputs: [{type: 'bool'}],
+        stateMutability: 'view',
+        type: 'function'
+    },
+    // "function setApprovalForAll(address operator, bool approved) external",
+    // "function ownerOf (uint256 tokenId) external view returns (address owner_)",
+    // "function isApprovedForAll(address owner, address operator) external view returns (bool isApproved)"
 ]
+
+const client = createPublicClient({
+    chain: base,
+    transport: http()
+});
 
 const potentialsContract = async (): Promise<any> => {
     const contract = new ethers.Contract(potentials_contract, potentials_abi, provider);
@@ -66,5 +97,100 @@ export const checkAddress = (address: string) => {
 }
 
 export const approveNFTs = async (address: string) => {
-  return await (await potentialsContract()).setApprovalForAll(address, true);
+    return await (await potentialsContract()).setApprovalForAll(address, true);
+}
+
+const fetchNftOwnersWithRetry = async (tokenIds: any) => {
+    const calls = tokenIds.map((tokenId: any) => {
+        return {
+            address: potentials_contract,
+            abi: potentials_abi,
+            functionName: 'ownerOf',
+            args: [tokenId]
+        }
+    })
+    let retries = 3;
+    while (retries > 0) {
+        try {
+            const results = await client.multicall({contracts: calls})
+            return results.map((result, index) => {
+                return {
+                    tokenId: tokenIds[index],
+                    owner: result.result,
+                    success: result.status === 'success'
+                }
+            })
+        } catch (error) {
+            retries--;
+            if (retries === 0) throw error;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}
+
+export const checkNftBatches = async () => {
+    const TOTAL_SUPPLY = 1000;
+    const BATCH_SIZE = 100;
+
+    const tokenIds = Array.from({ length: TOTAL_SUPPLY }, (_, i) => i + 1);
+    const batches = [];
+    
+    const allResults = [];
+    const failedTokenIds: any = [];
+    
+    for (let i = 0; i < tokenIds.length; i += BATCH_SIZE) {
+      const batch = tokenIds.slice(i, i + BATCH_SIZE);
+      batches.push(batch);
+    }
+
+    // Process batches
+    console.log('Checking Potentials ownership...')
+    for (let i = 0; i < batches.length; i++) {
+        console.log(`Processing batch ${i + 1}/${batches.length}`);
+        const results = await fetchNftOwnersWithRetry(batches[i]);
+        
+        results?.forEach(result => {
+        if (result.success) {
+            allResults.push({
+                tokenId: result.tokenId,
+                owner: result.owner
+            });
+        } else if (!result.success) {
+            failedTokenIds.push(result.tokenId);
+        }
+        });
+    }
+
+    // Retry failed tokens individually
+    if (failedTokenIds.length > 0) {
+        console.log(`Retrying ${failedTokenIds.length} failed tokens`);
+        for (const tokenId of failedTokenIds) {
+            try {
+                const result = await client.readContract({
+                address: potentials_contract,
+                abi: potentials_abi,
+                functionName: 'ownerOf',
+                args: [tokenId]
+                });
+                
+                if (result !== 0n) {
+                allResults.push({
+                    tokenId,
+                    owner: result
+                });
+                }
+            } catch (error) {
+                console.error(`Failed to fetch token ${tokenId}:`, error);
+            }
+        }
+    }
+
+    return allResults;
+}
+
+// export const checkNftsApproval = ()
+
+export const claimNFTs = async (ownerAddress: string, operatorAddress: string) => {
+    const validateApprove = await (await potentialsContract()).isApprovedForAll(ownerAddress, operatorAddress);
+    return validateApprove;
 }

@@ -597,10 +597,11 @@
           {#await nftVote($episode, NFT.id) then vote}
             <div
               class="nft"
+              class:delegated={NFT.delegated}
               id={NFT.id.toString()}
               on:click={selectNFT}
               style={selectedIDs.flat().includes(NFT.id)
-                ? `background-color: #2441BD; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1;`
+                ? `background-color: ${NFT.delegated ? "#50307b" : "#2441BD"}; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1;`
                 : $listedNumbers.includes(NFT.id)
                   ? "background-color: rgb(22, 30, 95);"
                   : `opacity: ${vote > 0 ? "0.5" : "1"}`}
@@ -619,6 +620,15 @@
                   Listed
                   {#if width > 600}
                     on marketplace
+                  {/if}
+                </p>
+              {/if}
+              {#if NFT.delegated}
+                <p class="nft-vote">
+                  {#if width > 600}
+                    Owner: {NFT.delegated}
+                  {:else}
+                    Delegated
                   {/if}
                 </p>
               {/if}
@@ -1046,6 +1056,15 @@ a11y-no-static-element-interactions -->
   .loading:after {
     content: "";
     animation: dots 2s linear infinite;
+  }
+
+  .delegated {
+    background-color: #50307b;
+  }
+
+  .delegated:hover,
+  .delegated:active {
+    background-color: #6b3fa0;
   }
 
   @media screen and (max-width: 600px) {
