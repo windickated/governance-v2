@@ -129,6 +129,19 @@ button img {
   backdrop-filter: blur(1rem);
 }
 
+.searching {
+  height: 1.5vw;
+  animation: searching 1s linear infinite;
+}
+
+@keyframes searching {
+  from {
+    transform: none;
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media screen and (max-width: 600px) {
   html {
@@ -140,5 +153,9 @@ button img {
     line-height: 1.75em;
     padding: 0.25em 1em;
     border-radius: 0.5em;
+  }
+
+  .searching {
+    height: 1em;
   }
 }

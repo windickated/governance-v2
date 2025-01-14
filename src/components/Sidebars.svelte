@@ -15,6 +15,7 @@
     walletAddress,
     transactionInfo,
     listedNumbers,
+    loading,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import handleOptions from "../utils/options.ts";
@@ -555,11 +556,19 @@
           on:click={() => ($showModal = true)}
         />
       {/if}
-      <button class="wallet-connect" on:click={connectWallet}>
-        <img
-          src="/sign-{$isLogged ? 'out' : 'in'}.png"
-          alt="Sign {$isLogged ? 'out' : 'in'}"
-        />
+      <button
+        class="wallet-connect"
+        on:click={connectWallet}
+        disabled={$loading}
+      >
+        {#if $loading}
+          <img class="searching" src="/searching.png" alt="Loading" />
+        {:else}
+          <img
+            src="/sign-{$isLogged ? 'out' : 'in'}.png"
+            alt="Sign {$isLogged ? 'out' : 'in'}"
+          />
+        {/if}
         {#if width > 600}
           Sign {$isLogged ? "out" : "in"}
         {/if}
@@ -847,6 +856,12 @@ a11y-no-static-element-interactions -->
     width: 2.5vw;
     height: auto;
     filter: drop-shadow(0 0 0.25vw #010020);
+  }
+
+  .wallet-connect .searching {
+    height: 1.5vw;
+    width: 1.5vw;
+    margin: 0.5vw;
   }
 
   .wallet-legend {
@@ -1176,6 +1191,12 @@ a11y-no-static-element-interactions -->
     .wallet-connect img {
       width: 2em;
       min-height: 2em;
+    }
+
+    .wallet-connect .searching {
+      width: 2em;
+      height: 2em;
+      margin: 0;
     }
 
     .delegate-button {
