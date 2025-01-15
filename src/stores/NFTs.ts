@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import { provider } from "../lib/ethers";
-import { contract, checkNftBatches, claimNFTs } from "../lib/contract";
+import { contract } from "../lib/contract";
+import { checkNftBatches, claimNFTs } from "../lib/potentials.js";
 
 export class NFT {
   id: number;

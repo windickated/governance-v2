@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
   import { storyNodes, episode, selectedOption } from "../stores/storyNode.ts";
-  import handleOptions from "../utils/options.ts";
 
   export let handlePopUpMessage: Function;
 
@@ -87,7 +86,7 @@
               );
             } else {
               $episode--;
-              if ($selectedOption) handleOptions.reset(null);
+              if ($selectedOption) $selectedOption = null;
             }
             break;
           case "forward":
@@ -103,7 +102,7 @@
               );
             } else {
               $episode++;
-              if ($selectedOption) handleOptions.reset(null);
+              if ($selectedOption) $selectedOption = null;
             }
             break;
         }

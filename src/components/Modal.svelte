@@ -1,6 +1,6 @@
 <script lang="ts">
   import { showModal } from "../stores/modal.ts";
-  import { checkAddress, approveNFTs } from "../lib/contract";
+  import { checkAddress, approveNFTs } from "../lib/potentials.js";
 
   let dialog: HTMLDialogElement;
   let userAddress: string = "";

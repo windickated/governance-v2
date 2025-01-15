@@ -6,10 +6,13 @@
     season,
     episode,
     selectedOption,
+    votingResults,
+    checkingResults,
+    failedVotingChecks,
   } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
-  import handleOptions from "../utils/options.ts";
   import vote from "../utils/vote.ts";
+  import checkVote from "../lib/voting.js";
 
   export let handlePopUpMessage: Function;
 
@@ -21,13 +24,68 @@
     if (width > 600) mobileTextVisibility = true;
   });
 
+  let votingCountdown: string = "";
+  let interval;
   $: if ($storyNodes.length > 0) {
+    clearInterval(interval);
+    votingCountdown = "0:00:00:00";
     if ($episode !== -1) {
       $story = $storyNodes[$episode];
+      if (!$story.ended)
+        interval = setInterval(
+          () =>
+            calculateVotingEnd(new Date(Number($story.endTimestamp) * 1000)),
+          1000
+        );
     } else {
       $story = null;
     }
     $selectedNFTs = [];
+    $votingResults = null;
+  }
+
+  function calculateVotingEnd(countDownDate) {
+    const now = new Date().getTime();
+    const distance = countDownDate - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    votingCountdown = `${days}:${
+      hours < 10 ? "0" + hours : hours
+    }:${minutes < 10 ? "0" + minutes : minutes}:${
+      seconds < 10 ? "0" + seconds : seconds
+    }`;
+  }
+
+  async function checkVotingResults() {
+    const votes = await checkVote($episode);
+    const optionsCount = $story.votes_options.length;
+    const optionVotes = [];
+    for (let i = 1; i <= optionsCount; i++) {
+      const result = votes.filter((vote) => vote == i);
+      optionVotes.push({
+        option: i,
+        votes: result.length,
+      });
+    }
+    let win = optionVotes[0];
+    optionVotes.map((result) => {
+      if (win.votes < result.votes) win = result;
+    });
+    $votingResults = {
+      results: optionVotes,
+      win: win.option,
+      participation: votes.length,
+    };
+    console.log($votingResults); // console check
+    $selectedOption = win.option;
+    $checkingResults = null;
+    $failedVotingChecks = null;
   }
 
   function selectOption(event: Event) {
@@ -41,43 +99,34 @@
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
-    if (event.type === "pointerover")
-      handleOptions.focus(optionContainer, optionSelector);
-    if (event.type === "pointerout")
-      handleOptions.blur(optionContainer, optionSelector);
-    if (event.type === "click") {
-      if ($storyNodes[$episode].ended) {
-        handlePopUpMessage(
-          event as PointerEvent,
-          "Voting period for this episode is ended."
-        );
-        return;
-      }
-      if ($selectedNFTs.length === 0) {
-        handlePopUpMessage(
-          event as PointerEvent,
-          "Select any Potential to vote!"
-        );
-        return;
-      }
-      if (optionContainer.dataset.class) {
-        $selectedNFTs.forEach((nft) => {
-          if (
-            optionContainer.dataset.class != nft.class &&
-            nft.class != "Ne-Yon"
-          )
-            classMatch = false;
-        });
-      }
-      if (!classMatch) {
-        handlePopUpMessage(
-          event as PointerEvent,
-          `This option is only for the ${optionContainer.dataset.class} class!`
-        );
-        return;
-      }
-      handleOptions.reset(optionID);
+    if ($storyNodes[$episode].ended) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        "Voting period for this episode is ended."
+      );
+      return;
     }
+    if ($selectedNFTs.length === 0) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        "Select any Potential to vote!"
+      );
+      return;
+    }
+    if (optionContainer.dataset.class) {
+      $selectedNFTs.forEach((nft) => {
+        if (optionContainer.dataset.class != nft.class && nft.class != "Ne-Yon")
+          classMatch = false;
+      });
+    }
+    if (!classMatch) {
+      handlePopUpMessage(
+        event as PointerEvent,
+        `This option is only for the ${optionContainer.dataset.class} class!`
+      );
+      return;
+    }
+    $selectedOption = optionID;
 
     if (width < 600 && $selectedOption && $selectedNFTs.length > 0) vote();
   }
@@ -94,7 +143,51 @@
       <h1 class="season-episode-number">
         The Dischordian Saga: Season {$season} - Episode {$episode + 1}
       </h1>
-      <h2 class="duration">{$story.duration}</h2>
+      <div class="voting-period">
+        {#if $storyNodes[$episode].ended}
+          <div class="voting-info">
+            <p>{$story.duration}</p>
+            <span>|</span>
+            <p style="color: rgba(255, 60, 64, 0.9);">Voting ended</p>
+          </div>
+          {#if $votingResults}
+            <p class="participation">
+              Option: <strong>{$votingResults.win}</strong>
+              | Participation:
+              <strong
+                >{Math.round(
+                  ($votingResults.participation / 1035) * 100
+                )}%</strong
+              >
+            </p>
+          {:else}
+            <div class="check-votes">
+              <button on:click={checkVotingResults} disabled={$checkingResults}>
+                {#if $checkingResults}
+                  <img class="searching" src="/searching.png" alt="Loading" />
+                  {#if $failedVotingChecks}
+                    Retrying {$failedVotingChecks} tokens...
+                  {:else}
+                    Loading...
+                  {/if}
+                {:else}
+                  Check Results
+                {/if}
+              </button>
+              {#if $checkingResults}
+                <p>{$checkingResults}</p>
+              {/if}
+            </div>
+          {/if}
+        {:else}
+          <div class="voting-info">
+            <p>{$story.duration}</p>
+            <span>|</span>
+            <p style="color: rgba(0, 185, 55, 0.9);">Voting active</p>
+          </div>
+          <p class="countdown">{votingCountdown}</p>
+        {/if}
+      </div>
     {:else}
       <h1 class="empty-header">Select any episode from the tab</h1>
     {/if}
@@ -154,29 +247,31 @@
           tabindex="0"
           id={(index + 1).toString()}
           data-class={option.class}
-          on:pointerover={selectOption}
-          on:pointerout={selectOption}
           on:click={selectOption}
+          style={$selectedOption == index + 1
+            ? "text-shadow: 0 0 0.1vw rgb(51, 226, 230); color: rgb(51, 226, 230);"
+            : ""}
         >
           <img
             class="option-selector"
-            src={option.class ? `/${option.class}.png` : "/option-selector.png"}
+            src={option.class
+              ? `/${option.class}.png`
+              : $selectedOption == index + 1
+                ? "/option-selector-hover.png"
+                : "/option-selector.png"}
             alt="selector"
             style="
                 height: {width > 600 &&
               (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
               "
           />
+          {#if $votingResults}
+            ({$votingResults.results[index].votes})
+          {/if}
           {option.option}
         </div>
       {/each}
     </div>
-
-    <span
-      class="voting-ended {$storyNodes[$episode].ended ? '' : 'voting-active'}"
-    >
-      {$storyNodes[$episode].ended ? "Voting ended" : "Voting active"}
-    </span>
   {/if}
 </section>
 
@@ -213,32 +308,75 @@
     font-size: 3.5vw;
     text-align: center;
     padding: 1vw 0;
-    color: #33e2e6;
-    opacity: 0.75;
+    color: rgba(51, 226, 230, 0.85);
   }
 
   .header,
   .season-episode-number {
     font-size: 3vw;
     text-align: center;
-    -webkit-text-stroke: 0.03vw #33e2e6;
-    filter: drop-shadow(0 0 0.1vw #33e2e6);
     line-height: 5vw;
+    color: rgba(51, 226, 230, 0.85);
   }
 
   .season-episode-number {
     font-size: 2.5vw;
-    margin-bottom: 2vw;
-    opacity: 0.75;
+    margin-bottom: 1vw;
+    color: #dedede;
   }
 
-  .duration {
-    font-size: 2vw;
-    text-align: center;
-    -webkit-text-stroke: 0.03vw #33e2e6;
-    filter: drop-shadow(0 0 0.1vw #33e2e6);
+  .voting-period {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
     color: #bebebe;
-    padding-bottom: 1vw;
+    background-color: #07387d;
+    box-shadow: 0 0.5vw 0.5vw rgba(1, 0, 32, 0.25);
+    border: 0.1vw solid #203962;
+    border-radius: 1.5vw;
+    padding: 1vw 2vw;
+    font-size: 1.5vw;
+    line-height: 1.5vw;
+    gap: 2vw;
+  }
+
+  .voting-info {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2vw;
+    padding: 1vw 2vw;
+    border-radius: 1vw;
+    background-color: #01204e;
+    border: 0.1vw solid #203962;
+    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.25);
+  }
+
+  .voting-info span {
+    color: #010020;
+  }
+
+  .participation {
+    color: rgba(51, 226, 230, 0.75);
+  }
+
+  .participation strong {
+    color: rgb(51, 226, 230);
+  }
+
+  .countdown {
+    color: rgba(51, 226, 230, 0.85);
+  }
+
+  .check-votes {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
   }
 
   .text {
@@ -362,6 +500,12 @@
     background-color: rgba(0, 0, 0, 0);
     border: none;
     cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+
+  .option:active,
+  .option:hover {
+    filter: brightness(125%);
   }
 
   .option-selector {
@@ -373,23 +517,6 @@
     background-position: center;
     background-size: contain;
     opacity: 0.9;
-  }
-
-  .voting-ended {
-    display: block;
-    margin-inline: auto;
-    margin-top: 8vw;
-    margin-bottom: -4vw;
-    color: rgba(255, 255, 255, 0.5);
-    text-align: center;
-    font-size: 3vw;
-    filter: drop-shadow(0 0 1vw 5vw #33e2e6);
-    -webkit-text-stroke: 0.2vw rgba(255, 0, 0, 0.1);
-  }
-
-  .voting-active {
-    color: rgba(51, 226, 230, 0.8);
-    -webkit-text-stroke: 0.2vw rgba(0, 255, 0, 0.1);
   }
 
   @media screen and (max-width: 600px) {
@@ -419,9 +546,34 @@
       font-size: 1em;
     }
 
-    .duration {
+    .voting-period {
+      flex-direction: column;
+      gap: 0.5em;
       font-size: 1em;
-      opacity: 0.75;
+      line-height: 1.75em;
+      padding: 0.5em 1em;
+      border-radius: 0.5em;
+    }
+
+    .voting-period button {
+      gap: 1em;
+    }
+
+    .voting-info {
+      width: 100%;
+      flex-direction: column;
+      gap: 0.5em;
+      padding: 0.5em;
+      background-color: rgba(1, 0, 32, 0.85);
+    }
+
+    .voting-info span {
+      display: none;
+    }
+
+    .check-votes {
+      gap: 0.5em;
+      flex-wrap: wrap;
     }
 
     .text {
@@ -483,12 +635,6 @@
 
     .option-selector {
       height: 1.5em;
-    }
-
-    .voting-ended {
-      font-size: 1.2em;
-      margin-top: 0;
-      margin-bottom: 0;
     }
   }
 </style>

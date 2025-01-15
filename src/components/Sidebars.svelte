@@ -6,6 +6,7 @@
     episode,
     selectedOption,
     get_nodes,
+    loadingStories,
   } from "../stores/storyNode.ts";
   import {
     potentials,
@@ -18,7 +19,6 @@
     loading,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
-  import handleOptions from "../utils/options.ts";
   import { provider, switch_network, network } from "../lib/ethers";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
@@ -42,14 +42,14 @@
     }
   };
 
-  const switchEpisode = (event: Event) => {
+  const switchEpisode = async (event: Event) => {
     const target = event.target as HTMLDivElement;
     const episodeContainer =
       target.localName === "div"
         ? target
         : (target.parentElement as HTMLDivElement);
     $episode = Number(episodeContainer?.id);
-    handleOptions.reset(null);
+    $selectedOption = null;
   };
 
   $: if ($episode !== -1) {
@@ -109,7 +109,6 @@
   }
 
   function selectNFT(event: Event) {
-    if ($selectedOption) handleOptions.reset(null);
     const target = event.target as HTMLDivElement;
     const nftTile =
       target.localName === "div"
@@ -151,6 +150,7 @@
             `This Potential will change his decision.`
           );
         }
+        if ($selectedOption) $selectedOption = null;
         potential.selected = !potential.selected;
         if (potential.selected) {
           $selectedNFTs.push(potential);
@@ -223,6 +223,7 @@
       }
     });
     $selectedNFTs = $selectedNFTs;
+    if ($selectedOption) $selectedOption = null;
   };
 
   /* --- TABS HANDLING --- */
@@ -467,7 +468,7 @@
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
     >Dive into LOREDEX</button
   >
-  <select class="season" on:change={switchSeason}>
+  <select class="season" on:change={switchSeason} disabled={$loadingStories}>
     <option value="1">Season 1</option>
     <option value="2" selected={true}>Season 2</option>
   </select>
@@ -783,6 +784,10 @@ a11y-no-static-element-interactions -->
     border-radius: 1.5vw;
     background-color: rgba(51, 226, 230, 0.5);
     cursor: pointer;
+  }
+
+  .season:disabled {
+    cursor: not-allowed;
   }
 
   .episodes-container {

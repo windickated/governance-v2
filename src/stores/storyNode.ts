@@ -18,18 +18,24 @@ export type StoryNode = {
 };
 
 export const storyNodes = writable<StoryNode[]>([]);
+export const loadingStories = writable<boolean>(false);
+export const checkingResults = writable(null);
+export const failedVotingChecks = writable<number | null>(null);
 
 export const story = writable<StoryNode | null>(null)
 
 export const season = writable<number>(2);
 export const episode = writable<number>(-1);
 export const selectedOption = writable<number | null>(null);
+export const votingResults = writable<any>(null);
 
 export const get_nodes = async () => {
   const count = await (await contract()).getStoryNodesCount();
   const nodes = [];
+  loadingStories.set(true);
 
   for (let i = 0; i < count; i++) {
+    console.log('Fetching Episode ' + (i + 1).toString());
     let ipfs_uri = await (await contract()).storyNodeMetadata(i);
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
       ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
@@ -51,6 +57,8 @@ export const get_nodes = async () => {
       })
     }
   }
+
+  loadingStories.set(false);
   return nodes as StoryNode[];
 };
 
@@ -68,7 +76,7 @@ function getDuration(timestamp: number): string {
   const fullDateStart: string = `${dayStart}.${monthStart}.${yearStart}`;
   const fullDateEnd: string = `${dayEnd}.${monthEnd}.${yearEnd}`;
 
-  const duration: string = "Duration: " + fullDateStart + " - " + fullDateEnd;
+  const duration: string = fullDateStart + " - " + fullDateEnd;
 
   return duration;
 }

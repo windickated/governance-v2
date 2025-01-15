@@ -16,7 +16,7 @@
     const legend = document.querySelector(".empty-header");
     const pulseKeyframes = new KeyframeEffect(
       legend,
-      [{ opacity: "0" }, { opacity: "0.75" }, { opacity: "0" }],
+      [{ opacity: "0" }, { opacity: "1" }, { opacity: "0" }],
       {
         duration: 3000,
         easing: "linear",

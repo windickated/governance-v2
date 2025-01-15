@@ -1,6 +1,5 @@
 import { episode, selectedOption } from "../stores/storyNode";
 import { potentials, NFT, selectedNFTs } from "../stores/NFTs";
-import handleOptions from "../utils/options.ts";
 import { contract } from "../lib/contract";
 
 let _episode: number;
@@ -30,7 +29,7 @@ export default async function vote() {
     await (await contract()).batchVote(_episode, potentialNumbers, options);
   }
   // reset Options & NFT tiles
-  handleOptions.reset(null);
+  selectedOption.set(null);
   _potentials.map(async (potential) => {
     if (potential.selected) {
       potential.selected = false;
