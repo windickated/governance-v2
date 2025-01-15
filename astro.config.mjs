@@ -7,4 +7,7 @@ import svelte from '@astrojs/svelte';
 export default defineConfig({
   integrations: [svelte()],
   site: "https://governance.degenerousdao.com",
+  devToolbar: {
+    enabled: false
+  }
 });

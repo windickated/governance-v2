@@ -611,7 +611,7 @@
               id={NFT.id.toString()}
               on:click={selectNFT}
               style={selectedIDs.flat().includes(NFT.id)
-                ? `background-color: ${NFT.delegated ? "#50307b" : "#2441BD"}; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1;`
+                ? `background-color: ${NFT.delegated ? "#50307b" : "#2441BD"}; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1; filter: brightness(125%);`
                 : $listedNumbers.includes(NFT.id)
                   ? "background-color: rgb(22, 30, 95);"
                   : `opacity: ${vote > 0 ? "0.5" : "1"}`}
@@ -788,6 +788,7 @@ a11y-no-static-element-interactions -->
 
   .season:disabled {
     cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .episodes-container {

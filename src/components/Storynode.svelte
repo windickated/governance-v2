@@ -165,11 +165,7 @@
               <button on:click={checkVotingResults} disabled={$checkingResults}>
                 {#if $checkingResults}
                   <img class="searching" src="/searching.png" alt="Loading" />
-                  {#if $failedVotingChecks}
-                    Retrying {$failedVotingChecks} tokens...
-                  {:else}
-                    Loading...
-                  {/if}
+                  Loading...
                 {:else}
                   Check Results
                 {/if}
