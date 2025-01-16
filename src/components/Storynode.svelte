@@ -31,6 +31,7 @@
     votingCountdown = "0:00:00:00";
     if ($episode !== -1) {
       $story = $storyNodes[$episode];
+      endSoon = false;
       if (!$story.ended)
         interval = setInterval(
           () =>
@@ -45,6 +46,7 @@
     $abortVotingCheck = true;
   }
 
+  let endSoon: boolean = false;
   function calculateVotingEnd(countDownDate: any) {
     const now = new Date().getTime();
     const distance = countDownDate - now;
@@ -55,6 +57,10 @@
     );
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    if (hours == 0 && !endSoon) {
+      endSoon = true;
+    }
 
     votingCountdown = `${days}:${
       hours < 10 ? "0" + hours : hours
@@ -192,7 +198,12 @@
             <span>|</span>
             <p style="color: rgba(0, 185, 55, 0.9);">Voting active</p>
           </div>
-          <p class="countdown">{votingCountdown}</p>
+          <p
+            class="countdown"
+            style={endSoon ? "color: rgba(255, 60, 64, 0.9);" : ""}
+          >
+            {votingCountdown}
+          </p>
         {/if}
       </div>
       {#if $votingResults && $season == 1 && $episode == 2}
