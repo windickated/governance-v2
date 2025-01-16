@@ -78,6 +78,15 @@
     optionVotes.map((result) => {
       if (win.votes < result.votes) win = result;
     });
+
+    // check for s1e3
+    if ($season == 1 && $episode == 2) {
+      win = {
+        option: 1,
+        votes: 222,
+      };
+    }
+
     $votingResults = {
       results: optionVotes,
       win: win.option,
@@ -186,6 +195,9 @@
           <p class="countdown">{votingCountdown}</p>
         {/if}
       </div>
+      {#if $votingResults && $season == 1 && $episode == 2}
+        <p class="additional-voting-note">(+2.5% from TikTok)</p>
+      {/if}
     {:else}
       <h1 class="empty-header">Select any episode from the tab</h1>
     {/if}
@@ -391,6 +403,11 @@
     border-top-left-radius: 0.5vw;
     border-bottom-left-radius: 0.5vw;
     transition: all 1s linear;
+  }
+
+  .additional-voting-note {
+    font-size: 1.5vw;
+    line-height: 4vw;
   }
 
   .text {
@@ -600,6 +617,11 @@
       height: 0.5em;
       border-top-left-radius: 0.25em;
       border-bottom-left-radius: 0.25em;
+    }
+
+    .additional-voting-note {
+      font-size: 1em;
+      line-height: 3em;
     }
 
     .text {
