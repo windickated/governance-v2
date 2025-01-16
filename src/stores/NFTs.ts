@@ -23,7 +23,8 @@ export class NFT {
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
-export const loading = writable<boolean>(false)
+export const loading = writable<boolean>(false);
+export const checkingDelegations = writable<boolean>(false);
 export const walletAddress = writable<string>('');
 export const transactionInfo = writable<string | null>(null);
 
@@ -76,6 +77,7 @@ export async function getNFTs() {
   console.log(filteredOwners.length + ' unique NFT owners.');
 
   filteredOwners.map(async (ownerAddress: any) => {
+    checkingDelegations.set(true);
     if (!(await claimNFTs(ownerAddress, address))) return;
     const maskedAddress = ownerAddress.slice(0, 6) + "..." + ownerAddress.slice(ownerAddress.length - 4);
     const json = await fetch(
@@ -93,6 +95,7 @@ export async function getNFTs() {
       potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
     }
     console.log('Received delegated Potentials from: ' + maskedAddress);
+    checkingDelegations.set(false);
     potentials.set(potentialNFTs);
   })
 

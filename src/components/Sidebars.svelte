@@ -17,6 +17,7 @@
     transactionInfo,
     listedNumbers,
     loading,
+    checkingDelegations,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import { provider, switch_network, network } from "../lib/ethers";
@@ -595,7 +596,11 @@
     {#if $potentials.length > 0}
       <div class="nfts-legend">
         <p class="nfts-total">
-          Total NFTs: {$potentials.length}
+          {#if $checkingDelegations}
+            Loading NFTs...
+          {:else}
+            Total NFTs: {$potentials.length}
+          {/if}
           <button
             class="refresh-button"
             on:click={() => {
