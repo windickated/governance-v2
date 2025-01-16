@@ -62,6 +62,10 @@
       endSoon = true;
     }
 
+    if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
+      window.open("/", "_self");
+    }
+
     votingCountdown = `${days}:${
       hours < 10 ? "0" + hours : hours
     }:${minutes < 10 ? "0" + minutes : minutes}:${
