@@ -8,7 +8,7 @@
     selectedOption,
     votingResults,
     checkingResults,
-    failedVotingChecks,
+    abortVotingCheck,
   } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
@@ -25,7 +25,7 @@
   });
 
   let votingCountdown: string = "";
-  let interval;
+  let interval: NodeJS.Timeout;
   $: if ($storyNodes.length > 0) {
     clearInterval(interval);
     votingCountdown = "0:00:00:00";
@@ -34,7 +34,7 @@
       if (!$story.ended)
         interval = setInterval(
           () =>
-            calculateVotingEnd(new Date(Number($story.endTimestamp) * 1000)),
+            calculateVotingEnd(new Date(Number($story!.endTimestamp) * 1000)),
           1000
         );
     } else {
@@ -42,9 +42,10 @@
     }
     $selectedNFTs = [];
     $votingResults = null;
+    $abortVotingCheck = true;
   }
 
-  function calculateVotingEnd(countDownDate) {
+  function calculateVotingEnd(countDownDate: any) {
     const now = new Date().getTime();
     const distance = countDownDate - now;
 
@@ -64,10 +65,10 @@
 
   async function checkVotingResults() {
     const votes = await checkVote($episode);
-    const optionsCount = $story.votes_options.length;
+    const optionsCount = $story!.votes_options.length;
     const optionVotes = [];
     for (let i = 1; i <= optionsCount; i++) {
-      const result = votes.filter((vote) => vote == i);
+      const result = votes!.filter((vote) => vote == i);
       optionVotes.push({
         option: i,
         votes: result.length,
@@ -80,12 +81,11 @@
     $votingResults = {
       results: optionVotes,
       win: win.option,
-      participation: votes.length,
+      participation: votes!.length,
     };
     console.log($votingResults); // console check
     $selectedOption = win.option;
     $checkingResults = null;
-    $failedVotingChecks = null;
   }
 
   function selectOption(event: Event) {
@@ -162,7 +162,10 @@
             </p>
           {:else}
             <div class="check-votes">
-              <button on:click={checkVotingResults} disabled={$checkingResults}>
+              <button
+                on:click={checkVotingResults}
+                disabled={$checkingResults !== null}
+              >
                 {#if $checkingResults}
                   <img class="searching" src="/searching.png" alt="Loading" />
                   Loading...

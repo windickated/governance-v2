@@ -1,6 +1,6 @@
 import { createPublicClient, http } from 'viem'
 import { base } from 'viem/chains'
-import { season, checkingResults, failedVotingChecks } from "../stores/storyNode";
+import { season, checkingResults, abortVotingCheck } from "../stores/storyNode";
 
 const v1 = '0x1E2f59De3C0D51b596e0E9c80FEAa35A2cFBEe50';
 // const v2 = '0x8dC749360eA4f408C438C4FC7A272EE1f1250A89'; // prod
@@ -87,10 +87,19 @@ async function main(storyNode = 0) {
 
   const allResults = [];
   const failedTokenIds = [];
-  failedVotingChecks.set(null);
+  abortVotingCheck.set(false);
 
   // Process batches
   for (let i = 0; i < batches.length; i++) {
+    // check for abort
+    let abort = false;
+    abortVotingCheck.subscribe((value) => abort = value);
+    if (abort) {
+      console.log('Abort fetching results.');
+      checkingResults.set(null);
+      return;
+    }
+
     checkingResults.set(`${i + 1}/${batches.length}`);
     console.log(`Processing batch ${i + 1}/${batches.length}`);
     const results = await fetchVotesWithRetry(storyNode, batches[i]);
@@ -109,9 +118,17 @@ async function main(storyNode = 0) {
 
   // Retry failed tokens individually
   if (failedTokenIds.length > 0) {
-    failedVotingChecks.set(failedTokenIds.length);
     console.log(`Retrying ${failedTokenIds.length} failed tokens`);
     for (const tokenId of failedTokenIds) {
+          // check for abort
+          let abort = false;
+          abortVotingCheck.subscribe((value) => abort = value);
+          if (abort) {
+            console.log('Abort fetching results.');
+            checkingResults.set(null);
+            return;
+          }
+
       checkingResults.set(`${tokenId}/1000`);
       try {
         const result = await client.readContract({

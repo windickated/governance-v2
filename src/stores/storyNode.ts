@@ -17,22 +17,33 @@ export type StoryNode = {
   }[];
 };
 
+interface Result {
+  results: {
+      option: number
+      votes: number
+    }[],
+  win: number,
+  participation: number,
+}
+
 export const storyNodes = writable<StoryNode[]>([]);
 export const loadingStories = writable<boolean>(false);
-export const checkingResults = writable(null);
-export const failedVotingChecks = writable<number | null>(null);
 
 export const story = writable<StoryNode | null>(null)
 
 export const season = writable<number>(2);
 export const episode = writable<number>(-1);
 export const selectedOption = writable<number | null>(null);
-export const votingResults = writable<any>(null);
+
+export const votingResults = writable<Result | null>(null);
+export const checkingResults = writable<string | null>(null);
+export const abortVotingCheck = writable<boolean>(false);
 
 export const get_nodes = async () => {
   const count = await (await contract()).getStoryNodesCount();
   const nodes = [];
   loadingStories.set(true);
+  abortVotingCheck.set(false);
 
   for (let i = 0; i < count; i++) {
     console.log('Fetching Episode ' + (i + 1).toString());
