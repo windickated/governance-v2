@@ -391,18 +391,6 @@
 
   .progress-bar {
     width: 20vw;
-    background-color: #01204e;
-    border: 0.1vw solid #010020;
-    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.25);
-    border-radius: 0.5vw;
-  }
-
-  .progress-thumb {
-    height: 1vw;
-    background-color: rgba(51, 226, 230, 0.5);
-    border-top-left-radius: 0.5vw;
-    border-bottom-left-radius: 0.5vw;
-    transition: all 1s linear;
   }
 
   .additional-voting-note {
@@ -610,13 +598,6 @@
 
     .progress-bar {
       width: 80%;
-      border-radius: 0.25em;
-    }
-
-    .progress-thumb {
-      height: 0.5em;
-      border-top-left-radius: 0.25em;
-      border-bottom-left-radius: 0.25em;
     }
 
     .additional-voting-note {

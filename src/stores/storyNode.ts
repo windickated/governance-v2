@@ -42,7 +42,7 @@ export const abortVotingCheck = writable<boolean>(false);
 export const get_nodes = async () => {
   const count = await (await contract()).getStoryNodesCount();
   const nodes = [];
-  abortVotingCheck.set(false);
+  abortVotingCheck.set(true);
   const storyPercent = 100 / Number(count);
   let progress: number = 0;
   loadingStories.set(progress);
