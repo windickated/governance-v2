@@ -27,7 +27,7 @@ interface Result {
 }
 
 export const storyNodes = writable<StoryNode[]>([]);
-export const loadingStories = writable<boolean>(false);
+export const loadingStories = writable<boolean>(true);
 
 export const story = writable<StoryNode | null>(null)
 
@@ -36,7 +36,7 @@ export const episode = writable<number>(-1);
 export const selectedOption = writable<number | null>(null);
 
 export const votingResults = writable<Result | null>(null);
-export const checkingResults = writable<string | null>(null);
+export const checkingResults = writable<number>(-1);
 export const abortVotingCheck = writable<boolean>(false);
 
 export const get_nodes = async () => {

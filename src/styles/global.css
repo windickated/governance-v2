@@ -131,6 +131,7 @@ button img {
 
 .searching {
   height: 1.5vw;
+  width: 1.5vw;
   animation: searching 1s linear infinite;
 }
 
@@ -157,5 +158,6 @@ button img {
 
   .searching {
     height: 1em;
+    width: 1em;
   }
 }

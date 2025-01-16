@@ -85,7 +85,7 @@
     };
     console.log($votingResults); // console check
     $selectedOption = win.option;
-    $checkingResults = null;
+    $checkingResults = -1;
   }
 
   function selectOption(event: Event) {
@@ -162,19 +162,18 @@
             </p>
           {:else}
             <div class="check-votes">
-              <button
-                on:click={checkVotingResults}
-                disabled={$checkingResults !== null}
-              >
-                {#if $checkingResults}
-                  <img class="searching" src="/searching.png" alt="Loading" />
-                  Loading...
-                {:else}
-                  Check Results
-                {/if}
-              </button>
-              {#if $checkingResults}
-                <p>{$checkingResults}</p>
+              {#if $checkingResults !== -1}
+                <img class="searching" src="/searching.png" alt="Loading" />
+                <p>Loading...</p>
+                <div class="progress-bar">
+                  <div
+                    class="progress-thumb"
+                    style="width: {$checkingResults}%;"
+                  ></div>
+                </div>
+                <p>{Math.round($checkingResults)}%</p>
+              {:else}
+                <button on:click={checkVotingResults}> Check Results </button>
               {/if}
             </div>
           {/if}
@@ -376,6 +375,22 @@
     justify-content: center;
     align-items: center;
     gap: 1vw;
+  }
+
+  .progress-bar {
+    width: 20vw;
+    background-color: #01204e;
+    border: 0.1vw solid #010020;
+    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.25);
+    border-radius: 0.5vw;
+  }
+
+  .progress-thumb {
+    height: 1vw;
+    background-color: rgba(51, 226, 230, 0.5);
+    border-top-left-radius: 0.5vw;
+    border-bottom-left-radius: 0.5vw;
+    transition: all 1s linear;
   }
 
   .text {

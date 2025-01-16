@@ -88,6 +88,8 @@ async function main(storyNode = 0) {
   const allResults = [];
   const failedTokenIds = [];
   abortVotingCheck.set(false);
+  let checkingStatus = 0;
+  checkingResults.set(checkingStatus);
 
   // Process batches
   for (let i = 0; i < batches.length; i++) {
@@ -96,11 +98,11 @@ async function main(storyNode = 0) {
     abortVotingCheck.subscribe((value) => abort = value);
     if (abort) {
       console.log('Abort fetching results.');
-      checkingResults.set(null);
+      checkingResults.set(-1);
       return;
     }
 
-    checkingResults.set(`${i + 1}/${batches.length}`);
+    checkingResults.set(checkingStatus += 9);
     console.log(`Processing batch ${i + 1}/${batches.length}`);
     const results = await fetchVotesWithRetry(storyNode, batches[i]);
     
@@ -125,11 +127,11 @@ async function main(storyNode = 0) {
           abortVotingCheck.subscribe((value) => abort = value);
           if (abort) {
             console.log('Abort fetching results.');
-            checkingResults.set(null);
+            checkingResults.set(-1);
             return;
           }
 
-      checkingResults.set(`${tokenId}/1000`);
+      checkingResults.set(checkingStatus += (10 / failedTokenIds.length));
       try {
         const result = await client.readContract({
           address: CONTRACT_ADDRESS,
