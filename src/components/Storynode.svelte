@@ -586,8 +586,20 @@
     }
 
     .check-votes {
+      width: 100%;
       gap: 0.5em;
       flex-wrap: wrap;
+    }
+
+    .progress-bar {
+      width: 80%;
+      border-radius: 0.25em;
+    }
+
+    .progress-thumb {
+      height: 0.5em;
+      border-top-left-radius: 0.25em;
+      border-bottom-left-radius: 0.25em;
     }
 
     .text {
