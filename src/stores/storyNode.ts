@@ -27,7 +27,7 @@ interface Result {
 }
 
 export const storyNodes = writable<StoryNode[]>([]);
-export const loadingStories = writable<boolean>(true);
+export const loadingStories = writable<number>(-1);
 
 export const story = writable<StoryNode | null>(null)
 
@@ -42,10 +42,13 @@ export const abortVotingCheck = writable<boolean>(false);
 export const get_nodes = async () => {
   const count = await (await contract()).getStoryNodesCount();
   const nodes = [];
-  loadingStories.set(true);
   abortVotingCheck.set(false);
+  const storyPercent = 100 / Number(count);
+  let progress: number = 0;
+  loadingStories.set(progress);
 
   for (let i = 0; i < count; i++) {
+    loadingStories.set(progress += storyPercent);
     console.log('Fetching Episode ' + (i + 1).toString());
     let ipfs_uri = await (await contract()).storyNodeMetadata(i);
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
@@ -69,7 +72,7 @@ export const get_nodes = async () => {
     }
   }
 
-  loadingStories.set(false);
+  loadingStories.set(-1);
   return nodes as StoryNode[];
 };
 

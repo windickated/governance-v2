@@ -468,7 +468,11 @@
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
     >Dive into LOREDEX</button
   >
-  <select class="season" on:change={switchSeason} disabled={$loadingStories}>
+  <select
+    class="season"
+    on:change={switchSeason}
+    disabled={$loadingStories !== -1}
+  >
     <option value="1">Season 1</option>
     <option value="2" selected={true}>Season 2</option>
   </select>
@@ -498,6 +502,9 @@
     </div>
   {:else}
     <p class="season-title loading">Loading Season {$season}</p>
+    <div class="progress-bar">
+      <div class="progress-thumb" style="width: {$loadingStories}%;"></div>
+    </div>
   {/if}
 </div>
 
@@ -753,6 +760,22 @@ a11y-no-static-element-interactions -->
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.75);
+  }
+
+  .progress-bar {
+    width: 35vw;
+    background-color: #01204e;
+    border: 0.1vw solid #010020;
+    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.25);
+    border-radius: 0.5vw;
+  }
+
+  .progress-thumb {
+    height: 1vw;
+    background-color: rgba(51, 226, 230, 0.5);
+    border-top-left-radius: 0.5vw;
+    border-bottom-left-radius: 0.5vw;
+    transition: all 1s linear;
   }
 
   /* EPISODES bar */
@@ -1089,6 +1112,17 @@ a11y-no-static-element-interactions -->
   }
 
   @media screen and (max-width: 600px) {
+    .progress-bar {
+      width: 80vw;
+      border-radius: 0.25em;
+    }
+
+    .progress-thumb {
+      height: 0.5em;
+      border-top-left-radius: 0.25em;
+      border-bottom-left-radius: 0.25em;
+    }
+
     .nft-icon {
       width: 70vw;
       height: 12vw;
