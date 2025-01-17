@@ -42,8 +42,8 @@
         Potentials
       </h2>
       <h3>
-        You can always revoke this approval via 3rd party services like
-        <a href="https://revoke.cash/"> revoke.cash </a>
+        You can always
+        <a href="https://revoke.cash/"> revoke this approval</a>
       </h3>
       <input
         type="text"
