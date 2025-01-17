@@ -58,7 +58,7 @@
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    if (hours == 0 && !endSoon) {
+    if (days == 0 && hours == 0 && !endSoon) {
       endSoon = true;
     }
 
