@@ -523,7 +523,11 @@
 <div class="nft-bar" bind:this={nftBar}>
   <div class="wallet-container" bind:this={walletContainer}>
     <p class="wallet-legend" bind:this={walletLegend}>Connect Wallet:</p>
-    <p class="wallet" bind:this={wallet}>{$walletAddress}</p>
+    <p class="wallet" bind:this={wallet}>
+      {$walletAddress.slice(0, 6) +
+        "..." +
+        $walletAddress.slice($walletAddress.length - 4)}
+    </p>
     <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
       {#if width > 600}
         <p>Select Potentials:</p>

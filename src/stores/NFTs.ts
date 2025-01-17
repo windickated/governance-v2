@@ -42,7 +42,7 @@ It will not cause a blockchain transaction, nor any gas fees.
 export async function getNFTs() {
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
-  walletAddress.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+  walletAddress.set(address);
   try {
     transactionInfo.set('Please sign the transaction in your wallet to proceed.');
     await signer.signMessage(message(address));

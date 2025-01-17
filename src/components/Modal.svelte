@@ -1,6 +1,7 @@
 <script lang="ts">
   import { showModal } from "../stores/modal.ts";
-  import { checkAddress, approveNFTs } from "../lib/potentials.js";
+  import { walletAddress } from "../stores/NFTs.ts";
+  import { checkAddress, approveNFTs, claimNFTs } from "../lib/potentials.js";
 
   let dialog: HTMLDialogElement;
   let userAddress: string = "";
@@ -14,6 +15,15 @@
   const closeDialog = () => {
     $showModal = false;
     dialog?.close();
+  };
+
+  $: if (userAddress && validation) checkDelegation();
+
+  let approval: boolean | null = null;
+  const checkDelegation = async () => {
+    approval = false;
+    const approved = await claimNFTs(userAddress, $walletAddress);
+    approval = approved ? true : null;
   };
 </script>
 
@@ -44,6 +54,19 @@
       {:else if !validation}
         <p class="validation">Please provide a valid address!</p>
       {/if}
+
+      {#if approval == false}
+        <p class="validation gray">Checking approval for NFTs...</p>
+      {:else if approval == true}
+        <p class="validation green">
+          Successfuly delegated NFTs to this address!
+        </p>
+      {:else if validation}
+        <p class="validation gray">
+          Sign the transaction to delegate your NFTs to this address.
+        </p>
+      {/if}
+
       <button
         disabled={!validation}
         on:click={() => {
@@ -155,6 +178,14 @@
     font-size: 1.25vw;
     line-height: 1.5vw;
     color: rgba(255, 50, 50, 0.75);
+  }
+
+  .gray {
+    color: rgba(150, 150, 150, 0.75);
+  }
+
+  .green {
+    color: rgba(0, 185, 55, 0.75);
   }
 
   @media only screen and (max-width: 600px) {
