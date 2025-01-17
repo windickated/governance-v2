@@ -41,6 +41,10 @@
         Paste the address of your choice to delegate the voting power of your
         Potentials
       </h2>
+      <h3>
+        You can always revoke this approval via 3rd party services like
+        <a href="https://revoke.cash/"> revoke.cash </a>
+      </h3>
       <input
         type="text"
         placeholder="Enter Web3 Address"
@@ -159,6 +163,24 @@
     line-height: 3vw;
   }
 
+  h3 {
+    width: 50vw;
+    text-align: center;
+    font-size: 1vw;
+    line-height: 2vw;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  h3 a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  h3 a:hover,
+  h3 a:active {
+    text-decoration: underline;
+  }
+
   input {
     width: 40vw;
     font-size: 1.5vw;
@@ -211,6 +233,12 @@
     h2 {
       width: 70vw;
       font-size: 1.25em;
+      line-height: 1.5em;
+    }
+
+    h3 {
+      width: 70vw;
+      font-size: 1em;
       line-height: 1.5em;
     }
 
