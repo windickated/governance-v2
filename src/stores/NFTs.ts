@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import { provider } from "../lib/ethers";
 import { contract } from "../lib/contract";
-import { checkNftBatches, claimNFTs } from "../lib/potentials.js";
+import { checkNftBatches, getDelegatedAdresses } from "../lib/potentials.js";
 
 export class NFT {
   id: number;
@@ -24,7 +24,6 @@ export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
 export const loading = writable<boolean>(false);
-export const checkingDelegations = writable<boolean>(false);
 export const walletAddress = writable<string>('');
 export const transactionInfo = writable<string | null>(null);
 
@@ -53,6 +52,7 @@ export async function getNFTs() {
     return null;
   }
   transactionInfo.set(null);
+
   const json = await fetch(
     `https://api.degenerousdao.com/nft/owner/${address}`
   );
@@ -76,12 +76,13 @@ export async function getNFTs() {
   const filteredOwners = Array.from(new Set(ownersList));
   console.log(filteredOwners.length + ' unique NFT owners.');
 
-  filteredOwners.map(async (ownerAddress: any) => {
-    checkingDelegations.set(true);
-    if (!(await claimNFTs(ownerAddress, address))) return;
-    const maskedAddress = ownerAddress.slice(0, 6) + "..." + ownerAddress.slice(ownerAddress.length - 4);
+  const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
+  console.log(delegatedWallets);
+
+  delegatedWallets.map(async ({owner, approved}: any) => {
+    const maskedAddress = owner.slice(0, 6) + "..." + owner.slice(owner.length - 4);
     const json = await fetch(
-      `https://api.degenerousdao.com/nft/owner/${ownerAddress}`
+      `https://api.degenerousdao.com/nft/owner/${owner}`
     );
     const data = await json.json();
     const delegatedNftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
@@ -95,7 +96,6 @@ export async function getNFTs() {
       potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
     }
     console.log('Received delegated Potentials from: ' + maskedAddress);
-    checkingDelegations.set(false);
     potentials.set(potentialNFTs);
   })
 

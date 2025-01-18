@@ -17,7 +17,6 @@
     transactionInfo,
     listedNumbers,
     loading,
-    checkingDelegations,
   } from "../stores/NFTs.ts";
   import { isLogged } from "../stores/auth.ts";
   import { provider, switch_network, network } from "../lib/ethers";
@@ -463,7 +462,7 @@
 ></span>
 
 <div class="episodes-bar" bind:this={episodesBar}>
-  <p class="season-title">The Dishordian Saga</p>
+  <p class="season-title">The Dischordian Saga</p>
   <button
     class="loredex"
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
@@ -600,11 +599,7 @@
     {#if $potentials.length > 0}
       <div class="nfts-legend">
         <p class="nfts-total">
-          {#if $checkingDelegations}
-            Loading NFTs...
-          {:else}
-            Total NFTs: {$potentials.length}
-          {/if}
+          Total NFTs: {$potentials.length}
           <button
             class="refresh-button"
             on:click={() => {
