@@ -70,34 +70,34 @@ export async function getNFTs() {
   potentials.set(potentialNFTs);
 
   // check delegated Potentials
-  const allNFTs = await checkNftBatches();
-  const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
-  const ownersList = filteredNFTs.map(nft => nft.owner)
-  const filteredOwners = Array.from(new Set(ownersList));
-  console.log(filteredOwners.length + ' unique NFT owners.');
+  // const allNFTs = await checkNftBatches();
+  // const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
+  // const ownersList = filteredNFTs.map(nft => nft.owner)
+  // const filteredOwners = Array.from(new Set(ownersList));
+  // console.log(filteredOwners.length + ' unique NFT owners.');
 
-  const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
-  console.log(delegatedWallets);
+  // const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
+  // console.log(delegatedWallets);
 
-  delegatedWallets.map(async ({owner, approved}: any) => {
-    const maskedAddress = owner.slice(0, 6) + "..." + owner.slice(owner.length - 4);
-    const json = await fetch(
-      `https://api.degenerousdao.com/nft/owner/${owner}`
-    );
-    const data = await json.json();
-    const delegatedNftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
-    const metadata: any[] = [];
-    for (let i in delegatedNftNumbers) {
-      const response = await fetch(
-        `https://api.degenerousdao.com/nft/data/${delegatedNftNumbers[i]}`
-      );
-      metadata[Number(i)] = await response.json();
-      potentialNFTs[potentialNFTs.length] = new NFT(metadata, Number(i));
-      potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
-    }
-    console.log('Received delegated Potentials from: ' + maskedAddress);
-    potentials.set(potentialNFTs);
-  })
+  // delegatedWallets.map(async ({owner, approved}: any) => {
+  //   const maskedAddress = owner.slice(0, 6) + "..." + owner.slice(owner.length - 4);
+  //   const json = await fetch(
+  //     `https://api.degenerousdao.com/nft/owner/${owner}`
+  //   );
+  //   const data = await json.json();
+  //   const delegatedNftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
+  //   const metadata: any[] = [];
+  //   for (let i in delegatedNftNumbers) {
+  //     const response = await fetch(
+  //       `https://api.degenerousdao.com/nft/data/${delegatedNftNumbers[i]}`
+  //     );
+  //     metadata[Number(i)] = await response.json();
+  //     potentialNFTs[potentialNFTs.length] = new NFT(metadata, Number(i));
+  //     potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
+  //   }
+  //   console.log('Received delegated Potentials from: ' + maskedAddress);
+  //   potentials.set(potentialNFTs);
+  // })
 
   // check listed Potentials
   let listedNFTs: number[];

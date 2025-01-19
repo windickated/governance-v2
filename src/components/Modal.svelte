@@ -5,8 +5,12 @@
 
   let dialog: HTMLDialogElement;
   let userAddress: string = "";
+  let checkApproval: boolean = false;
 
-  $: validation = userAddress.length == 42 && checkAddress(userAddress);
+  $: validation =
+    userAddress.length == 42 &&
+    checkAddress(userAddress) &&
+    userAddress !== $walletAddress;
 
   $: if (dialog && $showModal) {
     dialog.showModal();
@@ -18,6 +22,7 @@
   };
 
   $: if (userAddress && validation) checkDelegation();
+  $: if (approval && userAddress.length < 42) approval = null;
 
   let approval: boolean | null = null;
   const checkDelegation = async () => {
@@ -39,44 +44,81 @@
     <section class="delegate-container">
       <h2>
         Paste the address of your choice to delegate the voting power of your
-        Potentials
+        Potentials.
       </h2>
-      <h3>
-        You can always
-        <a href="https://revoke.cash/"> revoke this approval</a>
-      </h3>
-      <input
-        type="text"
-        placeholder="Enter Web3 Address"
-        maxlength="42"
-        bind:value={userAddress}
-      />
-      {#if !userAddress}{:else if !userAddress.startsWith("0x")}
-        <p class="validation">Address should start with "0x..."</p>
-      {:else if userAddress.length < 42}
-        <p class="validation">Address is too short</p>
-      {:else if !validation}
-        <p class="validation">Please provide a valid address!</p>
-      {/if}
 
-      {#if approval == false}
-        <p class="validation gray">Checking approval for NFTs...</p>
-      {:else if approval == true}
-        <p class="validation green">
-          Successfuly delegated NFTs to this address!
-        </p>
-      {:else if validation}
-        <p class="validation gray">
-          Sign the transaction to delegate your NFTs to this address.
-        </p>
-      {/if}
-
-      <button
-        disabled={!validation}
-        on:click={() => {
-          approveNFTs(userAddress);
-        }}>DELEGATE</button
+      <div
+        class="address-container"
+        style={checkApproval
+          ? "background-color: rgba(56, 117, 250, 0.1); color: rgba(56, 117, 250, 0.75); box-shadow: 0 0 0.5vw rgba(56, 117, 250, 0.75);"
+          : ""}
       >
+        <input
+          type="text"
+          placeholder="Enter Web3 Address"
+          maxlength="42"
+          bind:value={userAddress}
+          style={checkApproval
+            ? "background-color: rgba(56, 117, 250, 0.1); color: rgb(56, 117, 250); border: 0.1vw solid rgba(56, 117, 250, 0.5);"
+            : ""}
+        />
+        {#if !userAddress}{:else if !userAddress.startsWith("0x")}
+          <p class="validation">Address should start with "0x..."</p>
+        {:else if userAddress.length < 42}
+          <p class="validation">Address is too short</p>
+        {:else if userAddress == $walletAddress}
+          <p class="validation">You can't use your connected address.</p>
+        {:else if !validation}
+          <p class="validation">Please provide a valid address!</p>
+        {/if}
+
+        {#if checkApproval}
+          {#if approval == false}
+            <p class="validation gray">Checking approval for NFTs...</p>
+          {:else if validation && approval == null && userAddress !== $walletAddress}
+            <p class="validation">There is no approval for this address.</p>
+          {/if}
+          <div>
+            <p
+              on:click={() => (checkApproval = false)}
+              style="color: rgba(56, 117, 250, 0.75);"
+            >
+              Delegate
+            </p>
+            <span>|</span>
+            <button
+              disabled={!validation ||
+                !approval ||
+                userAddress == $walletAddress}
+              on:click={() => {}}>IMPORT POTENTIALS</button
+            >
+          </div>
+        {:else}
+          {#if approval == false}
+            <p class="validation gray">Checking approval for NFTs...</p>
+          {:else if approval == true}
+            <p class="validation green">
+              This address can vote with your Potentials!
+            </p>
+          {/if}
+          <div>
+            <button
+              disabled={!validation ||
+                approval ||
+                userAddress == $walletAddress}
+              on:click={() => {
+                approveNFTs(userAddress);
+              }}>DELEGATE</button
+            >
+            <span>|</span>
+            <p on:click={() => (checkApproval = true)}>Import Potentials</p>
+          </div>
+        {/if}
+      </div>
+      <h2>
+        You can always
+        <a href="https://revoke.cash/"> revoke this approval</a>.
+      </h2>
     </section>
     <button class="close-button" on:click={closeDialog}>
       <img src="/close.png" alt="Close" />
@@ -159,26 +201,32 @@
   h2 {
     width: 50vw;
     text-align: center;
-    font-size: 2vw;
-    line-height: 3vw;
+    font-size: 1.5vw;
+    line-height: 2.5vw;
   }
 
-  h3 {
-    width: 50vw;
-    text-align: center;
-    font-size: 1vw;
-    line-height: 2vw;
-    color: rgba(255, 255, 255, 0.5);
-  }
-
-  h3 a {
+  h2 a {
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.6);
+    color: white;
   }
 
-  h3 a:hover,
-  h3 a:active {
+  h2 a:hover,
+  h2 a:active {
     text-decoration: underline;
+  }
+
+  .address-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vw;
+    padding: 1.5vw;
+    background-color: rgba(51, 226, 230, 0.1);
+    box-shadow: 0 0 0.5vw rgba(51, 226, 230, 0.5);
+    border-radius: 1.5vw;
+    color: rgba(51, 226, 230, 0.5);
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   input {
@@ -193,6 +241,26 @@
     outline: none;
     text-align: center;
     cursor: text;
+  }
+
+  .address-container > div {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vw;
+  }
+
+  .address-container > div > p {
+    color: rgba(51, 226, 230, 0.5);
+    text-shadow: 0 0 0.1vw #010020;
+    cursor: pointer;
+  }
+
+  .address-container > div > p:hover,
+  .address-container > div > p:active {
+    color: rgb(51, 226, 230);
+    text-decoration: underline;
   }
 
   .validation {
@@ -232,14 +300,14 @@
 
     h2 {
       width: 70vw;
-      font-size: 1.25em;
+      font-size: 1.15em;
       line-height: 1.5em;
     }
 
-    h3 {
-      width: 70vw;
-      font-size: 1em;
-      line-height: 1.5em;
+    .address-container {
+      gap: 1.5em;
+      padding: 1em;
+      border-radius: 1em;
     }
 
     input {
@@ -248,6 +316,15 @@
       font-size: 1.25em;
       line-height: 1.5em;
       white-space: wrap;
+    }
+
+    .address-container > div {
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    .address-container > div > span {
+      display: none;
     }
 
     .validation {

@@ -78,6 +78,7 @@
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
+  $: nftNumbers = $potentials.map((potential) => potential.id);
 
   async function connectWallet() {
     if (!$isLogged) {
