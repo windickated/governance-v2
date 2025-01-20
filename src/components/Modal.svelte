@@ -45,10 +45,12 @@
   };
 
   let approvals: { owner: string; nfts: number[] }[] = [];
-  $: if ($nftApprovals.length > 0)
+  $: if ($nftApprovals.length > 0) {
+    localStorage.setItem("delegations", JSON.stringify($nftApprovals));
     $nftApprovals.map(async ({ owner }, i) => {
       approvals[i] = await getApproval(owner);
     });
+  }
   $: if ($nftApprovals.length == 0) approvals = [];
 
   const getApproval = async (owner: string) => {
@@ -71,6 +73,7 @@
     potentials.set(potentialNFTs);
     nftApprovals.set([]);
     selectedNFTs.set([]);
+    localStorage.clear();
   };
 </script>
 
