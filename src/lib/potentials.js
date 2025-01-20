@@ -199,7 +199,7 @@ const getDelegatedAdresses = async (walletsList, operator) => {
 
     // Retry failed tokens individually
     if (failedTokenIds.length > 0) {
-        checkingDelegations.set(`Checking ${failedTokenIds.length} Potentials one more time...`);
+        checkingDelegations.set(`Checking ${failedTokenIds.length} wallets one more time...`);
         console.log(`Retrying ${failedTokenIds.length} failed addresses`);
         for (const owner of failedTokenIds) {
             try {

@@ -143,7 +143,8 @@
                 userAddress == $walletAddress ||
                 approvals
                   .map((approval) => approval.owner)
-                  .includes(userAddress)}
+                  .includes(userAddress) ||
+                $checkingDelegations !== null}
               on:click={async () => {
                 $nftApprovals[$nftApprovals.length] = {
                   owner: userAddress,
@@ -227,11 +228,16 @@
             on:click={removeDelegations}
             disabled={$nftApprovals.length == 0}>CLEAR</button
           >
-          <button on:click={checkDelegatedWallets}>
+          <button
+            on:click={checkDelegatedWallets}
+            disabled={$checkingDelegations !== null}
+          >
             {#if $checkingDelegations}
               <img class="searching" src="/searching.png" alt="Loading" />
+              Loading...
+            {:else}
+              FETCH
             {/if}
-            FETCH
           </button>
         </div>
       </div>
@@ -425,6 +431,10 @@
     justify-content: center;
     align-items: center;
     gap: 1vw;
+  }
+
+  .delegations strong {
+    color: white;
   }
 
   .wallet {
