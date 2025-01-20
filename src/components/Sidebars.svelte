@@ -106,6 +106,7 @@
       walletLegend.style.display = "block";
       wallet.style.display = "none";
       nftsSelector.style.display = "none";
+      window.open("/", "_self");
     }
   }
 

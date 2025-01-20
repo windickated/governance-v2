@@ -58,7 +58,8 @@ export async function getNFTs() {
   const potentialNFTs: NFT[] = await getPotentials(address);
   potentials.set(potentialNFTs);
 
-  const delegations = localStorage.getItem("delegations");
+  const delegations = localStorage.getItem(address);
+  console.log(delegations)
   if (delegations) nftApprovals.set(JSON.parse(delegations));
 
   // check listed Potentials
