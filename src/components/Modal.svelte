@@ -50,6 +50,11 @@
     getDelegatedNFTs();
   }
 
+  $: if (!$nftApprovals || $nftApprovals.length < 1) {
+    localStorage.removeItem($walletAddress);
+    getDelegatedNFTs();
+  }
+
   const getDelegatedNFTs = async () => {
     const userNftNumbers = await getNftNumbers($walletAddress);
     let userNFTs = await getPotentials(userNftNumbers);
@@ -62,6 +67,8 @@
         $potentials = userNFTs;
       }
     });
+
+    $potentials = userNFTs;
   };
 
   const removeDelegations = async () => {
