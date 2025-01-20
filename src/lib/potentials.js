@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { provider } from "./ethers";
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { potentials, walletAddress, nftApprovals, checkingDelegations } from "../stores/NFTs";
+import { potentials, walletAddress, nftApprovals, checkingDelegations, getPotentials } from "../stores/NFTs";
 
 const CONTRACT_ADDRESS = "0x111e0861baa9d479cff55d542e5a9e4205012bbe";
 const abi = [
@@ -199,9 +199,12 @@ const getDelegatedAdresses = async (walletsList, operator) => {
 
     // Retry failed tokens individually
     if (failedTokenIds.length > 0) {
+        let failsCount = 0;
+        const nextWalletCount = () => failsCount++;
         checkingDelegations.set(`Checking ${failedTokenIds.length} wallets one more time...`);
         console.log(`Retrying ${failedTokenIds.length} failed addresses`);
         for (const owner of failedTokenIds) {
+            checkingDelegations.set(`Checking ${nextWalletCount()}/${failedTokenIds.length} wallets one more time...`);
             try {
                 const result = await client.readContract({
                     address: CONTRACT_ADDRESS,
@@ -226,15 +229,17 @@ const getDelegatedAdresses = async (walletsList, operator) => {
 }
 
 export const checkDelegatedWallets = async () => {
-    let nftsList;
     let address;
-    potentials.subscribe(value => nftsList = value);
     walletAddress.subscribe(value => address = value);
+
+    let nftsList = await getPotentials(address);
     let nftNumbers = nftsList.map(nft => nft.id);
 
     checkingDelegations.set('Checking Potentials ownership...');
     const allNFTs = await checkNftBatches();
-    const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
+    const filteredNFTs = nftNumbers.length > 0
+        ? allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
+        : allNFTs;
     const ownersList = filteredNFTs.map(nft => nft.owner)
     const filteredOwners = Array.from(new Set(ownersList));
     console.log(filteredOwners.length + ' unique NFT owners.');

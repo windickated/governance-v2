@@ -26,7 +26,7 @@ export const listedNumbers = writable<Array<number>>([]);
 export const loading = writable<boolean>(false);
 export const checkingDelegations = writable<string | null>(null);
 export const walletAddress = writable<string>('');
-export const nftApprovals = writable<{ owner: string, approved: boolean }[]>([]);
+export const nftApprovals = writable<{ owner: string, approved: boolean, nfts?: number[] }[]>([]);
 export const transactionInfo = writable<string | null>(null);
 
 const message = (address: string): string => { 
@@ -59,7 +59,6 @@ export async function getNFTs() {
   potentials.set(potentialNFTs);
 
   const delegations = localStorage.getItem(address);
-  console.log(delegations)
   if (delegations) nftApprovals.set(JSON.parse(delegations));
 
   // check listed Potentials

@@ -44,28 +44,28 @@
     approval = approved ? true : null;
   };
 
-  let approvals: { owner: string; nfts: number[] }[] = [];
-  $: if ($nftApprovals.length > 0) {
+  let approvals: { owner: string; approved: boolean; nfts: number[] }[] = [];
+  $: if ($nftApprovals && $nftApprovals.length > 0) {
     localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
-    $nftApprovals.map(async ({ owner }, i) => {
-      approvals[i] = await getApproval(owner);
+    $nftApprovals.map(async ({ owner, approved }, i) => {
+      const nfts = await getApproval(owner);
+      approvals[i] = {
+        owner,
+        approved,
+        nfts,
+      };
+      // approvals[i] = await getApproval(owner);
     });
   }
-  $: if ($nftApprovals.length == 0) approvals = [];
+  $: if ($nftApprovals && $nftApprovals.length == 0) approvals = [];
 
   const getApproval = async (owner: string) => {
-    let allPotentials: NFT[] = [];
-    potentials.subscribe((array) => (allPotentials = array));
-
     const delegatedPotentials = await getPotentials(owner, true);
 
     console.log("Received delegated Potentials from: " + owner);
-    potentials.set(allPotentials.concat(delegatedPotentials));
+    $potentials = $potentials.concat(delegatedPotentials);
 
-    return {
-      owner,
-      nfts: delegatedPotentials.map((potential) => potential.id),
-    };
+    return delegatedPotentials.map((potential) => potential.id);
   };
 
   const removeDelegations = async () => {
@@ -177,13 +177,15 @@
       </div>
       <h2>
         You can always
-        <a href="https://revoke.cash/"> revoke this approval</a>.
+        <a href="https://revoke.cash/"> revoke your approvals</a>.
       </h2>
 
       <div class="delegations">
         <h2>
-          Delegations: <strong>{$nftApprovals.length}</strong>
-          wallet{$nftApprovals.length == 1 ? "" : "s"} |
+          Delegations: <strong
+            >{$nftApprovals ? $nftApprovals.length : "0"}</strong
+          >
+          wallet{$nftApprovals && $nftApprovals.length == 1 ? "" : "s"} |
           <strong
             >{approvals.map((approval) => approval.nfts).flat().length}</strong
           >
@@ -191,14 +193,14 @@
             ? ""
             : "s"}
         </h2>
-        {#if approvals.length > 0 && $nftApprovals.length > 0}
+        {#if $nftApprovals && $nftApprovals.length > 0}
           <ul>
             {#each approvals as { owner, nfts }, index}
               <li class="wallet">
                 <p>{index + 1}</p>
                 <span
                   >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)} |
-                  {nfts.length} NFTs</span
+                  {nfts?.length} NFTs</span
                 >
                 <p
                   class="remove-wallet"
@@ -207,10 +209,6 @@
                   on:click={() => {
                     $nftApprovals = $nftApprovals.filter(
                       (approval) => approval.owner !== owner
-                    );
-                    localStorage.setItem(
-                      $walletAddress,
-                      JSON.stringify($nftApprovals)
                     );
                   }}
                 >
@@ -226,7 +224,7 @@
         <div class="delegation-buttons">
           <button
             on:click={removeDelegations}
-            disabled={$nftApprovals.length == 0}>CLEAR</button
+            disabled={!$nftApprovals || $nftApprovals.length == 0}>CLEAR</button
           >
           <button
             on:click={checkDelegatedWallets}
