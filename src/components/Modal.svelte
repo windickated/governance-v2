@@ -1,7 +1,20 @@
 <script lang="ts">
   import { showModal } from "../stores/modal.ts";
-  import { walletAddress } from "../stores/NFTs.ts";
-  import { checkAddress, approveNFTs, claimNFTs } from "../lib/potentials.js";
+  import {
+    NFT,
+    potentials,
+    getPotentials,
+    walletAddress,
+    nftApprovals,
+    selectedNFTs,
+    checkingDelegations,
+  } from "../stores/NFTs.ts";
+  import {
+    checkAddress,
+    approveNFTs,
+    claimNFTs,
+    checkDelegatedWallets,
+  } from "../lib/potentials.js";
 
   let dialog: HTMLDialogElement;
   let userAddress: string = "";
@@ -30,6 +43,35 @@
     const approved = await claimNFTs(userAddress, $walletAddress);
     approval = approved ? true : null;
   };
+
+  let approvals: { owner: string; nfts: number[] }[] = [];
+  $: if ($nftApprovals.length > 0)
+    $nftApprovals.map(async ({ owner }, i) => {
+      approvals[i] = await getApproval(owner);
+    });
+  $: if ($nftApprovals.length == 0) approvals = [];
+
+  const getApproval = async (owner: string) => {
+    let allPotentials: NFT[] = [];
+    potentials.subscribe((array) => (allPotentials = array));
+
+    const delegatedPotentials = await getPotentials(owner, true);
+
+    console.log("Received delegated Potentials from: " + owner);
+    potentials.set(allPotentials.concat(delegatedPotentials));
+
+    return {
+      owner,
+      nfts: delegatedPotentials.map((potential) => potential.id),
+    };
+  };
+
+  const removeDelegations = async () => {
+    const potentialNFTs: NFT[] = await getPotentials($walletAddress);
+    potentials.set(potentialNFTs);
+    nftApprovals.set([]);
+    selectedNFTs.set([]);
+  };
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -39,12 +81,12 @@
   on:close={closeDialog}
   on:click|self={closeDialog}
 >
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-no-static-element-interactions a11y_no_noninteractive_element_to_interactive_role -->
   <div on:click|stopPropagation>
     <section class="delegate-container">
       <h2>
         Paste the address of your choice to delegate the voting power of your
-        Potentials.
+        Potentials or import delegated Potentials from another wallet.
       </h2>
 
       <div
@@ -77,6 +119,12 @@
             <p class="validation gray">Checking approval for NFTs...</p>
           {:else if validation && approval == null && userAddress !== $walletAddress}
             <p class="validation">There is no approval for this address.</p>
+          {:else if approvals
+            .map((approval) => approval.owner)
+            .includes(userAddress)}
+            <p class="validation">
+              You have already imported NFTs from this address.
+            </p>
           {/if}
           <div>
             <p
@@ -89,8 +137,16 @@
             <button
               disabled={!validation ||
                 !approval ||
-                userAddress == $walletAddress}
-              on:click={() => {}}>IMPORT POTENTIALS</button
+                userAddress == $walletAddress ||
+                approvals
+                  .map((approval) => approval.owner)
+                  .includes(userAddress)}
+              on:click={async () => {
+                $nftApprovals[$nftApprovals.length] = {
+                  owner: userAddress,
+                  approved: true,
+                };
+              }}>IMPORT POTENTIALS</button
             >
           </div>
         {:else}
@@ -119,6 +175,59 @@
         You can always
         <a href="https://revoke.cash/"> revoke this approval</a>.
       </h2>
+
+      <div class="delegations">
+        <h2>
+          Delegations: <strong>{$nftApprovals.length}</strong>
+          wallet{$nftApprovals.length == 1 ? "" : "s"} |
+          <strong
+            >{approvals.map((approval) => approval.nfts).flat().length}</strong
+          >
+          NFT{approvals.map((approval) => approval.nfts).flat().length == 1
+            ? ""
+            : "s"}
+        </h2>
+        {#if approvals.length > 0 && $nftApprovals.length > 0}
+          <ul>
+            {#each approvals as { owner, nfts }, index}
+              <li class="wallet">
+                <p>{index + 1}</p>
+                <span
+                  >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)} |
+                  {nfts.length} NFTs</span
+                >
+                <p
+                  class="remove-wallet"
+                  role="button"
+                  tabindex="0"
+                  on:click={() => {
+                    $nftApprovals = $nftApprovals.filter(
+                      (approval) => approval.owner !== owner
+                    );
+                  }}
+                >
+                  ❌
+                </p>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        {#if $checkingDelegations}
+          <p class="validation gray">{$checkingDelegations}</p>
+        {/if}
+        <div class="delegation-buttons">
+          <button
+            on:click={removeDelegations}
+            disabled={$nftApprovals.length == 0}>CLEAR</button
+          >
+          <button on:click={checkDelegatedWallets}>
+            {#if $checkingDelegations}
+              <img class="searching" src="/searching.png" alt="Loading" />
+            {/if}
+            FETCH
+          </button>
+        </div>
+      </div>
     </section>
     <button class="close-button" on:click={closeDialog}>
       <img src="/close.png" alt="Close" />
@@ -189,7 +298,7 @@
   }
 
   .delegate-container {
-    width: 65vw;
+    width: 70vw;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
@@ -199,7 +308,7 @@
   }
 
   h2 {
-    width: 50vw;
+    width: 60vw;
     text-align: center;
     font-size: 1.5vw;
     line-height: 2.5vw;
@@ -255,6 +364,7 @@
     color: rgba(51, 226, 230, 0.5);
     text-shadow: 0 0 0.1vw #010020;
     cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
   }
 
   .address-container > div > p:hover,
@@ -276,6 +386,73 @@
 
   .green {
     color: rgba(0, 185, 55, 0.75);
+  }
+
+  .delegations {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vw;
+    padding: 1.5vw;
+    background-color: rgba(51, 226, 230, 0.1);
+    box-shadow: 0 0 0.5vw rgba(51, 226, 230, 0.5);
+    border-radius: 1.5vw;
+  }
+
+  .delegations h2 {
+    width: 44vw;
+  }
+
+  .delegation-buttons {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5vw;
+  }
+
+  .delegations ul {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
+  }
+
+  .wallet {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1vw;
+    padding: 0.5vw 1vw;
+    font-size: 2vw;
+    background-color: rgb(36, 65, 189);
+    box-shadow: inset 0 0 0.5vw rgba(51, 226, 230, 0.25);
+    border-radius: 1vw;
+    cursor: default;
+    color: #010020;
+  }
+
+  .wallet span {
+    text-align: center;
+    padding: 1vw 2vw;
+    font-size: 1.5vw;
+    color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(1, 0, 32, 0.5);
+    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.5);
+    border-radius: 1vw;
+  }
+
+  .remove-wallet {
+    cursor: pointer;
+  }
+
+  .remove-wallet:hover,
+  .remove-wallet:active {
+    text-shadow: 0 0 0.5vw rgba(1, 0, 32, 0.5);
+    transform: scale(1.05);
   }
 
   @media only screen and (max-width: 600px) {
@@ -330,6 +507,40 @@
     .validation {
       font-size: 1em;
       line-height: 1.5em;
+    }
+
+    .delegations {
+      gap: 1.5em;
+      padding: 1em;
+      border-radius: 1em;
+    }
+
+    .delegations h2 {
+      width: 80vw;
+    }
+
+    .delegation-buttons {
+      gap: 1em;
+    }
+
+    .delegations ul {
+      gap: 1em;
+    }
+
+    .wallet {
+      gap: 0.5em;
+      padding: 0.25em 0.5em;
+      font-size: 1em;
+      line-height: 1.5em;
+      width: auto;
+      border-radius: 0.5em;
+    }
+
+    .wallet span {
+      padding: 0.5em 1em;
+      font-size: 1em;
+      line-height: 1.5em;
+      border-radius: 0.5em;
     }
   }
 

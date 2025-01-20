@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { provider } from "./ethers";
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
+import { potentials, walletAddress, nftApprovals, checkingDelegations } from "../stores/NFTs";
 
 const CONTRACT_ADDRESS = "0x111e0861baa9d479cff55d542e5a9e4205012bbe";
 const abi = [
@@ -72,7 +73,7 @@ const fetchNftOwnersWithRetry = async (tokenIds) => {
     }
 }
 
-export const checkNftBatches = async () => {
+const checkNftBatches = async () => {
     const TOTAL_SUPPLY = 1000;
     const BATCH_SIZE = 100;
 
@@ -90,7 +91,7 @@ export const checkNftBatches = async () => {
     // Process batches
     console.log('Checking Potentials ownership...')
     for (let i = 0; i < batches.length; i++) {
-        console.log(`Processing batch ${i + 1}/${batches.length}`);
+        console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
         const results = await fetchNftOwnersWithRetry(batches[i]);
         
         results?.forEach(result => {
@@ -124,7 +125,7 @@ export const checkNftBatches = async () => {
                 });
                 }
             } catch (error) {
-                console.error(`Failed to fetch token ${tokenId}:`, error);
+                console.error(`Failed to fetch NFT #${tokenId}:`, error);
             }
         }
     }
@@ -165,7 +166,7 @@ const fetchDelegatedWalletsWithRetry = async (walletsList, operator) => {
     }
 }
 
-export const getDelegatedAdresses = async (walletsList, operator) => {
+const getDelegatedAdresses = async (walletsList, operator) => {
     const TOTAL_SUPPLY = walletsList.length;
     const BATCH_SIZE = TOTAL_SUPPLY / 10;
     const batches = [];
@@ -179,12 +180,12 @@ export const getDelegatedAdresses = async (walletsList, operator) => {
     }
 
     // Process batches
-    console.log('Checking Delegations...')
+    console.log('Searching for delegated Potentials...')
     for (let i = 0; i < batches.length; i++) {
-        console.log(`Processing batch ${i + 1}/${batches.length}`);
+        console.log(`Processing wallets batch ${i + 1}/${batches.length}`);
         const results = await fetchDelegatedWalletsWithRetry(batches[i], operator);
         
-        results?.forEach(result => {
+        results?.forEach((result) => {
         if (result.success) {
             allResults.push({
                 owner: result.owner,
@@ -198,7 +199,8 @@ export const getDelegatedAdresses = async (walletsList, operator) => {
 
     // Retry failed tokens individually
     if (failedTokenIds.length > 0) {
-        console.log(`Retrying ${failedTokenIds.length} failed tokens`);
+        checkingDelegations.set(`Checking ${failedTokenIds.length} Potentials one more time...`);
+        console.log(`Retrying ${failedTokenIds.length} failed addresses`);
         for (const owner of failedTokenIds) {
             try {
                 const result = await client.readContract({
@@ -221,4 +223,23 @@ export const getDelegatedAdresses = async (walletsList, operator) => {
     }
 
     return allResults;
+}
+
+export const checkDelegatedWallets = async () => {
+    let nftsList;
+    let address;
+    potentials.subscribe(value => nftsList = value);
+    walletAddress.subscribe(value => address = value);
+    let nftNumbers = nftsList.map(nft => nft.id);
+
+    checkingDelegations.set('Checking Potentials ownership...');
+    const allNFTs = await checkNftBatches();
+    const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
+    const ownersList = filteredNFTs.map(nft => nft.owner)
+    const filteredOwners = Array.from(new Set(ownersList));
+    console.log(filteredOwners.length + ' unique NFT owners.');
+    checkingDelegations.set('Searching for delegated Potentials...');
+    const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
+    nftApprovals.set(delegatedWallets);
+    checkingDelegations.set(null);
 }

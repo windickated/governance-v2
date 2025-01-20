@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 import { provider } from "../lib/ethers";
 import { contract } from "../lib/contract";
-import { checkNftBatches, getDelegatedAdresses } from "../lib/potentials.js";
+// import { checkNftBatches, getDelegatedAdresses } from "../lib/potentials.js";
 
 export class NFT {
   id: number;
@@ -24,7 +24,9 @@ export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
 export const loading = writable<boolean>(false);
+export const checkingDelegations = writable<string | null>(null);
 export const walletAddress = writable<string>('');
+export const nftApprovals = writable<{ owner: string, approved: boolean }[]>([]);
 export const transactionInfo = writable<string | null>(null);
 
 const message = (address: string): string => { 
@@ -53,51 +55,8 @@ export async function getNFTs() {
   }
   transactionInfo.set(null);
 
-  const json = await fetch(
-    `https://api.degenerousdao.com/nft/owner/${address}`
-  );
-  const data = await json.json();
-  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
-  const potentialNFTs: NFT[] = [];
-  const metadata: any[] = [];
-  for (let i in nftNumbers) {
-    const response = await fetch(
-      `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
-    );
-    metadata[Number(i)] = await response.json();
-    potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
-  }
+  const potentialNFTs: NFT[] = await getPotentials(address);
   potentials.set(potentialNFTs);
-
-  // check delegated Potentials
-  // const allNFTs = await checkNftBatches();
-  // const filteredNFTs = allNFTs.filter(nft => !nftNumbers.includes(nft.tokenId))
-  // const ownersList = filteredNFTs.map(nft => nft.owner)
-  // const filteredOwners = Array.from(new Set(ownersList));
-  // console.log(filteredOwners.length + ' unique NFT owners.');
-
-  // const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
-  // console.log(delegatedWallets);
-
-  // delegatedWallets.map(async ({owner, approved}: any) => {
-  //   const maskedAddress = owner.slice(0, 6) + "..." + owner.slice(owner.length - 4);
-  //   const json = await fetch(
-  //     `https://api.degenerousdao.com/nft/owner/${owner}`
-  //   );
-  //   const data = await json.json();
-  //   const delegatedNftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
-  //   const metadata: any[] = [];
-  //   for (let i in delegatedNftNumbers) {
-  //     const response = await fetch(
-  //       `https://api.degenerousdao.com/nft/data/${delegatedNftNumbers[i]}`
-  //     );
-  //     metadata[Number(i)] = await response.json();
-  //     potentialNFTs[potentialNFTs.length] = new NFT(metadata, Number(i));
-  //     potentialNFTs[potentialNFTs.length - 1].delegated = maskedAddress;
-  //   }
-  //   console.log('Received delegated Potentials from: ' + maskedAddress);
-  //   potentials.set(potentialNFTs);
-  // })
 
   // check listed Potentials
   let listedNFTs: number[];
@@ -115,6 +74,27 @@ export async function getNFTs() {
 
   loading.set(false);
 }
+
+export const getPotentials = async (wallet: string, delegated: boolean = false) => {
+  const maskedAddress =
+    wallet.slice(0, 6) + "..." + wallet.slice(wallet.length - 4);
+  const json = await fetch(
+    `https://api.degenerousdao.com/nft/owner/${wallet}`
+  );
+  const data = await json.json();
+  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
+  const potentialNFTs: NFT[] = [];
+  const metadata: any[] = [];
+  for (let i in nftNumbers) {
+    const response = await fetch(
+      `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
+    );
+    metadata[Number(i)] = await response.json();
+    potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
+    if (delegated) potentialNFTs[Number(i)].delegated = maskedAddress;
+  }
+  return potentialNFTs;
+};
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
   if (episodeNr === -1) return;

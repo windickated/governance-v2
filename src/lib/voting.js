@@ -103,7 +103,7 @@ async function main(storyNode = 0) {
     }
 
     checkingResults.set(checkingStatus += 9);
-    console.log(`Processing batch ${i + 1}/${batches.length}`);
+    console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
     const results = await fetchVotesWithRetry(storyNode, batches[i]);
     
     results.forEach(result => {
@@ -147,7 +147,7 @@ async function main(storyNode = 0) {
           });
         }
       } catch (error) {
-        console.error(`Failed to fetch token ${tokenId}:`, error.message);
+        console.error(`Failed to fetch NFT #${tokenId}:`, error.message);
       }
     }
   }
