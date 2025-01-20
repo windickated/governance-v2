@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { provider } from "./ethers";
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { potentials, walletAddress, nftApprovals, checkingDelegations, getPotentials } from "../stores/NFTs";
+import { potentials, walletAddress, nftApprovals, checkingDelegations, getPotentials, getNftNumbers } from "../stores/NFTs";
 
 const CONTRACT_ADDRESS = "0x111e0861baa9d479cff55d542e5a9e4205012bbe";
 const abi = [
@@ -232,8 +232,7 @@ export const checkDelegatedWallets = async () => {
     let address;
     walletAddress.subscribe(value => address = value);
 
-    let nftsList = await getPotentials(address);
-    let nftNumbers = nftsList.map(nft => nft.id);
+    let nftNumbers = await getNftNumbers(address);;
 
     checkingDelegations.set('Checking Potentials ownership...');
     const allNFTs = await checkNftBatches();

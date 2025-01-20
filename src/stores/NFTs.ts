@@ -55,7 +55,8 @@ export async function getNFTs() {
   }
   transactionInfo.set(null);
 
-  const potentialNFTs: NFT[] = await getPotentials(address);
+  const potentialNumbers: number[] = await getNftNumbers(address)
+  const potentialNFTs: NFT[] = await getPotentials(potentialNumbers);
   potentials.set(potentialNFTs);
 
   const delegations = localStorage.getItem(address);
@@ -78,14 +79,18 @@ export async function getNFTs() {
   loading.set(false);
 }
 
-export const getPotentials = async (wallet: string, delegated: boolean = false) => {
-  const maskedAddress =
-    wallet.slice(0, 6) + "..." + wallet.slice(wallet.length - 4);
+export const getNftNumbers = async (wallet: string) => {
   const json = await fetch(
     `https://api.degenerousdao.com/nft/owner/${wallet}`
   );
   const data = await json.json();
-  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
+  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
+  return nftNumbers;
+}
+
+export const getPotentials = async (nftNumbers: number[], owner: string | null = null) => {
+  const maskedAddress =
+  owner?.slice(0, 6) + "..." + owner?.slice(owner?.length - 4);
   const potentialNFTs: NFT[] = [];
   const metadata: any[] = [];
   for (let i in nftNumbers) {
@@ -94,7 +99,7 @@ export const getPotentials = async (wallet: string, delegated: boolean = false) 
     );
     metadata[Number(i)] = await response.json();
     potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
-    if (delegated) potentialNFTs[Number(i)].delegated = maskedAddress;
+    if (owner) potentialNFTs[Number(i)].delegated = maskedAddress;
   }
   return potentialNFTs;
 };

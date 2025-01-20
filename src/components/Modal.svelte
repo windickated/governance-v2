@@ -3,6 +3,7 @@
   import {
     NFT,
     potentials,
+    getNftNumbers,
     getPotentials,
     walletAddress,
     nftApprovals,
@@ -44,32 +45,28 @@
     approval = approved ? true : null;
   };
 
-  let approvals: { owner: string; approved: boolean; nfts: number[] }[] = [];
   $: if ($nftApprovals && $nftApprovals.length > 0) {
     localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
-    $nftApprovals.map(async ({ owner, approved }, i) => {
-      const nfts = await getApproval(owner);
-      approvals[i] = {
-        owner,
-        approved,
-        nfts,
-      };
-      // approvals[i] = await getApproval(owner);
-    });
+    getDelegatedNFTs();
   }
-  $: if ($nftApprovals && $nftApprovals.length == 0) approvals = [];
 
-  const getApproval = async (owner: string) => {
-    const delegatedPotentials = await getPotentials(owner, true);
+  const getDelegatedNFTs = async () => {
+    const userNftNumbers = await getNftNumbers($walletAddress);
+    let userNFTs = await getPotentials(userNftNumbers);
 
-    console.log("Received delegated Potentials from: " + owner);
-    $potentials = $potentials.concat(delegatedPotentials);
-
-    return delegatedPotentials.map((potential) => potential.id);
+    $nftApprovals.map(async ({ owner }) => {
+      const nftNumbers = await getNftNumbers(owner);
+      const NFTs = await getPotentials(nftNumbers, owner);
+      if (NFTs && NFTs.length > 0) {
+        userNFTs = userNFTs.concat(NFTs);
+        $potentials = userNFTs;
+      }
+    });
   };
 
   const removeDelegations = async () => {
-    const potentialNFTs: NFT[] = await getPotentials($walletAddress);
+    const potentialNumbers: number[] = await getNftNumbers($walletAddress);
+    const potentialNFTs: NFT[] = await getPotentials(potentialNumbers);
     potentials.set(potentialNFTs);
     nftApprovals.set([]);
     selectedNFTs.set([]);
@@ -122,7 +119,7 @@
             <p class="validation gray">Checking approval for NFTs...</p>
           {:else if validation && approval == null && userAddress !== $walletAddress}
             <p class="validation">There is no approval for this address.</p>
-          {:else if approvals
+          {:else if $nftApprovals
             .map((approval) => approval.owner)
             .includes(userAddress)}
             <p class="validation">
@@ -141,7 +138,7 @@
               disabled={!validation ||
                 !approval ||
                 userAddress == $walletAddress ||
-                approvals
+                $nftApprovals
                   .map((approval) => approval.owner)
                   .includes(userAddress) ||
                 $checkingDelegations !== null}
@@ -185,23 +182,22 @@
           Delegations: <strong
             >{$nftApprovals ? $nftApprovals.length : "0"}</strong
           >
-          wallet{$nftApprovals && $nftApprovals.length == 1 ? "" : "s"} |
-          <strong
-            >{approvals.map((approval) => approval.nfts).flat().length}</strong
-          >
-          NFT{approvals.map((approval) => approval.nfts).flat().length == 1
-            ? ""
-            : "s"}
+          wallet{$nftApprovals && $nftApprovals.length == 1 ? "" : "s"}
         </h2>
         {#if $nftApprovals && $nftApprovals.length > 0}
           <ul>
-            {#each approvals as { owner, nfts }, index}
+            {#each $nftApprovals as { owner }, index}
               <li class="wallet">
                 <p>{index + 1}</p>
-                <span
-                  >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)} |
-                  {nfts?.length} NFTs</span
-                >
+                {#await getNftNumbers(owner) then nfts}
+                  <span
+                    >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
+                    |
+                    {nfts.length} NFTs</span
+                  >
+                {:catch}
+                  <span>Error...</span>
+                {/await}
                 <p
                   class="remove-wallet"
                   role="button"
