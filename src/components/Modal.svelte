@@ -207,6 +207,10 @@
                     $nftApprovals = $nftApprovals.filter(
                       (approval) => approval.owner !== owner
                     );
+                    localStorage.setItem(
+                      "delegations",
+                      JSON.stringify($nftApprovals)
+                    );
                   }}
                 >
                   ❌
