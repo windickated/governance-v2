@@ -56,8 +56,8 @@ export async function getNFTs() {
   transactionInfo.set(null);
 
   const potentialNumbers: number[] = await getNftNumbers(address)
-  const potentialNFTs: NFT[] = await getPotentials(potentialNumbers);
-  potentials.set(potentialNFTs);
+  const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
+  if (potentialNFTs) potentials.set(potentialNFTs);
 
   const delegations = localStorage.getItem(address);
   if (delegations) nftApprovals.set(JSON.parse(delegations));
@@ -80,28 +80,38 @@ export async function getNFTs() {
 }
 
 export const getNftNumbers = async (wallet: string) => {
-  const json = await fetch(
-    `https://api.degenerousdao.com/nft/owner/${wallet}`
-  );
-  const data = await json.json();
-  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
-  return nftNumbers;
+  try {
+    const json = await fetch(
+      `https://api.degenerousdao.com/nft/owner/${wallet}`
+    );
+    const data = await json.json();
+    const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
+    return nftNumbers;
+  } catch (error) {
+    console.log('Error: ' + error);
+    return null;
+  }
 }
 
 export const getPotentials = async (nftNumbers: number[], owner: string | null = null) => {
-  const maskedAddress =
-  owner?.slice(0, 6) + "..." + owner?.slice(owner?.length - 4);
-  const potentialNFTs: NFT[] = [];
-  const metadata: any[] = [];
-  for (let i in nftNumbers) {
-    const response = await fetch(
-      `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
-    );
-    metadata[Number(i)] = await response.json();
-    potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
-    if (owner) potentialNFTs[Number(i)].delegated = maskedAddress;
+  try {
+    const maskedAddress =
+    owner?.slice(0, 6) + "..." + owner?.slice(owner?.length - 4);
+    const potentialNFTs: NFT[] = [];
+    const metadata: any[] = [];
+    for (let i in nftNumbers) {
+      const response = await fetch(
+        `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
+      );
+      metadata[Number(i)] = await response.json();
+      potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
+      if (owner) potentialNFTs[Number(i)].delegated = maskedAddress;
+    }
+    return potentialNFTs;
+  } catch (error) {
+    console.log('Error: ' + error);
+    return null;
   }
-  return potentialNFTs;
 };
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
