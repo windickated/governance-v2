@@ -205,7 +205,7 @@
                   <span
                     >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
                     |
-                    {nfts.length} NFTs</span
+                    {nfts.length} NFT{nfts.length == 1 ? "" : "s"}</span
                   >
                 {:catch}
                   <span>Error...</span>
