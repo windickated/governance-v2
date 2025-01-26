@@ -190,13 +190,13 @@
       </h2>
 
       <div class="delegations">
-        <!-- {#await getDelegationsCount() then count}
-          <h2>
-            Your Delegations: <strong>{count}</strong>
-            NFT{count == 1 ? "" : "s"}
-          </h2>
-        {/await} -->
         {#if $nftApprovals && $nftApprovals.length > 0}
+          {#await getDelegationsCount() then count}
+            <h2>
+              Your Delegations: <strong>{count}</strong>
+              NFT{count == 1 ? "" : "s"}
+            </h2>
+          {/await}
           <ul>
             {#each $nftApprovals as { owner }, index}
               <li class="wallet">

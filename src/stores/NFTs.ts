@@ -60,7 +60,6 @@ export async function getNFTs() {
   if (potentialNFTs) potentials.set(potentialNFTs);
 
   const delegations = localStorage.getItem(address);
-  if (delegations) console.log(JSON.parse(delegations));
   if (delegations) nftApprovals.set(JSON.parse(delegations));
 
   // check listed Potentials
