@@ -51,6 +51,7 @@
     const userNftNumbers = await getNftNumbers($walletAddress);
     let userNFTs = await getPotentials(userNftNumbers);
     $nftApprovals.map(async ({ owner }) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const nftNumbers = await getNftNumbers(owner);
       const NFTs = await getPotentials(nftNumbers, owner);
       if (NFTs && NFTs.length > 0) {
@@ -75,6 +76,7 @@
     let count: number = 0;
     const walletsList = $nftApprovals.map((approval) => approval.owner);
     for (let i = 0; i < walletsList.length; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       count += (await getNftNumbers(walletsList[i])).length;
     }
     return count;
