@@ -80,6 +80,7 @@ export async function getNFTs() {
 }
 
 export const getNftNumbers = async (wallet: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
     const json = await fetch(
       `https://api.degenerousdao.com/nft/owner/${wallet}`

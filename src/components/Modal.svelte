@@ -48,23 +48,18 @@
   $: if ($nftApprovals && $nftApprovals.length > 0) getDelegatedNFTs();
 
   const getDelegatedNFTs = async () => {
-    if (!$nftApprovals || $nftApprovals.length < 1) {
-      localStorage.removeItem($walletAddress);
-      removeDelegations();
-    } else {
-      const userNftNumbers = await getNftNumbers($walletAddress);
-      let userNFTs = await getPotentials(userNftNumbers);
-      $nftApprovals.map(async ({ owner }) => {
-        const nftNumbers = await getNftNumbers(owner);
-        const NFTs = await getPotentials(nftNumbers, owner);
-        if (NFTs && NFTs.length > 0) {
-          userNFTs = userNFTs!.concat(NFTs);
-          $potentials = userNFTs;
-        }
-      });
-      if (userNFTs) $potentials = userNFTs;
-      localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
-    }
+    const userNftNumbers = await getNftNumbers($walletAddress);
+    let userNFTs = await getPotentials(userNftNumbers);
+    $nftApprovals.map(async ({ owner }) => {
+      const nftNumbers = await getNftNumbers(owner);
+      const NFTs = await getPotentials(nftNumbers, owner);
+      if (NFTs && NFTs.length > 0) {
+        userNFTs = userNFTs!.concat(NFTs);
+        $potentials = userNFTs;
+      }
+    });
+    if (userNFTs) $potentials = userNFTs;
+    localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
   };
 
   const removeDelegations = async () => {
@@ -190,18 +185,28 @@
       </h2>
 
       <div class="delegations">
-        {#if $nftApprovals && $nftApprovals.length > 0}
-          {#await getDelegationsCount() then count}
-            <h2>
-              Your Delegations: <strong>{count}</strong>
+        <h2 class="delegations-count">
+          {#if $nftApprovals && $nftApprovals.length > 0}
+            {#await getDelegationsCount()}
+              <img class="searching" src="/searching.png" alt="Loading" />
+              Fetching delegated NFTs...
+            {:then count}
+              Your Delegations:
+              <strong>{count}</strong>
               NFT{count == 1 ? "" : "s"}
-            </h2>
-          {/await}
+            {/await}
+          {:else}
+            Your Delegations
+          {/if}
+        </h2>
+        {#if $nftApprovals && $nftApprovals.length > 0}
           <ul>
             {#each $nftApprovals as { owner }, index}
               <li class="wallet">
                 <p>{index + 1}</p>
-                {#await getNftNumbers(owner) then nfts}
+                {#await getNftNumbers(owner)}
+                  <span>Loading...</span>
+                {:then nfts}
                   <span
                     >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
                     |
@@ -218,8 +223,10 @@
                     $nftApprovals = $nftApprovals.filter(
                       (approval) => approval.owner !== owner
                     );
-                    if (!$nftApprovals || $nftApprovals.length < 1)
-                      getDelegatedNFTs();
+                    if (!$nftApprovals || $nftApprovals.length < 1) {
+                      localStorage.removeItem($walletAddress);
+                      removeDelegations();
+                    }
                   }}
                 >
                   ❌
@@ -343,6 +350,14 @@
   h2 a:hover,
   h2 a:active {
     text-decoration: underline;
+  }
+
+  .delegations-count {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5vw;
   }
 
   .address-container {
@@ -504,6 +519,10 @@
       width: 70vw;
       font-size: 1.15em;
       line-height: 1.5em;
+    }
+
+    .delegations-count {
+      gap: 0.5em;
     }
 
     .address-container {

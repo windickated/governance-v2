@@ -664,7 +664,8 @@
         Your wallet doesn't have any <a
           href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
           >Potential</a
-        >... You're not allowed to enter the Galactic Governance Hub.
+        >... You're not allowed to enter the Galactic Governance Hub unless you
+        have any delegated NFTs.
       </p>
     {/if}
   {:else if $transactionInfo}
