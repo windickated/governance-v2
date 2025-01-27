@@ -25,6 +25,7 @@ export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
 export const loading = writable<boolean>(false);
 export const checkingDelegations = writable<string | null>(null);
+export const fetchingDelegations = writable<boolean>(false);
 export const walletAddress = writable<string>('');
 export const nftApprovals = writable<{ owner: string, approved: boolean, nfts?: number[] }[]>([]);
 export const transactionInfo = writable<string | null>(null);
@@ -80,17 +81,12 @@ export async function getNFTs() {
 }
 
 export const getNftNumbers = async (wallet: string) => {
-  try {
-    const json = await fetch(
-      `https://api.degenerousdao.com/nft/owner/${wallet}`
-    );
-    const data = await json.json();
-    const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
-    return nftNumbers;
-  } catch (error) {
-    console.log('Error: ' + error);
-    return null;
-  }
+  const json = await fetch(
+    `https://api.degenerousdao.com/nft/owner/${wallet}`
+  );
+  const data = await json.json();
+  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
+  return nftNumbers;
 }
 
 export const getPotentials = async (nftNumbers: number[], owner: string | null = null) => {

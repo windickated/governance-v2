@@ -9,6 +9,7 @@
     nftApprovals,
     selectedNFTs,
     checkingDelegations,
+    fetchingDelegations,
   } from "../stores/NFTs.ts";
   import {
     checkAddress,
@@ -48,19 +49,30 @@
   $: if ($nftApprovals && $nftApprovals.length > 0) getDelegatedNFTs();
 
   const getDelegatedNFTs = async () => {
+    $fetchingDelegations = true;
     const userNftNumbers = await getNftNumbers($walletAddress);
     let userNFTs = await getPotentials(userNftNumbers);
-    $nftApprovals.map(async ({ owner }) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const nftNumbers = await getNftNumbers(owner);
-      const NFTs = await getPotentials(nftNumbers, owner);
-      if (NFTs && NFTs.length > 0) {
-        userNFTs = userNFTs!.concat(NFTs);
-        $potentials = userNFTs;
+    for (let i = 0; i < $nftApprovals.length; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      try {
+        const nftNumbers = await getNftNumbers($nftApprovals[i].owner);
+        const NFTs = await getPotentials(nftNumbers, $nftApprovals[i].owner);
+        if (NFTs && NFTs.length > 0) {
+          userNFTs = userNFTs!.concat(NFTs);
+          $potentials = userNFTs;
+        }
+      } catch (error) {
+        console.log(
+          "Failed to fetch delegated NFTs from " +
+            $nftApprovals[i].owner +
+            ": " +
+            error
+        );
       }
-    });
+    }
     if (userNFTs) $potentials = userNFTs;
     localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
+    $fetchingDelegations = false;
   };
 
   const removeDelegations = async () => {
@@ -76,7 +88,7 @@
     let count: number = 0;
     const walletsList = $nftApprovals.map((approval) => approval.owner);
     for (let i = 0; i < walletsList.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       count += (await getNftNumbers(walletsList[i])).length;
     }
     return count;
@@ -206,17 +218,11 @@
             {#each $nftApprovals as { owner }, index}
               <li class="wallet">
                 <p>{index + 1}</p>
-                {#await getNftNumbers(owner)}
-                  <span>Loading...</span>
-                {:then nfts}
-                  <span
-                    >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
-                    |
-                    {nfts.length} NFT{nfts.length == 1 ? "" : "s"}</span
-                  >
-                {:catch}
-                  <span>Error...</span>
-                {/await}
+                <span
+                  >{owner.slice(0, 6) +
+                    "..." +
+                    owner.slice(owner.length - 4)}</span
+                >
                 <p
                   class="remove-wallet"
                   role="button"

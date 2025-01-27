@@ -243,7 +243,7 @@ export const checkDelegatedWallets = async () => {
     const filteredOwners = Array.from(new Set(ownersList));
     console.log(filteredOwners.length + ' unique NFT owners.');
     checkingDelegations.set('Searching for delegated Potentials...');
-    const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter(address => address.approved);
+    const delegatedWallets = (await getDelegatedAdresses(filteredOwners, address)).filter((address) => address.approved);
     nftApprovals.set(delegatedWallets);
     checkingDelegations.set(null);
 }
