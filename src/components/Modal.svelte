@@ -55,8 +55,10 @@
     for (let i = 0; i < $nftApprovals.length; i++) {
       await new Promise((resolve) => setTimeout(resolve, 500));
       try {
-        const nftNumbers = await getNftNumbers($nftApprovals[i].owner);
-        const NFTs = await getPotentials(nftNumbers, $nftApprovals[i].owner);
+        const NFTs = await getPotentials(
+          $nftApprovals[i].nfts!,
+          $nftApprovals[i].owner
+        );
         if (NFTs && NFTs.length > 0) {
           userNFTs = userNFTs!.concat(NFTs);
           $potentials = userNFTs;
@@ -84,12 +86,10 @@
     localStorage.removeItem($walletAddress);
   };
 
-  const getDelegationsCount = async () => {
+  const getDelegationsCount = () => {
     let count: number = 0;
-    const walletsList = $nftApprovals.map((approval) => approval.owner);
-    for (let i = 0; i < walletsList.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      count += (await getNftNumbers(walletsList[i])).length;
+    for (let i = 0; i < $nftApprovals.length; i++) {
+      count += $nftApprovals[i].nfts!.length;
     }
     return count;
   };
@@ -201,27 +201,24 @@
       <div class="delegations">
         <h2 class="delegations-count">
           {#if $nftApprovals && $nftApprovals.length > 0}
-            {#await getDelegationsCount()}
-              <img class="searching" src="/searching.png" alt="Loading" />
-              Fetching delegated NFTs...
-            {:then count}
-              Your Delegations:
-              <strong>{count}</strong>
-              NFT{count == 1 ? "" : "s"}
-            {/await}
+            Your Delegations:
+            <strong>{getDelegationsCount()}</strong>
+            NFT{getDelegationsCount() == 1 ? "" : "s"}
           {:else}
             Your Delegations
           {/if}
         </h2>
         {#if $nftApprovals && $nftApprovals.length > 0}
           <ul>
-            {#each $nftApprovals as { owner }, index}
+            {#each $nftApprovals as { owner, nfts }, index}
               <li class="wallet">
                 <p>{index + 1}</p>
                 <span
-                  >{owner.slice(0, 6) +
-                    "..." +
-                    owner.slice(owner.length - 4)}</span
+                  >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
+                  {#if nfts}
+                    |
+                    {nfts.length} NFT{nfts.length == 1 ? "" : "s"}
+                  {/if}</span
                 >
                 <p
                   class="remove-wallet"
