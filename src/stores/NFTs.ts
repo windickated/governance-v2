@@ -105,7 +105,7 @@ export const getPotentials = async (nftNumbers: number[], owner: string | null =
     }
     return potentialNFTs;
   } catch (error) {
-    console.log('Error: ' + error);
+    console.log('Failed to fetch Potentials # ' + nftNumbers + ': ' + error);
     return null;
   }
 };

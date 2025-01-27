@@ -73,7 +73,6 @@
       }
     }
     if (userNFTs) $potentials = userNFTs;
-    localStorage.setItem($walletAddress, JSON.stringify($nftApprovals));
     $fetchingDelegations = false;
   };
 

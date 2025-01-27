@@ -249,6 +249,7 @@ export const checkDelegatedWallets = async () => {
         checkingDelegations.set(`Fetching delegations ${i}/${delegatedWallets.length}...`);
         delegatedWallets[i].nfts = await getNftNumbers(delegatedWallets[i].owner);
     }
+    localStorage.setItem(address, JSON.stringify(delegatedWallets));
     nftApprovals.set(delegatedWallets);
     checkingDelegations.set(null);
 }
