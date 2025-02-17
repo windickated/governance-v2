@@ -688,6 +688,7 @@
       border: 0.1vw solid rgba(51, 226, 230, 0.5);
       border-radius: 2.5vw;
       padding: 0;
+      padding-bottom: 1em;
       display: block;
     }
 

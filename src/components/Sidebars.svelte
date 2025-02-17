@@ -569,9 +569,13 @@
         stroke-linecap="round"
         stroke-linejoin="round"
         on:click={() => {
+          if (!$selectedNFTs || $selectedNFTs.length == 0) return;
           undoSelection();
           selectCondition = "";
         }}
+        style={!$selectedNFTs || $selectedNFTs.length == 0
+          ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
+          : ""}
         role="button"
         tabindex="0"
         aria-label="Undo selection"
@@ -852,7 +856,7 @@
             <g
               id="refresh-arrow"
               style="transform: {refreshSvgFocus
-                ? 'scale(0.75) rotate(180deg)'
+                ? 'scale(0.75) rotate(360deg)'
                 : 'none'}"
             >
               <path

@@ -52,7 +52,6 @@ svg * {
 .eye-svg:hover,
 .star-svg:hover,
 .refresh-svg:hover,
-.contract-svg:hover,
 .location-svg:hover,
 .warning-svg:hover,
 .chain-svg:hover,
@@ -68,7 +67,6 @@ svg * {
 .volume-svg:hover,
 .replay-svg:hover,
 .refresh-svg:hover,
-.contract-svg:hover,
 .location-svg:hover,
 .chain-svg:hover,
 .calendar-svg:hover {
@@ -79,6 +77,10 @@ svg * {
 .close-svg:active {
   transform: scale(1.2);
   stroke: rgb(255, 60, 64);
+}
+
+.contract-svg:hover {
+  transform: scale(1.1);
 }
 
 .warning-svg:hover {
@@ -116,7 +118,8 @@ svg * {
 
 .reset-svg,
 .delete-svg-circle,
-.play-svg-circle {
+.play-svg-circle,
+.refresh-svg * {
   transition: all 0.6s ease-in-out !important;
 }
 .reset-svg:hover {
