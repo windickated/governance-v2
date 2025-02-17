@@ -174,6 +174,12 @@
 </div>
 
 <style>
+  .console {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .console-panel {
     position: relative;
     margin-top: 5vw;

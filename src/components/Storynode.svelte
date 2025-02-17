@@ -182,11 +182,27 @@
           {:else}
             <div class="check-votes">
               {#if $checkingResults !== -1}
-                <img class="searching" src="/searching.png" alt="Loading" />
-                <p>Loading...</p>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 100 100"
+                  class="loading-svg"
+                  stroke="transparent"
+                  stroke-width="7.5"
+                  stroke-dasharray="288.5"
+                  stroke-linecap="round"
+                  fill="none"
+                >
+                  <path
+                    d="
+                      M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
+                    "
+                    transform-origin="50 50"
+                  />
+                </svg>
+                <p style="color: rgba(51, 226, 230, 0.75)">Loading...</p>
                 <div class="progress-bar">
                   <div
-                    class="progress-thumb"
+                    class="progress-thumb loading-animation"
                     style="width: {$checkingResults}%;"
                   ></div>
                 </div>
@@ -240,11 +256,27 @@
             : ""}
         >
           {(mobileTextVisibility ? "Hide" : "Show") + " story text"}
-          <img
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-100 -100 200 200"
+            class="option-selector-svg"
+            fill="rgb(51, 226, 230)"
+            stroke="rgb(51, 226, 230)"
+            stroke-width="20"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-label={mobileTextVisibility ? "Hide" : "Show"}
             style={mobileTextVisibility ? "transform: rotate(180deg)" : ""}
-            src="/dropdown.png"
-            alt={mobileTextVisibility ? "Hide" : "Show"}
-          />
+          >
+            <polygon
+              class="option-selector-icon"
+              points="
+                -40 -90 -40 90 50 0
+              "
+              opacity="0.75"
+              transform="rotate(90)"
+            />
+          </svg>
         </button>
         {#if mobileTextVisibility}
           <div class="text-wrapper">
@@ -277,19 +309,42 @@
             ? "text-shadow: 0 0 0.1vw rgb(51, 226, 230); color: rgb(51, 226, 230);"
             : ""}
         >
-          <img
-            class="option-selector"
-            src={option.class
-              ? `/${option.class}.png`
-              : $selectedOption == index + 1
-                ? "/option-selector-hover.png"
-                : "/option-selector.png"}
-            alt="selector"
-            style="
-                height: {width > 600 &&
-              (optionsCounter >= 5 ? `${15 / optionsCounter}vw` : '3vw')}
+          {#if option.class}
+            <img
+              class="option-selector"
+              src="/{option.class}.png"
+              alt="Selector"
+              style="height: {width > 600 &&
+                (optionsCounter >= 5 ? `${12.5 / optionsCounter}vw` : '2.5vw')}
               "
-          />
+            />
+          {:else}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="-100 -100 200 200"
+              class="option-selector-svg option-selector"
+              fill={$selectedOption == index + 1
+                ? "rgb(51, 226, 230)"
+                : "#dedede"}
+              stroke={$selectedOption == index + 1
+                ? "rgb(51, 226, 230)"
+                : "#dedede"}
+              stroke-width="20"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="height: {width > 600 &&
+                (optionsCounter >= 5 ? `${12.5 / optionsCounter}vw` : '2.5vw')}
+              "
+            >
+              <polygon
+                class="option-selector-icon"
+                points="-40 -90 -40 90 50 0"
+                style="transform: {$selectedOption == index + 1
+                  ? 'scaleX(1.5)'
+                  : ''}"
+              />
+            </svg>
+          {/if}
           {#if $votingResults}
             ({$votingResults.results[index].votes})
           {/if}
@@ -386,6 +441,7 @@
 
   .participation {
     color: rgba(51, 226, 230, 0.75);
+    white-space: nowrap;
   }
 
   .participation strong {
@@ -416,10 +472,10 @@
   .text {
     position: absolute;
     top: 10.4vw;
-    width: 80vw;
+    width: 84vw;
     left: 8vw;
     overflow-y: scroll;
-    height: 43vw;
+    height: 47vw;
     font-size: 2vw;
     line-height: 3vw;
     margin-bottom: auto;
@@ -455,11 +511,6 @@
     filter: none;
   }
 
-  .story-text-visibility > img {
-    width: 5%;
-    opacity: 0.5;
-  }
-
   .visible {
     display: block;
   }
@@ -476,6 +527,7 @@
   .text::-webkit-scrollbar-thumb {
     background-color: rgba(51, 226, 230, 0.5);
     border-radius: 0.5vw;
+    cursor: pointer;
   }
 
   .options {
@@ -484,8 +536,8 @@
     justify-content: space-around;
     position: absolute;
     top: 59vw;
-    width: 59vw;
-    height: 23.25vw;
+    width: 62vw;
+    height: 25.25vw;
     white-space: nowrap;
     margin: 2vw;
     margin-left: 2.75vw;
@@ -543,14 +595,14 @@
   }
 
   .option-selector {
-    height: 3vw;
+    height: 2.5vw;
     width: auto;
-    background-image: url("/option-selector.png");
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.9;
+    flex: none;
+  }
+
+  .loading-svg {
+    height: 1.5vw;
+    width: 1.5vw;
   }
 
   @media screen and (max-width: 600px) {
@@ -639,12 +691,6 @@
       display: block;
     }
 
-    .text button img {
-      height: 1em;
-      width: 1.5em;
-      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-    }
-
     .text-wrapper {
       padding-inline: 1em;
       padding-block: 0;
@@ -653,18 +699,17 @@
     .options {
       position: static;
       top: auto;
-      width: 91vw;
+      width: auto;
       height: auto;
       font-size: 1.1em !important;
       white-space: wrap !important;
-      margin-left: -2vw;
+      margin: 0;
+      padding: 0;
       margin-bottom: 4vw;
-      padding-top: 2vw;
+      padding: 2vw;
       background-color: rgba(1, 0, 32, 0.85);
       border: 0.1vw solid rgba(51, 226, 230, 0.5);
       border-radius: 2.5vw;
-      padding-top: 2vw;
-      padding-bottom: 2vw;
     }
 
     .option {
@@ -679,6 +724,11 @@
 
     .option-selector {
       height: 1.5em;
+    }
+
+    .loading-svg {
+      height: 1em;
+      width: 1em;
     }
   }
 </style>

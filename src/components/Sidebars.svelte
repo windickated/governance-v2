@@ -450,6 +450,14 @@
       }
     }
   }
+
+  // SVG Icons
+  let signInSvgFocus: boolean = false;
+  let signOutSvgFocus: boolean = false;
+
+  let contractSvgFocus: boolean = false;
+
+  let refreshSvgFocus: boolean = false;
 </script>
 
 <svelte:window bind:outerWidth={width} />
@@ -506,7 +514,10 @@
   {:else}
     <p class="season-title loading">Loading Season {$season}</p>
     <div class="progress-bar">
-      <div class="progress-thumb" style="width: {$loadingStories}%;"></div>
+      <div
+        class="progress-thumb loading-animation"
+        style="width: {$loadingStories}%;"
+      ></div>
     </div>
   {/if}
 </div>
@@ -548,44 +559,257 @@
         <option value="Engineer">Engineer</option>
         <option value="Oracle">Oracle</option>
       </select>
-      <img
-        class="reset-selection"
-        src="/reset.png"
-        alt="Undo selection"
-        role="button"
-        tabindex="0"
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="-100 -100 200 200"
+        class="reset-svg filter-image"
+        fill="#dedede"
+        stroke="#dedede"
+        stroke-width="20"
+        stroke-linecap="round"
+        stroke-linejoin="round"
         on:click={() => {
           undoSelection();
           selectCondition = "";
         }}
-      />
+        role="button"
+        tabindex="0"
+        aria-label="Undo selection"
+        aria-disabled={selectCondition !== ""}
+      >
+        <path
+          d="
+            M 70 -50
+            A 85 85 0 1 0 85 0
+          "
+          fill="none"
+        />
+        <polygon
+          points="
+            70 -50 60 -90 30 -55
+          "
+        />
+      </svg>
     </div>
     <div class="sign-button-wrapper">
       {#if $isLogged}
-        <img
-          class="delegate-button"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="-100 -100 200 200"
+          class="contract-svg"
+          fill="#dedede"
+          stroke="#dedede"
+          stroke-width="7.5"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          on:click={() => ($showModal = true)}
+          on:pointerover={() => (contractSvgFocus = true)}
+          on:pointerout={() => (contractSvgFocus = false)}
           role="button"
           tabindex="0"
-          src="/delegate.png"
-          alt="Delegate"
-          on:click={() => ($showModal = true)}
-        />
+          aria-label="Delegations"
+        >
+          <g style="opacity: {contractSvgFocus ? '0.5' : '1'}">
+            <path
+              d="
+                M -10 75
+                L -85 75
+                L -85 -85
+                L 45 -85
+                L 45 -15
+              "
+              fill="none"
+              stroke-width="12"
+            />
+            <circle r="35" cx="-20" cy="-30" fill="none" />
+            <path
+              d="
+                M -40 -30
+                L -25 -15
+                L 0 -40
+              "
+              fill="none"
+            />
+            <path
+              d="
+                M -65 25
+                L -15 25
+                M -65 45
+                L -25 45
+              "
+            />
+          </g>
+          <g
+            style={contractSvgFocus
+              ? "stroke: rgb(0, 185, 55); transform: scale(1.1) translate(-5%, -2.5%);"
+              : ""}
+          >
+            <g transform="rotate(45) translate(40 -30)">
+              <ellipse rx="35" ry="10" cx="15" cy="60" fill="none" />
+              <path
+                d="
+                  M -20 60
+                  L -20 35
+                  Q 15 20 50 35
+                  L 50 60
+                  M 0 27
+                  Q 10 10 0 -10
+                  C -15 -50 45 -50 30 -10
+                  Q 20 10 30 27
+                "
+                fill="none"
+              />
+            </g>
+          </g>
+        </svg>
       {/if}
       <button
         class="wallet-connect"
         on:click={connectWallet}
+        on:pointerover={() => {
+          signInSvgFocus = true;
+          signOutSvgFocus = true;
+        }}
+        on:pointerout={() => {
+          signInSvgFocus = false;
+          signOutSvgFocus = false;
+        }}
         disabled={$loading}
       >
         {#if $loading}
-          <img class="searching" src="/searching.png" alt="Loading" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            class="loading-svg"
+            stroke="transparent"
+            stroke-width="7.5"
+            stroke-dasharray="288.5"
+            stroke-linecap="round"
+            fill="none"
+          >
+            <path
+              d="
+                M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
+              "
+              transform-origin="50 50"
+            />
+          </svg>
+        {:else if $isLogged}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-100 -100 200 200"
+            class="door-svg"
+            fill="none"
+            stroke="#dedede"
+            stroke-width="12"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="stroke: {signOutSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
+          >
+            <defs>
+              <mask id="door-svg-mask">
+                <rect
+                  x="-25"
+                  y="-75"
+                  width="100"
+                  height="150"
+                  rx="15"
+                  fill="none"
+                  stroke="white"
+                />
+                <line
+                  x1="-25"
+                  y1="-35"
+                  x2="-25"
+                  y2="35"
+                  stroke="black"
+                  stroke-width="14"
+                  stroke-linecap="square"
+                />
+              </mask>
+            </defs>
+
+            <path
+              style="transform: {signOutSvgFocus ? 'translateX(-10%)' : 'none'}"
+              d="
+                    M 30 0
+                    L -80 0
+                    L -55 -25
+                    M -80 0
+                    L -55 25
+                  "
+              fill="none"
+            />
+            <rect
+              x="-25"
+              y="-75"
+              width="100"
+              height="150"
+              rx="15"
+              mask="url(#door-svg-mask)"
+            />
+          </svg>
+          {#if width > 600}
+            Sign out
+          {/if}
         {:else}
-          <img
-            src="/sign-{$isLogged ? 'out' : 'in'}.png"
-            alt="Sign {$isLogged ? 'out' : 'in'}"
-          />
-        {/if}
-        {#if width > 600}
-          Sign {$isLogged ? "out" : "in"}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-100 -100 200 200"
+            class="door-svg"
+            fill="none"
+            stroke="#dedede"
+            stroke-width="12"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="stroke: {signInSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
+          >
+            <defs>
+              <mask id="door-svg-mask">
+                <rect
+                  x="-25"
+                  y="-75"
+                  width="100"
+                  height="150"
+                  rx="15"
+                  fill="none"
+                  stroke="white"
+                />
+                <line
+                  x1="-25"
+                  y1="-35"
+                  x2="-25"
+                  y2="35"
+                  stroke="black"
+                  stroke-width="14"
+                  stroke-linecap="square"
+                />
+              </mask>
+            </defs>
+
+            <path
+              style="transform: {signInSvgFocus ? 'translateX(10%)' : 'none'}"
+              d="
+                    M -80 0
+                    L 30 0
+                    L 5 -25
+                    M 30 0
+                    L 5 25
+                  "
+              fill="none"
+            />
+            <rect
+              x="-25"
+              y="-75"
+              width="100"
+              height="150"
+              rx="15"
+              mask="url(#door-svg-mask)"
+            />
+          </svg>
+          {#if width > 600}
+            Sign in
+          {/if}
         {/if}
       </button>
       <button
@@ -608,21 +832,49 @@
             Total
           {/if}
           NFTs: {$potentials.length}
-          <button
-            class="refresh-button"
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-100 -100 200 200"
+            class="refresh-svg"
+            fill="rgb(51, 226, 230)"
+            stroke="rgb(51, 226, 230)"
+            stroke-width="20"
+            stroke-linejoin="round"
+            stroke-linecap="round"
             on:click={() => {
               $potentials = $potentials;
             }}
+            on:pointerover={() => (refreshSvgFocus = true)}
+            on:pointerout={() => (refreshSvgFocus = false)}
+            role="button"
+            tabindex="0"
           >
-            <img src="/refresh.png" alt="Refresh" />
-          </button>
+            <g
+              id="refresh-arrow"
+              style="transform: {refreshSvgFocus
+                ? 'scale(0.75) rotate(180deg)'
+                : 'none'}"
+            >
+              <path
+                d="
+                  M -75 -30
+                  A 80 80 0 0 1 75 -30
+                "
+                fill="none"
+              />
+              <polygon
+                points="
+                  75 -30 75 -70 40 -40
+                "
+              />
+            </g>
+            <use href="#refresh-arrow" transform="rotate(180)" />
+          </svg>
         </p>
         <p class="nfts-selected">Selected NFTs: {$selectedNFTs.length}</p>
       </div>
       <div class="nfts-container" bind:this={nftTiles}>
         {#each $potentials as NFT}
-          <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
-            a11y-no-static-element-interactions -->
           {#await nftVote($episode, NFT.id) then vote}
             <div
               class="nft"
@@ -635,6 +887,8 @@
                   ? "background-color: rgb(22, 30, 95);"
                   : `opacity: ${vote > 0 ? "0.5" : "1"}`}
               data-vote={vote}
+              role="button"
+              tabindex="0"
             >
               <img class="nft-image" src={NFT.image} alt={NFT.name} />
               <p class="nft-name">{NFT.name}</p>
@@ -741,8 +995,8 @@ a11y-no-static-element-interactions -->
     z-index: 18;
     top: 0;
     left: -44vw;
-    height: 95%;
-    width: 40vw;
+    height: 100%;
+    width: 44vw;
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
@@ -878,22 +1132,6 @@ a11y-no-static-element-interactions -->
     border-radius: 1.5vw;
   }
 
-  .wallet-connect {
-    color: #dedede;
-  }
-
-  .wallet-connect img {
-    width: 2.5vw;
-    height: auto;
-    filter: drop-shadow(0 0 0.25vw #010020);
-  }
-
-  .wallet-connect .searching {
-    height: 1.5vw;
-    width: 1.5vw;
-    margin: 0.5vw;
-  }
-
   .wallet-legend {
     font-size: 2.5vw;
     text-align: right;
@@ -919,6 +1157,7 @@ a11y-no-static-element-interactions -->
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
+    align-items: center;
     padding-inline: 7.5vw;
   }
 
@@ -939,20 +1178,6 @@ a11y-no-static-element-interactions -->
     gap: 1vw;
   }
 
-  .delegate-button {
-    height: 2vw;
-    width: auto;
-    filter: drop-shadow(0 0 0.25vw #010020);
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  .delegate-button:hover,
-  .delegate-button:active {
-    filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
-    transform: scale(1.05);
-  }
-
   .nfts-selector {
     font-size: 1.5vw;
     line-height: 3vw;
@@ -969,43 +1194,15 @@ a11y-no-static-element-interactions -->
     background-color: rgba(22, 30, 95, 0.9);
   }
 
-  .reset-selection {
-    width: 1.5vw;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  .reset-selection:hover,
-  .reset-selection:active {
-    filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
-    transform: scale(1.05);
-  }
-
   .nfts-total,
   .nfts-selected {
-    color: #33e2e6;
-    -webkit-text-stroke: 0.1vw #33e2e6;
+    color: rgb(51, 226, 230);
+    -webkit-text-stroke: 0.1vw rgb(51, 226, 230);
     font-size: 2vw;
     white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 1vw;
-  }
-
-  .refresh-button {
-    width: 3vw;
-    background-color: transparent !important;
-    border: none !important;
-  }
-
-  .refresh-button img {
-    height: 2vw;
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  .refresh-button:hover,
-  .refresh-button:active {
-    transform: scale(1.05);
   }
 
   .no-nfts-title,
@@ -1143,7 +1340,7 @@ a11y-no-static-element-interactions -->
       top: -80%;
       right: auto;
       left: 0;
-      padding: 0;
+      padding: 0 0 1em 0;
       background-image: none;
     }
 
@@ -1219,41 +1416,24 @@ a11y-no-static-element-interactions -->
     }
 
     .wallet-connect {
-      padding-inline: 0.5em;
+      padding: 0.35em;
     }
 
-    .wallet-connect img {
-      width: 2em;
-      min-height: 2em;
-    }
-
-    .wallet-connect .searching {
-      width: 2em;
-      height: 2em;
-      margin: 0;
-    }
-
-    .delegate-button {
+    .wallet-connect svg {
+      height: 1.5em;
       width: 1.5em;
-      min-height: 1.5em;
     }
 
     .nfts-legend {
       width: 90vw;
+      padding-inline: 1em;
+      gap: 1em;
     }
 
     .nfts-total,
     .nfts-selected {
       font-size: inherit;
       gap: 0.5em;
-    }
-
-    .refresh-button {
-      width: 5vw;
-    }
-
-    .refresh-button img {
-      height: 1em;
     }
 
     .no-nfts-title,
@@ -1279,10 +1459,6 @@ a11y-no-static-element-interactions -->
       padding-block: 0.5em;
       width: 40vw;
       border-radius: 0.5em;
-    }
-
-    .reset-selection {
-      width: 1em;
     }
 
     .nfts-container {

@@ -92,6 +92,9 @@
     }
     return count;
   };
+
+  // SVG Icons
+  let closeSvgFocus: boolean = false;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -219,10 +222,13 @@
                     {nfts.length} NFT{nfts.length == 1 ? "" : "s"}
                   {/if}</span
                 >
-                <p
-                  class="remove-wallet"
-                  role="button"
-                  tabindex="0"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="-100 -100 200 200"
+                  class="close-svg remove-wallet"
+                  stroke="rgba(255, 60, 64, 0.85)"
+                  stroke-width="30"
+                  stroke-linecap="round"
                   on:click={() => {
                     $nftApprovals = $nftApprovals.filter(
                       (approval) => approval.owner !== owner
@@ -232,9 +238,19 @@
                       removeDelegations();
                     }
                   }}
+                  role="button"
+                  tabindex="0"
                 >
-                  ❌
-                </p>
+                  <path
+                    d="
+                      M -65 -65
+                      L 65 65
+                      M -65 65
+                      L 65 -65
+                    "
+                    fill="none"
+                  />
+                </svg>
               </li>
             {/each}
           </ul>
@@ -250,9 +266,26 @@
           <button
             on:click={checkDelegatedWallets}
             disabled={$checkingDelegations !== null}
+            style={$checkingDelegations ? "color: rgb(51, 226, 230)" : ""}
           >
             {#if $checkingDelegations}
-              <img class="searching" src="/searching.png" alt="Loading" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100 100"
+                class="loading-svg"
+                stroke="transparent"
+                stroke-width="7.5"
+                stroke-dasharray="288.5"
+                stroke-linecap="round"
+                fill="none"
+              >
+                <path
+                  d="
+                  M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
+                "
+                  transform-origin="50 50"
+                />
+              </svg>
               Loading...
             {:else}
               FETCH
@@ -261,8 +294,37 @@
         </div>
       </div>
     </section>
-    <button class="close-button" on:click={closeDialog}>
-      <img src="/close.png" alt="Close" />
+    <button
+      class="close-button"
+      on:click={closeDialog}
+      on:pointerover={() => (closeSvgFocus = true)}
+      on:pointerout={() => (closeSvgFocus = false)}
+      aria-label="Close"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="-100 -100 200 200"
+        class="close-svg"
+        stroke="rgba(255, 60, 64, 0.85)"
+        stroke-width="30"
+        stroke-linecap="round"
+        style="
+            transform: {closeSvgFocus ? 'scale(1.2);' : 'none'}
+            stroke: {closeSvgFocus
+          ? 'rgb(255, 60, 64)'
+          : 'rgba(255, 60, 64, 0.85)'}
+          "
+      >
+        <path
+          d="
+            M -65 -65
+            L 65 65
+            M -65 65
+            L 65 -65
+          "
+          fill="none"
+        />
+      </svg>
     </button>
   </div>
 </dialog>
@@ -321,12 +383,9 @@
     padding: 0.5vw;
   }
 
-  .close-button img {
+  .close-button svg {
+    height: 3vw;
     width: 3vw;
-    padding: 0.25vw;
-    opacity: 0.9;
-    height: auto;
-    cursor: pointer;
   }
 
   .delegate-container {
@@ -499,6 +558,11 @@
     transform: scale(1.05);
   }
 
+  .loading-svg {
+    height: 1.5vw;
+    width: 1.5vw;
+  }
+
   @media only screen and (max-width: 600px) {
     dialog {
       max-width: 95vw;
@@ -509,18 +573,19 @@
       padding: 0.35em;
     }
 
+    .close-button svg {
+      height: 1.5em;
+      width: 1.5em;
+    }
+
     .delegate-container {
       width: 95vw;
       gap: 1em;
-      padding-block: 0.5em;
-    }
-
-    .close-button img {
-      width: 1.25em;
+      padding-block: 1em;
     }
 
     h2 {
-      width: 70vw;
+      width: 60vw;
       font-size: 1.15em;
       line-height: 1.5em;
     }
@@ -589,6 +654,11 @@
       font-size: 1em;
       line-height: 1.5em;
       border-radius: 0.5em;
+    }
+
+    .loading-svg {
+      height: 1em;
+      width: 1em;
     }
   }
 

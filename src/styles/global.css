@@ -1,81 +1,186 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-v2.0 | 20110126
-License: none (public domain) */
-
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+:where(
+    html,
+    body,
+    div,
+    span,
+    applet,
+    object,
+    iframe,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    blockquote,
+    pre,
+    a,
+    abbr,
+    acronym,
+    address,
+    big,
+    cite,
+    code,
+    del,
+    dfn,
+    em,
+    img,
+    ins,
+    kbd,
+    q,
+    s,
+    samp,
+    small,
+    strike,
+    strong,
+    sub,
+    sup,
+    tt,
+    var,
+    b,
+    u,
+    i,
+    center,
+    dl,
+    dt,
+    dd,
+    ol,
+    ul,
+    li,
+    fieldset,
+    form,
+    label,
+    legend,
+    table,
+    caption,
+    tbody,
+    tfoot,
+    thead,
+    tr,
+    th,
+    td,
+    article,
+    aside,
+    canvas,
+    details,
+    embed,
+    figure,
+    figcaption,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    output,
+    ruby,
+    section,
+    summary,
+    time,
+    mark,
+    audio,
+    video
+  ) {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 100%;
   font: inherit;
+  font-size: 100%;
   vertical-align: baseline;
+  box-sizing: border-box;
 }
-/* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
+
+:where(
+    article,
+    aside,
+    details,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    menu,
+    nav,
+    section
+  ) {
   display: block;
 }
-body {
+
+:where(body) {
   line-height: 1;
 }
-ol, ul {
+
+:where(ol, ul) {
   list-style: none;
 }
-blockquote, q {
+
+:where(blockquote, q) {
   quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
+
+:where(blockquote:before, blockquote:after, q:before, q:after) {
   content: '';
   content: none;
 }
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+
+:where(img) {
+  max-width: 100%;
 }
 
+:where(button) {
+  border: none;
+  cursor: pointer;
+}
+
+:where(dialog) {
+  padding: 0;
+  outline: none;
+}
 
 /* General */
 
+:where(*) {
+  cursor: default;
+  transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+* {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 html {
-  font-family: 'PT Serif Caption', serif;
-  background-image: url("/spaceshipBG.avif"), linear-gradient(#000000, #161E5F);
+  background-image: url("/spaceshipBG.avif"), linear-gradient(#000000, #010020);
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   background-color: #010020;
-}
-
-body {
-  overflow-x: hidden;
-  overflow-y: auto;
   box-sizing: border-box;
-  font-size: 1em;
+  overflow-x: hidden;
+  font-family: 'PT Serif Caption', serif;
   color: #dedede;
+  font-size: 1em;
   word-spacing: 0.2em;
-  line-height: 1.4em;
-  width: auto;
+  line-height: 2em;
 }
 
-body::-webkit-scrollbar {
+html::-webkit-scrollbar {
   width: 0px;
 }
 
 img {
   width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+input {
+  cursor: text;
+}
+
+input:disabled {
+  opacity: 1; /* for iOS */
 }
 
 button {
@@ -93,7 +198,6 @@ button {
   background-color: rgba(56, 117, 250, 0.5);
   border: 0.1vw solid rgba(51, 226, 230, 0.5);
   border-radius: 1vw;
-  transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 button:hover,
@@ -102,7 +206,7 @@ button:active {
   background-color: rgba(56, 117, 250, 0.9);
   border-color: rgba(51, 226, 230, 0.9);
   filter: drop-shadow(0 0 0.5vw rgba(51, 226, 230, 0.5));
-  text-shadow: 0 0 0.5vw rgba(1, 0, 32, 0.5);
+  text-shadow: 0 0 0.25vw rgba(1, 0, 32, 0.5);
   transform: scale(1.05);
 }
 
@@ -122,26 +226,23 @@ button img {
   height: 100%;
   width: auto;
   cursor: inherit;
+  filter: drop-shadow(0 0 0.5vw rgba(1, 0, 32, 0.5));
+}
+
+button svg {
+  height: 2vw;
+  width: 2vw;
+  cursor: inherit !important;
+}
+
+button *,
+[role="button"] * {
+  cursor: inherit;
 }
 
 .blur {
   -webkit-backdrop-filter: blur(1rem);
   backdrop-filter: blur(1rem);
-}
-
-.searching {
-  height: 1.5vw;
-  width: 1.5vw;
-  animation: searching 1s linear infinite;
-}
-
-@keyframes searching {
-  from {
-    transform: none;
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .progress-bar {
@@ -154,31 +255,37 @@ button img {
 
 .progress-thumb {
   height: 1vw;
-  background-color: transparent;
+  width: 0;
+  background-color: rgba(51, 226, 230, 0.5);
   border-top-left-radius: 0.5vw;
   border-bottom-left-radius: 0.5vw;
   transition: all 1s linear;
-  background-image: linear-gradient(
-      to right,
-      rgba(51, 226, 230, 0.5),
-      rgba(51, 226, 230, 0.75),
-      rgba(51, 226, 230, 0.5)
-    );
-  background-size: 200% auto;
-  animation: fleshlight 3s linear infinite;
 }
 
-@keyframes fleshlight {
+.loading-animation {
+  background-image: linear-gradient(
+    to right,
+    rgba(51, 226, 230, 0),
+    rgba(51, 226, 230, 0),
+    rgba(51, 226, 230, 0.25),
+    rgba(51, 226, 230, 0),
+    rgba(51, 226, 230, 0)
+  );
+  background-size: 200% auto;
+  animation: flashlight 7.5s cubic-bezier(0.14, 0.75, 0.2, 1) infinite;
+}
+
+@keyframes flashlight {
   0% {
-    opacity: 0.75;
-    background-position: 200% 0;
+    opacity: 0.9;
+    background-position: 400% 0;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: 0.75;
-    background-position: 0 200%;
+    opacity: 0.9;
+    background-position: 0 0;
   }
 }
 
@@ -192,11 +299,12 @@ button img {
     line-height: 1.75em;
     padding: 0.25em 1em;
     border-radius: 0.5em;
+    gap: 0.5em;
   }
 
-  .searching {
-    height: 1em;
-    width: 1em;
+  button svg {
+    height: 1.25em;
+    width: 1.25em;
   }
 
   .progress-bar {
