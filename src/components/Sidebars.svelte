@@ -23,6 +23,7 @@
   import { provider, switch_network, network } from "../lib/ethers";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
+  import WalletConnect from "./WalletConnect.svelte";
 
   export let handlePopUpMessage: Function;
 
@@ -667,6 +668,7 @@
           </g>
         </svg>
       {/if}
+      <WalletConnect />
       <button
         class="wallet-connect"
         on:click={connectWallet}
