@@ -66,9 +66,9 @@
   cursor: inherit;
 }
 
-[role='document'] button * :not(div, span) {
+/* [role='document'] button * :not(div, span) {
   color: rgb(255, 60, 64);
-}
+} */
 
 a > div {
   cursor: pointer;

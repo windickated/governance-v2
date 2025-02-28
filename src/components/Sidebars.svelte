@@ -441,6 +441,7 @@
   on:click={handleEpisodesBar}
 ></span>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="episodes-bar" bind:this={episodesBar}>
   <p class="season-title">The Dischordian Saga</p>
   <button
@@ -448,46 +449,57 @@
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
     >Dive into LOREDEX</button
   >
-  <select
-    class="season"
-    on:change={switchSeason}
-    disabled={$loadingStories !== -1}
-  >
-    <option value="1">Season 1</option>
-    <option value="2" selected={true}>Season 2</option>
-  </select>
-  {#if $storyNodes.length > 0}
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-    <div class="episodes-container" bind:this={episodes}>
-      {#each $storyNodes as episode, number}
+  {#if $walletAddress}
+    <select
+      class="season"
+      on:change={switchSeason}
+      disabled={$loadingStories !== -1}
+    >
+      <option value="1">Season 1</option>
+      <option value="2" selected={true}>Season 2</option>
+    </select>
+    {#if $storyNodes.length > 0}
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+      <div class="episodes-container" bind:this={episodes}>
+        {#each $storyNodes as episode, number}
+          <div
+            role="button"
+            tabindex="0"
+            class="episode"
+            id={number.toString()}
+            on:click={switchEpisode}
+          >
+            <img
+              class="episode-image"
+              src={episode.image_url}
+              alt="Episode {number + 1}"
+              draggable="false"
+            />
+            <p class="episode-title">
+              {episode.season ? episode.title : episode.episodeName}
+            </p>
+            <p class="episode-number">Episode {number + 1}</p>
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <p class="season-title loading">Loading Season {$season}</p>
+      <div class="progress-bar">
         <div
-          role="button"
-          tabindex="0"
-          class="episode"
-          id={number.toString()}
-          on:click={switchEpisode}
-        >
-          <img
-            class="episode-image"
-            src={episode.image_url}
-            alt="Episode {number + 1}"
-            draggable="false"
-          />
-          <p class="episode-title">
-            {episode.season ? episode.title : episode.episodeName}
-          </p>
-          <p class="episode-number">Episode {number + 1}</p>
-        </div>
-      {/each}
-    </div>
+          class="progress-thumb loading-animation"
+          style="width: {$loadingStories}%;"
+        ></div>
+      </div>
+    {/if}
   {:else}
-    <p class="season-title loading">Loading Season {$season}</p>
-    <div class="progress-bar">
-      <div
-        class="progress-thumb loading-animation"
-        style="width: {$loadingStories}%;"
-      ></div>
-    </div>
+    <span
+      class="season-title login-tip"
+      on:click={handleNFTsBar}
+      role="button"
+      tabindex="0"
+    >
+      Connect web3 account to load Story Nodes
+    </span>
   {/if}
 </div>
 
@@ -856,6 +868,21 @@ a11y-no-static-element-interactions -->
     text-shadow: 0 0 0.1vw rgb(51, 226, 230);
   }
 
+  .login-tip {
+    color: rgba(51, 226, 230, 0.5);
+    text-shadow: none;
+    font-size: 2vw;
+    line-height: 3vw;
+    width: 90%;
+    cursor: pointer;
+  }
+
+  .login-tip:hover,
+  .login-tip:active {
+    color: rgb(51, 226, 230);
+    text-decoration: underline;
+  }
+
   .loredex {
     width: 35vw;
     font-size: 2vw;
@@ -1163,6 +1190,11 @@ a11y-no-static-element-interactions -->
 
     .season-title {
       padding-top: 1em;
+      font-size: 1.5em;
+      line-height: 1.5em;
+    }
+
+    .login-tip {
       font-size: 1.5em;
       line-height: 1.5em;
     }
