@@ -9,18 +9,17 @@
     loadingStories,
   } from "../stores/storyNode.ts";
   import {
+    walletAddress,
+    username,
     potentials,
     selectedNFTs,
     getNFTs,
     nftVote,
-    walletAddress,
     transactionInfo,
     listedNumbers,
     loading,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
-  import { isLogged } from "../stores/auth.ts";
-  import { provider, switch_network, network } from "../lib/ethers";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
   import WalletConnect from "./WalletConnect.svelte";
@@ -73,43 +72,14 @@
   /* --- NFTs --- */
 
   let walletContainer: HTMLDivElement;
-  let walletLegend: HTMLParagraphElement;
-  let wallet: HTMLParagraphElement;
-  let networkSwitcher: HTMLButtonElement;
   let nftsSelector: HTMLDivElement;
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
-  $: nftNumbers = $potentials.map((potential) => potential.id);
 
-  async function connectWallet() {
-    if (!$isLogged) {
-      await provider.getNetwork().then(async (net) => {
-        if (net.chainId === BigInt(network.chainId)) {
-          await provider.send("eth_requestAccounts", []);
-          let reject: boolean = false;
-          await getNFTs().then((res) => {
-            if (res === null) reject = true;
-          });
-          if (reject) return;
-          $isLogged = true;
-          networkSwitcher.style.display = "none";
-          walletLegend.style.display = "none";
-          if (width > 600) wallet.style.display = "block";
-          nftsSelector.style.display = "flex";
-        } else {
-          walletLegend.innerHTML = "You're on a wrong network!";
-          networkSwitcher.style.display = "block";
-        }
-      });
-    } else {
-      $isLogged = false;
-      $potentials = [];
-      walletLegend.style.display = "block";
-      wallet.style.display = "none";
-      nftsSelector.style.display = "none";
-      window.open("/", "_self");
-    }
+  $: if ($walletAddress) {
+    console.log($walletAddress);
+    getNFTs();
   }
 
   function selectNFT(event: Event) {
@@ -453,11 +423,7 @@
   }
 
   // SVG Icons
-  let signInSvgFocus: boolean = false;
-  let signOutSvgFocus: boolean = false;
-
   let contractSvgFocus: boolean = false;
-
   let refreshSvgFocus: boolean = false;
 </script>
 
@@ -536,12 +502,11 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role a11y_click_events_have_key_events -->
 <div class="nft-bar" bind:this={nftBar}>
   <div class="wallet-container" bind:this={walletContainer}>
-    <p class="wallet-legend" bind:this={walletLegend}>Connect Wallet:</p>
-    <p class="wallet" bind:this={wallet}>
-      {$walletAddress.slice(0, 6) +
-        "..." +
-        $walletAddress.slice($walletAddress.length - 4)}
-    </p>
+    {#if $walletAddress}
+      <p class="wallet">{$username}</p>
+    {:else}
+      <p class="wallet-legend">Connect Wallet:</p>
+    {/if}
     <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
       {#if width > 600}
         <p>Select Potentials:</p>
@@ -597,7 +562,7 @@
       </svg>
     </div>
     <div class="sign-button-wrapper">
-      {#if $isLogged}
+      {#if $walletAddress}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="-100 -100 200 200"
@@ -669,166 +634,10 @@
         </svg>
       {/if}
       <WalletConnect />
-      <button
-        class="wallet-connect"
-        on:click={connectWallet}
-        on:pointerover={() => {
-          signInSvgFocus = true;
-          signOutSvgFocus = true;
-        }}
-        on:pointerout={() => {
-          signInSvgFocus = false;
-          signOutSvgFocus = false;
-        }}
-        disabled={$loading}
-      >
-        {#if $loading}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 100 100"
-            class="loading-svg"
-            stroke="transparent"
-            stroke-width="7.5"
-            stroke-dasharray="288.5"
-            stroke-linecap="round"
-            fill="none"
-          >
-            <path
-              d="
-                M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
-              "
-              transform-origin="50 50"
-            />
-          </svg>
-        {:else if $isLogged}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-100 -100 200 200"
-            class="door-svg"
-            fill="none"
-            stroke="#dedede"
-            stroke-width="12"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="stroke: {signOutSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
-          >
-            <defs>
-              <mask id="door-svg-mask">
-                <rect
-                  x="-25"
-                  y="-75"
-                  width="100"
-                  height="150"
-                  rx="15"
-                  fill="none"
-                  stroke="white"
-                />
-                <line
-                  x1="-25"
-                  y1="-35"
-                  x2="-25"
-                  y2="35"
-                  stroke="black"
-                  stroke-width="14"
-                  stroke-linecap="square"
-                />
-              </mask>
-            </defs>
-
-            <path
-              style="transform: {signOutSvgFocus ? 'translateX(-10%)' : 'none'}"
-              d="
-                    M 30 0
-                    L -80 0
-                    L -55 -25
-                    M -80 0
-                    L -55 25
-                  "
-              fill="none"
-            />
-            <rect
-              x="-25"
-              y="-75"
-              width="100"
-              height="150"
-              rx="15"
-              mask="url(#door-svg-mask)"
-            />
-          </svg>
-          {#if width > 600}
-            Sign out
-          {/if}
-        {:else}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-100 -100 200 200"
-            class="door-svg"
-            fill="none"
-            stroke="#dedede"
-            stroke-width="12"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="stroke: {signInSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
-          >
-            <defs>
-              <mask id="door-svg-mask">
-                <rect
-                  x="-25"
-                  y="-75"
-                  width="100"
-                  height="150"
-                  rx="15"
-                  fill="none"
-                  stroke="white"
-                />
-                <line
-                  x1="-25"
-                  y1="-35"
-                  x2="-25"
-                  y2="35"
-                  stroke="black"
-                  stroke-width="14"
-                  stroke-linecap="square"
-                />
-              </mask>
-            </defs>
-
-            <path
-              style="transform: {signInSvgFocus ? 'translateX(10%)' : 'none'}"
-              d="
-                    M -80 0
-                    L 30 0
-                    L 5 -25
-                    M 30 0
-                    L 5 25
-                  "
-              fill="none"
-            />
-            <rect
-              x="-25"
-              y="-75"
-              width="100"
-              height="150"
-              rx="15"
-              mask="url(#door-svg-mask)"
-            />
-          </svg>
-          {#if width > 600}
-            Sign in
-          {/if}
-        {/if}
-      </button>
-      <button
-        class="switch-network"
-        bind:this={networkSwitcher}
-        on:click={switch_network}
-      >
-        Switch network
-      </button>
     </div>
   </div>
 
-  {#if $isLogged}
+  {#if $walletAddress}
     {#if $potentials.length > 0}
       <div class="nfts-legend">
         <p class="nfts-total">
@@ -1145,7 +954,6 @@ a11y-no-static-element-interactions -->
   }
 
   .wallet {
-    display: none;
     padding: 0 3vw;
     font-size: 1.5vw;
     line-height: 3vw;
@@ -1155,9 +963,9 @@ a11y-no-static-element-interactions -->
     border-radius: 1vw;
   }
 
-  .switch-network {
+  /* .switch-network {
     display: none;
-  }
+  } */
 
   .nfts-legend {
     display: flex;
@@ -1421,14 +1229,14 @@ a11y-no-static-element-interactions -->
       border-radius: 0.5em;
     }
 
-    .wallet-connect {
+    /* .wallet-connect {
       padding: 0.35em;
     }
 
     .wallet-connect svg {
       height: 1.5em;
       width: 1.5em;
-    }
+    } */
 
     .nfts-legend {
       width: 90vw;

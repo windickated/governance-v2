@@ -11,6 +11,8 @@ import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
+import { walletAddress, username } from '../stores/NFTs';
+
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({
     appName: 'Degenerous DAO',
@@ -59,8 +61,12 @@ const RainbowConnect = () => {
           const ready = mounted;
           const connected = ready && account && chain;
           if (account) {
-            console.log(account.address);
-
+            walletAddress.set(account.address);
+            username.set(account.displayName);
+          }
+          else {
+            walletAddress.set('');
+            username.set('');
           }
           return (
             <div
@@ -75,11 +81,6 @@ const RainbowConnect = () => {
                       onClick={openConnectModal}
                       type="button"
                     >
-                      <img
-                        className="sign-icon"
-                        src="/icons/wallet.png"
-                        alt="Google"
-                      />
                       <p className="sign-lable">Sign in</p>
                     </button>
                   );
@@ -92,27 +93,28 @@ const RainbowConnect = () => {
                   );
                 }
                 return (
-                  <div>
-                    <button onClick={openChainModal} type="button">
-                      {chain.hasIcon && (
-                        <div>
-                          {chain.iconUrl && (
-                            <img
-                              alt={chain.name ?? 'Chain icon'}
-                              src={chain.iconUrl}
-                            />
-                          )}
-                        </div>
-                      )}
-                      {chain.name}
-                    </button>
+                  // <div>
+                  //   <button onClick={openChainModal} type="button">
+                  //     {chain.hasIcon && (
+                  //       <div>
+                  //         {chain.iconUrl && (
+                  //           <img
+                  //             alt={chain.name ?? 'Chain icon'}
+                  //             src={chain.iconUrl}
+                  //           />
+                  //         )}
+                  //       </div>
+                  //     )}
+                  //     {chain.name}
+                  //   </button>
                     <button onClick={openAccountModal} type="button">
-                      {account.displayName}
+                      {/* {account.displayName}
                       {account.displayBalance
                         ? ` (${account.displayBalance})`
-                        : ''}
+                        : ''} */}
+                      Sign out
                     </button>
-                  </div>
+                  // </div>
                 );
               })()}
             </div>
