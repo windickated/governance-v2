@@ -9,8 +9,6 @@
     loadingStories,
   } from "../stores/storyNode.ts";
   import {
-    walletAddress,
-    username,
     potentials,
     selectedNFTs,
     getNFTs,
@@ -18,16 +16,21 @@
     listedNumbers,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
+  import { walletAddress, username } from "../stores/auth";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
   import WalletConnect from "./WalletConnect.svelte";
+  import { metamask_init } from "../lib/ethers";
 
   export let handlePopUpMessage: Function;
 
   $: if ($walletAddress) {
-    console.log($walletAddress);
-    getNFTs();
-    get_nodes().then((nodes) => ($storyNodes = nodes));
+    metamask_init().then((provider_exists) => {
+      if (provider_exists) {
+        getNFTs();
+        get_nodes().then((nodes) => ($storyNodes = nodes));
+      }
+    });
   }
 
   /* --- EPISODES --- */

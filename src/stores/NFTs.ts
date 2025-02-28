@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import { contract } from "../lib/contract";
+import { walletAddress } from "./auth";
 
 export class NFT {
   id: number;
@@ -17,9 +18,6 @@ export class NFT {
     this.delegated = null;
   }
 }
-
-export const walletAddress = writable<string>('');
-export const username = writable<string>('');
 
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);

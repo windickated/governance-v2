@@ -5,12 +5,12 @@
     potentials,
     getNftNumbers,
     getPotentials,
-    walletAddress,
     nftApprovals,
     selectedNFTs,
     checkingDelegations,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
+  import { walletAddress } from "../stores/auth";
   import {
     checkAddress,
     approveNFTs,

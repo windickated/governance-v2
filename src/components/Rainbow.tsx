@@ -11,7 +11,7 @@ import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { walletAddress, username } from '../stores/NFTs';
+import { walletAddress, username } from '../stores/auth';
 
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({

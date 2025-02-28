@@ -20,16 +20,6 @@
   let mobileTextVisibility: boolean = false;
   $: optionsCounter = $story ? $story.votes_options.length : 0;
 
-  // const pulseKeyframes = new KeyframeEffect(
-  //   legend,
-  //   [{ opacity: "0" }, { opacity: "1" }, { opacity: "0" }],
-  //   {
-  //     duration: 3000,
-  //     easing: "linear",
-  //     iterations: Infinity,
-  //   }
-  // );
-
   onMount(() => {
     if (width > 600) mobileTextVisibility = true;
   });
