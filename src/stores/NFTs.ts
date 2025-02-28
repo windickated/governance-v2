@@ -1,7 +1,5 @@
 import { writable } from "svelte/store";
-import { provider } from "../lib/ethers";
 import { contract } from "../lib/contract";
-// import { checkNftBatches, getDelegatedAdresses } from "../lib/potentials.js";
 
 export class NFT {
   id: number;
@@ -20,27 +18,16 @@ export class NFT {
   }
 }
 
+export const walletAddress = writable<string>('');
+export const username = writable<string>('');
+
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
-export const loading = writable<boolean>(false);
+
 export const checkingDelegations = writable<string | null>(null);
 export const fetchingDelegations = writable<boolean>(false);
-export const walletAddress = writable<string>('');
-export const username = writable<string>('');
 export const nftApprovals = writable<{ owner: string, approved: boolean, nfts?: number[] }[]>([]);
-export const transactionInfo = writable<string | null>(null);
-
-const message = (address: string): string => { 
-return `
-Only Potential holders can enter the Galactic Governance Hub!
-
-Sign this message with your wallet
-${address}
-to prove you're a Potentials NFT holder.
-
-It will not cause a blockchain transaction, nor any gas fees.
-`;}
 
 export async function getNFTs() {
   walletAddress.subscribe(async (address) => {
@@ -65,8 +52,6 @@ export async function getNFTs() {
         listedNumbers.set(Array.from(new Set(listedNFTs)));
       })
       .catch(err => console.error(err));
-
-    loading.set(false);
   });
 }
 

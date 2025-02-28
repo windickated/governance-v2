@@ -15,9 +15,7 @@
     selectedNFTs,
     getNFTs,
     nftVote,
-    transactionInfo,
     listedNumbers,
-    loading,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
   import { showModal } from "../stores/modal";
@@ -504,63 +502,64 @@
   <div class="wallet-container" bind:this={walletContainer}>
     {#if $walletAddress}
       <p class="wallet">{$username}</p>
+      <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
+        {#if width > 600}
+          <p>Select Potentials:</p>
+        {/if}
+        <select
+          class="nfts-selector"
+          bind:value={selectCondition}
+          on:change={selectMultipleNFTs}
+          disabled={!$selectedNFTs || $selectedNFTs.length == 0}
+        >
+          <option value="" selected disabled hidden>Select</option>
+          <option value="All">All</option>
+          <option value="Remaining">Remaining</option>
+          <option value="Assassin">Assassin</option>
+          <option value="Soldier">Soldier</option>
+          <option value="Spy">Spy</option>
+          <option value="Engineer">Engineer</option>
+          <option value="Oracle">Oracle</option>
+        </select>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="-100 -100 200 200"
+          class="reset-svg filter-image"
+          fill="#dedede"
+          stroke="#dedede"
+          stroke-width="20"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          on:click={() => {
+            if (!$selectedNFTs || $selectedNFTs.length == 0) return;
+            undoSelection();
+            selectCondition = "";
+          }}
+          style={!$selectedNFTs || $selectedNFTs.length == 0
+            ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
+            : ""}
+          role="button"
+          tabindex="0"
+          aria-label="Undo selection"
+          aria-disabled={selectCondition !== ""}
+        >
+          <path
+            d="
+              M 70 -50
+              A 85 85 0 1 0 85 0
+            "
+            fill="none"
+          />
+          <polygon
+            points="
+              70 -50 60 -90 30 -55
+            "
+          />
+        </svg>
+      </div>
     {:else}
       <p class="wallet-legend">Connect Wallet:</p>
     {/if}
-    <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
-      {#if width > 600}
-        <p>Select Potentials:</p>
-      {/if}
-      <select
-        class="nfts-selector"
-        bind:value={selectCondition}
-        on:change={selectMultipleNFTs}
-      >
-        <option value="" selected disabled hidden>Select</option>
-        <option value="All">All</option>
-        <option value="Remaining">Remaining</option>
-        <option value="Assassin">Assassin</option>
-        <option value="Soldier">Soldier</option>
-        <option value="Spy">Spy</option>
-        <option value="Engineer">Engineer</option>
-        <option value="Oracle">Oracle</option>
-      </select>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="-100 -100 200 200"
-        class="reset-svg filter-image"
-        fill="#dedede"
-        stroke="#dedede"
-        stroke-width="20"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        on:click={() => {
-          if (!$selectedNFTs || $selectedNFTs.length == 0) return;
-          undoSelection();
-          selectCondition = "";
-        }}
-        style={!$selectedNFTs || $selectedNFTs.length == 0
-          ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
-          : ""}
-        role="button"
-        tabindex="0"
-        aria-label="Undo selection"
-        aria-disabled={selectCondition !== ""}
-      >
-        <path
-          d="
-            M 70 -50
-            A 85 85 0 1 0 85 0
-          "
-          fill="none"
-        />
-        <polygon
-          points="
-            70 -50 60 -90 30 -55
-          "
-        />
-      </svg>
-    </div>
     <div class="sign-button-wrapper">
       {#if $walletAddress}
         <svg
@@ -743,10 +742,6 @@
         have any delegated NFTs.
       </p>
     {/if}
-  {:else if $transactionInfo}
-    <p class="transaction-info">
-      {$transactionInfo}
-    </p>
   {/if}
 </div>
 
@@ -954,18 +949,18 @@ a11y-no-static-element-interactions -->
   }
 
   .wallet {
-    padding: 0 3vw;
+    padding: 0 2vw;
     font-size: 1.5vw;
     line-height: 3vw;
     color: rgba(51, 226, 230, 1);
     background-color: rgba(22, 30, 95, 0.9);
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
     border-radius: 1vw;
+    white-space: nowrap;
+    max-width: 20vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  /* .switch-network {
-    display: none;
-  } */
 
   .nfts-legend {
     display: flex;
@@ -976,7 +971,7 @@ a11y-no-static-element-interactions -->
   }
 
   .nfts-selector-wrapper {
-    display: none;
+    display: flex;
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
@@ -1008,6 +1003,11 @@ a11y-no-static-element-interactions -->
     background-color: rgba(22, 30, 95, 0.9);
   }
 
+  .nfts-selector:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .nfts-total,
   .nfts-selected {
     color: rgb(51, 226, 230);
@@ -1019,8 +1019,7 @@ a11y-no-static-element-interactions -->
     gap: 1vw;
   }
 
-  .no-nfts-title,
-  .transaction-info {
+  .no-nfts-title {
     width: 80%;
     text-align: center;
     font-size: 2vw;
@@ -1223,20 +1222,12 @@ a11y-no-static-element-interactions -->
     }
 
     .wallet {
+      display: none;
       font-size: 1em;
       line-height: 1.75em;
       padding: 0.25em 1em;
       border-radius: 0.5em;
     }
-
-    /* .wallet-connect {
-      padding: 0.35em;
-    }
-
-    .wallet-connect svg {
-      height: 1.5em;
-      width: 1.5em;
-    } */
 
     .nfts-legend {
       width: 90vw;
@@ -1250,8 +1241,7 @@ a11y-no-static-element-interactions -->
       gap: 0.5em;
     }
 
-    .no-nfts-title,
-    .transaction-info {
+    .no-nfts-title {
       font-size: 1em;
       line-height: 1.6em;
       margin-block: 2em;
@@ -1271,7 +1261,7 @@ a11y-no-static-element-interactions -->
       font-size: 1em;
       line-height: 1.5em;
       padding-block: 0.5em;
-      width: 40vw;
+      width: 25vw;
       border-radius: 0.5em;
     }
 
