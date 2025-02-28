@@ -5,39 +5,7 @@
   import Sidebars from "../components/Sidebars.svelte";
   import PopUpMessage from "./PopUpMessage.svelte";
 
-  import { onMount } from "svelte";
-
   import { metamask_init } from "../lib/ethers";
-  import { storyNodes, get_nodes } from "../stores/storyNode";
-
-  onMount(async () => {
-    if (!(await metamask_init())) return;
-
-    const legend = document.querySelector(".empty-header");
-    const pulseKeyframes = new KeyframeEffect(
-      legend,
-      [{ opacity: "0" }, { opacity: "1" }, { opacity: "0" }],
-      {
-        duration: 3000,
-        easing: "linear",
-        iterations: Infinity,
-      }
-    );
-    const pulseAnimation = new Animation(pulseKeyframes);
-    pulseAnimation.play();
-
-    try {
-      legend!.innerHTML = "Loading episodes...";
-      $storyNodes = await get_nodes();
-      pulseAnimation.cancel();
-      legend!.innerHTML = "Select any episode from the tab";
-    } catch (error) {
-      alert(
-        "Please sign in your wallet and make sure you're on Base network to load Story Nodes."
-      );
-      console.log(error);
-    }
-  });
 
   let showMessage: boolean;
   let messageNote: string;

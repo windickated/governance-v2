@@ -24,6 +24,12 @@
 
   export let handlePopUpMessage: Function;
 
+  $: if ($walletAddress) {
+    console.log($walletAddress);
+    getNFTs();
+    get_nodes().then((nodes) => ($storyNodes = nodes));
+  }
+
   /* --- EPISODES --- */
 
   let episodes: HTMLDivElement;
@@ -74,11 +80,6 @@
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
-
-  $: if ($walletAddress) {
-    console.log($walletAddress);
-    getNFTs();
-  }
 
   function selectNFT(event: Event) {
     const target = event.target as HTMLDivElement;

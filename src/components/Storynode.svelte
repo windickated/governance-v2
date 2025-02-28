@@ -20,6 +20,16 @@
   let mobileTextVisibility: boolean = false;
   $: optionsCounter = $story ? $story.votes_options.length : 0;
 
+  // const pulseKeyframes = new KeyframeEffect(
+  //   legend,
+  //   [{ opacity: "0" }, { opacity: "1" }, { opacity: "0" }],
+  //   {
+  //     duration: 3000,
+  //     easing: "linear",
+  //     iterations: Infinity,
+  //   }
+  // );
+
   onMount(() => {
     if (width > 600) mobileTextVisibility = true;
   });
@@ -230,7 +240,13 @@
         <p class="additional-voting-note">(+2.5% from TikTok)</p>
       {/if}
     {:else}
-      <h1 class="empty-header">Select any episode from the tab</h1>
+      <h1 class="empty-header" class:pulse-animation={$storyNodes.length == 0}>
+        {#if $storyNodes.length == 0}
+          Loading episodes...
+        {:else}
+          Select any episode from the tab
+        {/if}
+      </h1>
     {/if}
   </div>
 
@@ -730,6 +746,22 @@
     .loading-svg {
       height: 1em;
       width: 1em;
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse 3s linear infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 </style>
