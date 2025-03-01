@@ -16,21 +16,16 @@
     listedNumbers,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
-  import { walletAddress, username } from "../stores/auth";
+  import { walletAddress, username, userProvider } from "../stores/auth";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
   import WalletConnect from "./WalletConnect.svelte";
-  import { metamask_init } from "../lib/ethers";
 
   export let handlePopUpMessage: Function;
 
-  $: if ($walletAddress) {
-    metamask_init().then((provider_exists) => {
-      if (provider_exists) {
-        getNFTs();
-        get_nodes().then((nodes) => ($storyNodes = nodes));
-      }
-    });
+  $: if ($userProvider && $walletAddress) {
+    getNFTs();
+    get_nodes().then((nodes) => ($storyNodes = nodes));
   }
 
   /* --- EPISODES --- */
@@ -449,7 +444,7 @@
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
     >Dive into LOREDEX</button
   >
-  {#if $walletAddress}
+  {#if $walletAddress || $storyNodes.length > 0}
     <select
       class="season"
       on:change={switchSeason}
@@ -1061,6 +1056,8 @@ a11y-no-static-element-interactions -->
 
   .no-nfts-title a {
     color: rgba(51, 226, 230, 0.9);
+    font-size: inherit;
+    line-height: inherit;
   }
 
   .nfts-container {

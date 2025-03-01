@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { provider } from "./ethers";
+import { userProvider } from "../stores/auth";
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { nftApprovals, checkingDelegations, getNftNumbers } from "../stores/NFTs";
@@ -34,6 +34,9 @@ const client = createPublicClient({
 });
 
 const potentialsContract = async () => {
+    let provider;
+    userProvider.subscribe((userProvider) => provider = userProvider);
+    
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
     return contract.connect(await provider.getSigner());
 }

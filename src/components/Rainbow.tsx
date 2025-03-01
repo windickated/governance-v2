@@ -1,3 +1,4 @@
+import { BrowserProvider } from "ethers";
 import {
   darkTheme,
   getDefaultConfig,
@@ -6,12 +7,13 @@ import {
 } from '@rainbow-me/rainbowkit';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider } from 'wagmi';
+import { WagmiProvider, useAccount } from 'wagmi';
 import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { walletAddress, username } from '../stores/auth';
+import { walletAddress, username, userProvider } from '../stores/auth';
+import type { Provider } from 'ethers';
 
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({
@@ -60,14 +62,16 @@ const RainbowConnect = () => {
         }) => {
           const ready = mounted;
           const connected = ready && account && chain;
-          if (account) {
-            walletAddress.set(account.address);
-            username.set(account.displayName);
+          const userAccount = useAccount();
+          if (userAccount.status == 'connected') {
+            const { address, connector }  = userAccount;
+            walletAddress.set(address);
+            username.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+            connector.getProvider().then((provider: any) =>
+              userProvider.set(new BrowserProvider(provider, "any") as Provider)
+            );
           }
-          else {
-            walletAddress.set('');
-            username.set('');
-          }
+          
           return (
             <div
               {...(!ready && {

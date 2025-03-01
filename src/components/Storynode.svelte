@@ -230,7 +230,7 @@
       {#if $votingResults && $season == 1 && $episode == 2}
         <p class="additional-voting-note">(+2.5% from TikTok)</p>
       {/if}
-    {:else if $walletAddress}
+    {:else if $walletAddress || $storyNodes.length > 0}
       <h1 class="empty-header" class:pulse-animation={$storyNodes.length == 0}>
         {#if $storyNodes.length == 0}
           Loading episodes...
