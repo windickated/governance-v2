@@ -1,4 +1,4 @@
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, type Provider } from "ethers";
 import {
   darkTheme,
   getDefaultConfig,
@@ -13,7 +13,8 @@ import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { walletAddress, username, userProvider } from '../stores/auth';
-import type { Provider } from 'ethers';
+import { potentials, getNFTs } from "../stores/NFTs";
+import { storyNodes, get_nodes } from "../stores/storyNode.ts";
 
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({
@@ -62,14 +63,25 @@ const RainbowConnect = () => {
         }) => {
           const ready = mounted;
           const connected = ready && account && chain;
+          
           const userAccount = useAccount();
           if (userAccount.status == 'connected') {
+            // console.log(userAccount)
             const { address, connector }  = userAccount;
-            walletAddress.set(address);
-            username.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
-            connector.getProvider().then((provider: any) =>
-              userProvider.set(new BrowserProvider(provider, "any") as Provider)
-            );
+            userProvider.subscribe((res) => {
+              if (res) return;
+              walletAddress.set(address);
+              username.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+              connector.getProvider().then((provider: any) => {
+                userProvider.set(new BrowserProvider(provider, "any") as Provider);
+                getNFTs();
+                get_nodes().then((nodes) => (storyNodes.set(nodes)));
+              });
+            })
+          } else if (userAccount.status == 'disconnected' && !connected) {
+            walletAddress.subscribe((address) => {
+              if (address) location.reload();
+            });
           }
           
           return (
@@ -112,10 +124,10 @@ const RainbowConnect = () => {
                   //     {chain.name}
                   //   </button>
                     <button onClick={openAccountModal} type="button">
-                      {/* {account.displayName}
-                      {account.displayBalance
-                        ? ` (${account.displayBalance})`
-                        : ''} */}
+                    {/* //   {account.displayName}
+                    //   {account.displayBalance
+                    //     ? ` (${account.displayBalance})`
+                    //     : ''} */}
                       Sign out
                     </button>
                   // </div>

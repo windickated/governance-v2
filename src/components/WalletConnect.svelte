@@ -4,14 +4,11 @@
 
   import RainbowConnect from "./Rainbow";
 
-  export let linking = false;
-  export let title = "Connect Wallet";
-
   onMount(() => {
     const reactRoot = document.getElementById("react-root");
     if (reactRoot) {
       const root = createRoot(reactRoot); // Create a root
-      root.render(RainbowConnect(linking, title));
+      root.render(RainbowConnect());
     }
   });
 </script>

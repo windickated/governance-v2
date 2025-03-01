@@ -11,22 +11,16 @@
   import {
     potentials,
     selectedNFTs,
-    getNFTs,
     nftVote,
     listedNumbers,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
-  import { walletAddress, username, userProvider } from "../stores/auth";
+  import { walletAddress, username } from "../stores/auth";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
   import WalletConnect from "./WalletConnect.svelte";
 
   export let handlePopUpMessage: Function;
-
-  $: if ($userProvider && $walletAddress) {
-    getNFTs();
-    get_nodes().then((nodes) => ($storyNodes = nodes));
-  }
 
   /* --- EPISODES --- */
 

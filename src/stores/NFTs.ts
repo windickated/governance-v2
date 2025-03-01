@@ -29,6 +29,7 @@ export const nftApprovals = writable<{ owner: string, approved: boolean, nfts?: 
 
 export async function getNFTs() {
   walletAddress.subscribe(async (address) => {
+    if (!address) return;
 
     const potentialNumbers: number[] = await getNftNumbers(address)
     const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
