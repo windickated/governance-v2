@@ -66,7 +66,6 @@ const RainbowConnect = () => {
           
           const userAccount = useAccount();
           if (userAccount.status == 'connected') {
-            // console.log(userAccount)
             const { address, connector }  = userAccount;
             userProvider.subscribe((res) => {
               if (res) return;
@@ -109,28 +108,9 @@ const RainbowConnect = () => {
                   );
                 }
                 return (
-                  // <div>
-                  //   <button onClick={openChainModal} type="button">
-                  //     {chain.hasIcon && (
-                  //       <div>
-                  //         {chain.iconUrl && (
-                  //           <img
-                  //             alt={chain.name ?? 'Chain icon'}
-                  //             src={chain.iconUrl}
-                  //           />
-                  //         )}
-                  //       </div>
-                  //     )}
-                  //     {chain.name}
-                  //   </button>
-                    <button onClick={openAccountModal} type="button">
-                    {/* //   {account.displayName}
-                    //   {account.displayBalance
-                    //     ? ` (${account.displayBalance})`
-                    //     : ''} */}
-                      Sign out
-                    </button>
-                  // </div>
+                  <button onClick={openAccountModal} type="button">
+                    Sign out
+                  </button>
                 );
               })()}
             </div>
