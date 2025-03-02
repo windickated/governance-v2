@@ -8,7 +8,7 @@ import {
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, useAccount } from 'wagmi';
-import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -22,7 +22,7 @@ const Web3Provider = ({ children }: any) => {
     appIcon: 'https://media.degenerousdao.com/assets/logo.png',
     appUrl: 'https://degenerousdao.com',
     projectId: '0b8a3fac6220753a719b9aeceb8f19fb',
-    chains: [mainnet, polygon, optimism, arbitrum, base],
+    chains: [base],
     ssr: false, // If your dApp uses server side rendering (SSR)
   });
 
@@ -65,6 +65,7 @@ const RainbowConnect = () => {
           const connected = ready && account && chain;
           
           const userAccount = useAccount();
+          console.log(userAccount)
           if (userAccount.status == 'connected') {
             const { address, connector }  = userAccount;
             userProvider.subscribe((res) => {
