@@ -65,20 +65,22 @@ const RainbowConnect = () => {
           const connected = ready && account && chain;
           
           const userAccount = useAccount();
-          console.log(userAccount)
           if (userAccount.status == 'connected') {
             const { address, connector }  = userAccount;
             userProvider.subscribe((res) => {
               if (res) return;
+              console.log('Connected: ' + address); //
               walletAddress.set(address);
               username.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
               connector.getProvider().then((provider: any) => {
                 userProvider.set(new BrowserProvider(provider, "any") as Provider);
                 getNFTs();
+                console.log(provider); //
                 const episodeStorage = localStorage.getItem("activeEpisode");
                 if (episodeStorage) {
                   const { seasonNr } = JSON.parse(episodeStorage);
                   season.set(seasonNr);
+                  console.log("Active episode: " + episodeStorage); //
                 }
                 get_nodes().then((nodes) => {
                   storyNodes.set(nodes)

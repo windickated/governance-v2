@@ -42,6 +42,7 @@ export const abortVotingCheck = writable<boolean>(false);
 
 export const get_nodes = async () => {
   const count = await (await contract()).getStoryNodesCount();
+  console.log("Episodes count: " + count); //
   const nodes = [];
   abortVotingCheck.set(true);
   const storyPercent = 100 / Number(count);
@@ -50,12 +51,13 @@ export const get_nodes = async () => {
 
   for (let i = 0; i < count; i++) {
     loadingStories.set(progress += storyPercent);
-    console.log('Fetching Episode ' + (i + 1).toString());
+    console.log('Fetching Episode ' + (i + 1).toString()); //
     let ipfs_uri = await (await contract()).storyNodeMetadata(i);
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
       ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
     }
     const slicedURI = ipfs_uri.match('ipfs://') ? ipfs_uri.slice(7) : ipfs_uri;
+    console.log("ipfs URI: https://ipfs.io/ipfs/" +slicedURI); //
     // const json = await fetch(`https://ipfs.degenerousdao.com/ipfs/${slicedURI}`);
     const json = await fetch(`https://ipfs.io/ipfs/${slicedURI}`);
     nodes.push(await json.json());
