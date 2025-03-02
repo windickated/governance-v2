@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
-import { provider } from "./ethers";
+import { userProvider } from "../stores/auth";
 import { season } from "../stores/storyNode";
 
 const v1 = "0x1E2f59De3C0D51b596e0E9c80FEAa35A2cFBEe50";
-const v2 = "0x8dC749360eA4f408C438C4FC7A272EE1f1250A89"; // prod
-// const v2 = "0xe7bAD8bA4C622f6cC77c63B5C1e88f1BbBD722f6"; // test
+// const v2 = "0x8dC749360eA4f408C438C4FC7A272EE1f1250A89"; // prod
+const v2 = "0xe7bAD8bA4C622f6cC77c63B5C1e88f1BbBD722f6"; // test
 
 let CONTRACT_ADDRESS: string = v1;
 const abi_v1 = [
@@ -36,6 +36,9 @@ const abi_v2 = [
 let abi = abi_v1;
 
 export const contract = async (): Promise<any> => {
+    let provider;
+    userProvider.subscribe((userProvider) => provider = userProvider);
+
     let seasonNr: number = 1;
     season.subscribe((number) => seasonNr = number);
     
@@ -48,5 +51,5 @@ export const contract = async (): Promise<any> => {
     }
 
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-    return contract.connect(await provider.getSigner());
+    return contract.connect(await provider!.getSigner());
 }

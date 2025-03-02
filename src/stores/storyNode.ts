@@ -28,6 +28,7 @@ interface Result {
 
 export const storyNodes = writable<StoryNode[]>([]);
 export const loadingStories = writable<number>(-1);
+export const activeEpisode = writable<{seasonNr: number; episodeNr: number} | null>(null);
 
 export const story = writable<StoryNode | null>(null)
 

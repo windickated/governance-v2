@@ -7,22 +7,19 @@
     selectedOption,
     get_nodes,
     loadingStories,
+    activeEpisode,
   } from "../stores/storyNode.ts";
   import {
     potentials,
     selectedNFTs,
-    getNFTs,
     nftVote,
-    walletAddress,
-    transactionInfo,
     listedNumbers,
-    loading,
     fetchingDelegations,
   } from "../stores/NFTs.ts";
-  import { isLogged } from "../stores/auth.ts";
-  import { provider, switch_network, network } from "../lib/ethers";
+  import { walletAddress, username } from "../stores/auth";
   import { showModal } from "../stores/modal";
   import Modal from "./Modal.svelte";
+  import WalletConnect from "./WalletConnect.svelte";
 
   export let handlePopUpMessage: Function;
 
@@ -30,12 +27,23 @@
 
   let episodes: HTMLDivElement;
 
+  // Setting episode number to local memory
+  $: if ($episode !== -1) {
+    $activeEpisode = {
+      seasonNr: $season,
+      episodeNr: $episode,
+    };
+    localStorage.setItem("activeEpisode", JSON.stringify($activeEpisode));
+  }
+
   const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
     $season = Number(seasonSelector?.value);
     $episode = -1;
     $story = null;
     $storyNodes = [];
+    $activeEpisode = null;
+    localStorage.removeItem("activeEpisode");
     try {
       $storyNodes = await get_nodes();
     } catch (error) {
@@ -53,63 +61,19 @@
     $selectedOption = null;
   };
 
-  $: if ($episode !== -1) {
-    Array.from(episodes.children).forEach((node: ChildNode) => {
-      const episode = node as HTMLDivElement;
-      if ($episode == Number(episode.id)) {
-        episode!.style.color = "#010020";
-        episode!.style.boxShadow =
-          "inset 0 0 0.5vw rgba(51, 226, 230, 0.5), 0 0 0.5vw rgb(51, 226, 230)";
-        episode!.style.backgroundColor = "rgba(51, 226, 230, 0.75)";
-      } else {
-        episode.style.color = "inherit";
-        episode.style.boxShadow = "inset 0 0 0.5vw #010020";
-        episode.style.backgroundColor = "rgba(51, 226, 230, 0.5)";
-      }
-    });
-  }
+  const activeEpisodeStyling = `
+    color: #010020;
+    box-shadow: inset 0 0 0.5vw rgba(51, 226, 230, 0.5), 0 0 0.5vw rgb(51, 226, 230);
+    background-color: rgba(51, 226, 230, 0.75);
+  `;
 
   /* --- NFTs --- */
 
   let walletContainer: HTMLDivElement;
-  let walletLegend: HTMLParagraphElement;
-  let wallet: HTMLParagraphElement;
-  let networkSwitcher: HTMLButtonElement;
   let nftsSelector: HTMLDivElement;
 
   let nftTiles: HTMLDivElement;
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
-  $: nftNumbers = $potentials.map((potential) => potential.id);
-
-  async function connectWallet() {
-    if (!$isLogged) {
-      await provider.getNetwork().then(async (net) => {
-        if (net.chainId === BigInt(network.chainId)) {
-          await provider.send("eth_requestAccounts", []);
-          let reject: boolean = false;
-          await getNFTs().then((res) => {
-            if (res === null) reject = true;
-          });
-          if (reject) return;
-          $isLogged = true;
-          networkSwitcher.style.display = "none";
-          walletLegend.style.display = "none";
-          if (width > 600) wallet.style.display = "block";
-          nftsSelector.style.display = "flex";
-        } else {
-          walletLegend.innerHTML = "You're on a wrong network!";
-          networkSwitcher.style.display = "block";
-        }
-      });
-    } else {
-      $isLogged = false;
-      $potentials = [];
-      walletLegend.style.display = "block";
-      wallet.style.display = "none";
-      nftsSelector.style.display = "none";
-      window.open("/", "_self");
-    }
-  }
 
   function selectNFT(event: Event) {
     const target = event.target as HTMLDivElement;
@@ -452,11 +416,7 @@
   }
 
   // SVG Icons
-  let signInSvgFocus: boolean = false;
-  let signOutSvgFocus: boolean = false;
-
   let contractSvgFocus: boolean = false;
-
   let refreshSvgFocus: boolean = false;
 </script>
 
@@ -472,6 +432,7 @@
   on:click={handleEpisodesBar}
 ></span>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="episodes-bar" bind:this={episodesBar}>
   <p class="season-title">The Dischordian Saga</p>
   <button
@@ -479,46 +440,60 @@
     on:click={() => open("https://loredex.degenerousdao.com/", "_blank")}
     >Dive into LOREDEX</button
   >
-  <select
-    class="season"
-    on:change={switchSeason}
-    disabled={$loadingStories !== -1}
-  >
-    <option value="1">Season 1</option>
-    <option value="2" selected={true}>Season 2</option>
-  </select>
-  {#if $storyNodes.length > 0}
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-    <div class="episodes-container" bind:this={episodes}>
-      {#each $storyNodes as episode, number}
+  {#if $walletAddress || $storyNodes.length > 0}
+    <select
+      class="season"
+      on:change={switchSeason}
+      disabled={$loadingStories !== -1}
+    >
+      <option value="1" selected={$season == 1}>Season 1</option>
+      <option value="2" selected={$season == 2}>Season 2</option>
+    </select>
+    {#if $storyNodes.length > 0}
+      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+      <div class="episodes-container" bind:this={episodes}>
+        {#each $storyNodes as episodeObject, number}
+          <div
+            role="button"
+            tabindex="0"
+            class="episode"
+            id={number.toString()}
+            on:click={switchEpisode}
+            style={$episode == number ? activeEpisodeStyling : ""}
+          >
+            <img
+              class="episode-image"
+              src={episodeObject.image_url}
+              alt="Episode {number + 1}"
+              draggable="false"
+            />
+            <p class="episode-title">
+              {episodeObject.season
+                ? episodeObject.title
+                : episodeObject.episodeName}
+            </p>
+            <p class="episode-number">Episode {number + 1}</p>
+          </div>
+        {/each}
+      </div>
+    {:else}
+      <p class="season-title loading">Loading Season {$season}</p>
+      <div class="progress-bar">
         <div
-          role="button"
-          tabindex="0"
-          class="episode"
-          id={number.toString()}
-          on:click={switchEpisode}
-        >
-          <img
-            class="episode-image"
-            src={episode.image_url}
-            alt="Episode {number + 1}"
-            draggable="false"
-          />
-          <p class="episode-title">
-            {episode.season ? episode.title : episode.episodeName}
-          </p>
-          <p class="episode-number">Episode {number + 1}</p>
-        </div>
-      {/each}
-    </div>
+          class="progress-thumb loading-animation"
+          style="width: {$loadingStories}%;"
+        ></div>
+      </div>
+    {/if}
   {:else}
-    <p class="season-title loading">Loading Season {$season}</p>
-    <div class="progress-bar">
-      <div
-        class="progress-thumb loading-animation"
-        style="width: {$loadingStories}%;"
-      ></div>
-    </div>
+    <span
+      class="season-title login-tip"
+      on:click={handleNFTsBar}
+      role="button"
+      tabindex="0"
+    >
+      Connect web3 account to load Story Nodes
+    </span>
   {/if}
 </div>
 
@@ -535,68 +510,68 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role a11y_click_events_have_key_events -->
 <div class="nft-bar" bind:this={nftBar}>
   <div class="wallet-container" bind:this={walletContainer}>
-    <p class="wallet-legend" bind:this={walletLegend}>Connect Wallet:</p>
-    <p class="wallet" bind:this={wallet}>
-      {$walletAddress.slice(0, 6) +
-        "..." +
-        $walletAddress.slice($walletAddress.length - 4)}
-    </p>
-    <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
-      {#if width > 600}
-        <p>Select Potentials:</p>
-      {/if}
-      <select
-        class="nfts-selector"
-        bind:value={selectCondition}
-        on:change={selectMultipleNFTs}
-      >
-        <option value="" selected disabled hidden>Select</option>
-        <option value="All">All</option>
-        <option value="Remaining">Remaining</option>
-        <option value="Assassin">Assassin</option>
-        <option value="Soldier">Soldier</option>
-        <option value="Spy">Spy</option>
-        <option value="Engineer">Engineer</option>
-        <option value="Oracle">Oracle</option>
-      </select>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="-100 -100 200 200"
-        class="reset-svg filter-image"
-        fill="#dedede"
-        stroke="#dedede"
-        stroke-width="20"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        on:click={() => {
-          if (!$selectedNFTs || $selectedNFTs.length == 0) return;
-          undoSelection();
-          selectCondition = "";
-        }}
-        style={!$selectedNFTs || $selectedNFTs.length == 0
-          ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
-          : ""}
-        role="button"
-        tabindex="0"
-        aria-label="Undo selection"
-        aria-disabled={selectCondition !== ""}
-      >
-        <path
-          d="
-            M 70 -50
-            A 85 85 0 1 0 85 0
-          "
-          fill="none"
-        />
-        <polygon
-          points="
-            70 -50 60 -90 30 -55
-          "
-        />
-      </svg>
-    </div>
+    {#if $walletAddress}
+      <p class="wallet">{$username}</p>
+      <div class="nfts-selector-wrapper" bind:this={nftsSelector}>
+        {#if width > 600}
+          <p>Select Potentials:</p>
+        {/if}
+        <select
+          class="nfts-selector"
+          bind:value={selectCondition}
+          on:change={selectMultipleNFTs}
+          disabled={!$selectedNFTs || $selectedNFTs.length == 0}
+        >
+          <option value="" selected disabled hidden>Select</option>
+          <option value="All">All</option>
+          <option value="Remaining">Remaining</option>
+          <option value="Assassin">Assassin</option>
+          <option value="Soldier">Soldier</option>
+          <option value="Spy">Spy</option>
+          <option value="Engineer">Engineer</option>
+          <option value="Oracle">Oracle</option>
+        </select>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="-100 -100 200 200"
+          class="reset-svg filter-image"
+          fill="#dedede"
+          stroke="#dedede"
+          stroke-width="20"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          on:click={() => {
+            if (!$selectedNFTs || $selectedNFTs.length == 0) return;
+            undoSelection();
+            selectCondition = "";
+          }}
+          style={!$selectedNFTs || $selectedNFTs.length == 0
+            ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
+            : ""}
+          role="button"
+          tabindex="0"
+          aria-label="Undo selection"
+          aria-disabled={selectCondition !== ""}
+        >
+          <path
+            d="
+              M 70 -50
+              A 85 85 0 1 0 85 0
+            "
+            fill="none"
+          />
+          <polygon
+            points="
+              70 -50 60 -90 30 -55
+            "
+          />
+        </svg>
+      </div>
+    {:else}
+      <p class="wallet-legend">Connect Wallet:</p>
+    {/if}
     <div class="sign-button-wrapper">
-      {#if $isLogged}
+      {#if $walletAddress}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="-100 -100 200 200"
@@ -667,166 +642,11 @@
           </g>
         </svg>
       {/if}
-      <button
-        class="wallet-connect"
-        on:click={connectWallet}
-        on:pointerover={() => {
-          signInSvgFocus = true;
-          signOutSvgFocus = true;
-        }}
-        on:pointerout={() => {
-          signInSvgFocus = false;
-          signOutSvgFocus = false;
-        }}
-        disabled={$loading}
-      >
-        {#if $loading}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 100 100"
-            class="loading-svg"
-            stroke="transparent"
-            stroke-width="7.5"
-            stroke-dasharray="288.5"
-            stroke-linecap="round"
-            fill="none"
-          >
-            <path
-              d="
-                M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
-              "
-              transform-origin="50 50"
-            />
-          </svg>
-        {:else if $isLogged}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-100 -100 200 200"
-            class="door-svg"
-            fill="none"
-            stroke="#dedede"
-            stroke-width="12"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="stroke: {signOutSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
-          >
-            <defs>
-              <mask id="door-svg-mask">
-                <rect
-                  x="-25"
-                  y="-75"
-                  width="100"
-                  height="150"
-                  rx="15"
-                  fill="none"
-                  stroke="white"
-                />
-                <line
-                  x1="-25"
-                  y1="-35"
-                  x2="-25"
-                  y2="35"
-                  stroke="black"
-                  stroke-width="14"
-                  stroke-linecap="square"
-                />
-              </mask>
-            </defs>
-
-            <path
-              style="transform: {signOutSvgFocus ? 'translateX(-10%)' : 'none'}"
-              d="
-                    M 30 0
-                    L -80 0
-                    L -55 -25
-                    M -80 0
-                    L -55 25
-                  "
-              fill="none"
-            />
-            <rect
-              x="-25"
-              y="-75"
-              width="100"
-              height="150"
-              rx="15"
-              mask="url(#door-svg-mask)"
-            />
-          </svg>
-          {#if width > 600}
-            Sign out
-          {/if}
-        {:else}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-100 -100 200 200"
-            class="door-svg"
-            fill="none"
-            stroke="#dedede"
-            stroke-width="12"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="stroke: {signInSvgFocus ? 'rgb(51, 226, 230)' : '#dedede'}"
-          >
-            <defs>
-              <mask id="door-svg-mask">
-                <rect
-                  x="-25"
-                  y="-75"
-                  width="100"
-                  height="150"
-                  rx="15"
-                  fill="none"
-                  stroke="white"
-                />
-                <line
-                  x1="-25"
-                  y1="-35"
-                  x2="-25"
-                  y2="35"
-                  stroke="black"
-                  stroke-width="14"
-                  stroke-linecap="square"
-                />
-              </mask>
-            </defs>
-
-            <path
-              style="transform: {signInSvgFocus ? 'translateX(10%)' : 'none'}"
-              d="
-                    M -80 0
-                    L 30 0
-                    L 5 -25
-                    M 30 0
-                    L 5 25
-                  "
-              fill="none"
-            />
-            <rect
-              x="-25"
-              y="-75"
-              width="100"
-              height="150"
-              rx="15"
-              mask="url(#door-svg-mask)"
-            />
-          </svg>
-          {#if width > 600}
-            Sign in
-          {/if}
-        {/if}
-      </button>
-      <button
-        class="switch-network"
-        bind:this={networkSwitcher}
-        on:click={switch_network}
-      >
-        Switch network
-      </button>
+      <WalletConnect />
     </div>
   </div>
 
-  {#if $isLogged}
+  {#if $walletAddress}
     {#if $potentials.length > 0}
       <div class="nfts-legend">
         <p class="nfts-total">
@@ -932,10 +752,6 @@
         have any delegated NFTs.
       </p>
     {/if}
-  {:else if $transactionInfo}
-    <p class="transaction-info">
-      {$transactionInfo}
-    </p>
   {/if}
 </div>
 
@@ -1046,6 +862,21 @@ a11y-no-static-element-interactions -->
     text-shadow: 0 0 0.1vw rgb(51, 226, 230);
   }
 
+  .login-tip {
+    color: rgba(51, 226, 230, 0.5);
+    text-shadow: none;
+    font-size: 2vw;
+    line-height: 3vw;
+    width: 90%;
+    cursor: pointer;
+  }
+
+  .login-tip:hover,
+  .login-tip:active {
+    color: rgb(51, 226, 230);
+    text-decoration: underline;
+  }
+
   .loredex {
     width: 35vw;
     font-size: 2vw;
@@ -1143,18 +974,17 @@ a11y-no-static-element-interactions -->
   }
 
   .wallet {
-    display: none;
-    padding: 0 3vw;
+    padding: 0 2vw;
     font-size: 1.5vw;
     line-height: 3vw;
     color: rgba(51, 226, 230, 1);
     background-color: rgba(22, 30, 95, 0.9);
     border: 0.1vw solid rgba(51, 226, 230, 0.5);
     border-radius: 1vw;
-  }
-
-  .switch-network {
-    display: none;
+    white-space: nowrap;
+    max-width: 20vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nfts-legend {
@@ -1166,7 +996,7 @@ a11y-no-static-element-interactions -->
   }
 
   .nfts-selector-wrapper {
-    display: none;
+    display: flex;
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
@@ -1198,6 +1028,11 @@ a11y-no-static-element-interactions -->
     background-color: rgba(22, 30, 95, 0.9);
   }
 
+  .nfts-selector:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .nfts-total,
   .nfts-selected {
     color: rgb(51, 226, 230);
@@ -1209,8 +1044,7 @@ a11y-no-static-element-interactions -->
     gap: 1vw;
   }
 
-  .no-nfts-title,
-  .transaction-info {
+  .no-nfts-title {
     width: 80%;
     text-align: center;
     font-size: 2vw;
@@ -1221,6 +1055,8 @@ a11y-no-static-element-interactions -->
 
   .no-nfts-title a {
     color: rgba(51, 226, 230, 0.9);
+    font-size: inherit;
+    line-height: inherit;
   }
 
   .nfts-container {
@@ -1354,6 +1190,11 @@ a11y-no-static-element-interactions -->
       line-height: 1.5em;
     }
 
+    .login-tip {
+      font-size: 1.5em;
+      line-height: 1.5em;
+    }
+
     .loredex {
       width: 80vw;
       font-size: 1.2em;
@@ -1413,19 +1254,11 @@ a11y-no-static-element-interactions -->
     }
 
     .wallet {
+      display: none;
       font-size: 1em;
       line-height: 1.75em;
       padding: 0.25em 1em;
       border-radius: 0.5em;
-    }
-
-    .wallet-connect {
-      padding: 0.35em;
-    }
-
-    .wallet-connect svg {
-      height: 1.5em;
-      width: 1.5em;
     }
 
     .nfts-legend {
@@ -1440,8 +1273,7 @@ a11y-no-static-element-interactions -->
       gap: 0.5em;
     }
 
-    .no-nfts-title,
-    .transaction-info {
+    .no-nfts-title {
       font-size: 1em;
       line-height: 1.6em;
       margin-block: 2em;
@@ -1461,7 +1293,7 @@ a11y-no-static-element-interactions -->
       font-size: 1em;
       line-height: 1.5em;
       padding-block: 0.5em;
-      width: 40vw;
+      width: 25vw;
       border-radius: 0.5em;
     }
 

@@ -11,6 +11,7 @@
     abortVotingCheck,
   } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
+  import { walletAddress } from "../stores/auth.ts";
   import vote from "../utils/vote.ts";
   import checkVote from "../lib/voting.js";
 
@@ -229,8 +230,16 @@
       {#if $votingResults && $season == 1 && $episode == 2}
         <p class="additional-voting-note">(+2.5% from TikTok)</p>
       {/if}
+    {:else if $walletAddress || $storyNodes.length > 0}
+      <h1 class="empty-header" class:pulse-animation={$storyNodes.length == 0}>
+        {#if $storyNodes.length == 0}
+          Loading episodes...
+        {:else}
+          Select any episode from the tab
+        {/if}
+      </h1>
     {:else}
-      <h1 class="empty-header">Select any episode from the tab</h1>
+      <h1 class="empty-header">Please Sign in Your Profile</h1>
     {/if}
   </div>
 
@@ -730,6 +739,22 @@
     .loading-svg {
       height: 1em;
       width: 1em;
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse 3s linear infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 </style>
