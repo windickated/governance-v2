@@ -520,7 +520,7 @@
           class="nfts-selector"
           bind:value={selectCondition}
           on:change={selectMultipleNFTs}
-          disabled={!$selectedNFTs || $selectedNFTs.length == 0}
+          disabled={$episode == -1}
         >
           <option value="" selected disabled hidden>Select</option>
           <option value="All">All</option>
