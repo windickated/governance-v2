@@ -7,6 +7,7 @@
     selectedOption,
     get_nodes,
     loadingStories,
+    activeEpisode,
   } from "../stores/storyNode.ts";
   import {
     potentials,
@@ -26,12 +27,23 @@
 
   let episodes: HTMLDivElement;
 
+  // Setting episode number to local memory
+  $: if ($episode !== -1) {
+    $activeEpisode = {
+      seasonNr: $season,
+      episodeNr: $episode,
+    };
+    localStorage.setItem("activeEpisode", JSON.stringify($activeEpisode));
+  }
+
   const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
     $season = Number(seasonSelector?.value);
     $episode = -1;
     $story = null;
     $storyNodes = [];
+    $activeEpisode = null;
+    localStorage.removeItem("activeEpisode");
     try {
       $storyNodes = await get_nodes();
     } catch (error) {
@@ -49,21 +61,11 @@
     $selectedOption = null;
   };
 
-  $: if ($episode !== -1) {
-    Array.from(episodes.children).forEach((node: ChildNode) => {
-      const episode = node as HTMLDivElement;
-      if ($episode == Number(episode.id)) {
-        episode!.style.color = "#010020";
-        episode!.style.boxShadow =
-          "inset 0 0 0.5vw rgba(51, 226, 230, 0.5), 0 0 0.5vw rgb(51, 226, 230)";
-        episode!.style.backgroundColor = "rgba(51, 226, 230, 0.75)";
-      } else {
-        episode.style.color = "inherit";
-        episode.style.boxShadow = "inset 0 0 0.5vw #010020";
-        episode.style.backgroundColor = "rgba(51, 226, 230, 0.5)";
-      }
-    });
-  }
+  const activeEpisodeStyling = `
+    color: #010020;
+    box-shadow: inset 0 0 0.5vw rgba(51, 226, 230, 0.5), 0 0 0.5vw rgb(51, 226, 230);
+    background-color: rgba(51, 226, 230, 0.75);
+  `;
 
   /* --- NFTs --- */
 
@@ -444,28 +446,31 @@
       on:change={switchSeason}
       disabled={$loadingStories !== -1}
     >
-      <option value="1">Season 1</option>
-      <option value="2" selected={true}>Season 2</option>
+      <option value="1" selected={$season == 1}>Season 1</option>
+      <option value="2" selected={$season == 2}>Season 2</option>
     </select>
     {#if $storyNodes.length > 0}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
       <div class="episodes-container" bind:this={episodes}>
-        {#each $storyNodes as episode, number}
+        {#each $storyNodes as episodeObject, number}
           <div
             role="button"
             tabindex="0"
             class="episode"
             id={number.toString()}
             on:click={switchEpisode}
+            style={$episode == number ? activeEpisodeStyling : ""}
           >
             <img
               class="episode-image"
-              src={episode.image_url}
+              src={episodeObject.image_url}
               alt="Episode {number + 1}"
               draggable="false"
             />
             <p class="episode-title">
-              {episode.season ? episode.title : episode.episodeName}
+              {episodeObject.season
+                ? episodeObject.title
+                : episodeObject.episodeName}
             </p>
             <p class="episode-number">Episode {number + 1}</p>
           </div>
