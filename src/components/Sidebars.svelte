@@ -1242,7 +1242,7 @@ a11y-no-static-element-interactions -->
     .wallet-container {
       margin-top: 6vw;
       margin-bottom: 2vw;
-      width: 80vw;
+      width: 90vw;
       height: auto;
       padding: 0.5em 1em;
       border-radius: 0.5em;
@@ -1291,9 +1291,9 @@ a11y-no-static-element-interactions -->
 
     .nfts-selector {
       font-size: 1em;
-      line-height: 1.5em;
+      line-height: 1.75em;
       padding-block: 0.5em;
-      width: 25vw;
+      width: 30vw;
       border-radius: 0.5em;
     }
 
