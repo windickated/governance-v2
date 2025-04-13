@@ -14,6 +14,7 @@
   import { walletAddress } from "../stores/auth.ts";
   import vote from "../utils/vote.ts";
   import checkVote from "../lib/voting.js";
+  import { userProvider } from "../stores/auth";
 
   export let handlePopUpMessage: Function;
 
@@ -148,7 +149,18 @@
     }
     $selectedOption = optionID;
 
-    if (width < 600 && $selectedOption && $selectedNFTs.length > 0) vote();
+    if (width < 600 && $selectedOption && $selectedNFTs.length > 0) {
+      $userProvider!.getNetwork().then((network) => {
+        const baseNetwork: number = 8453;
+        console.log(network);
+        if (Number(network.chainId) === baseNetwork) vote();
+        else
+          handlePopUpMessage(
+            event as PointerEvent,
+            "Please select Base network!"
+          );
+      });
+    }
   }
 </script>
 

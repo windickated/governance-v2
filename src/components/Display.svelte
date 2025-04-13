@@ -3,6 +3,7 @@
   import { episode, selectedOption } from "../stores/storyNode.ts";
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
+  import { userProvider } from "../stores/auth";
 
   export let handlePopUpMessage: Function;
 
@@ -38,11 +39,21 @@
   const voteButtonHandle = (event: Event) => {
     if (!voteIsInactive && voteButtonState) {
       if (event.type === "click") {
-        voteButtonState = !voteButtonState;
-        setTimeout(() => {
-          voteButtonState = !voteButtonState;
-          vote();
-        }, 300);
+        $userProvider!.getNetwork().then((network) => {
+          const baseNetwork: number = 8453;
+          console.log(network);
+          if (Number(network.chainId) === baseNetwork) {
+            voteButtonState = !voteButtonState;
+            setTimeout(() => {
+              voteButtonState = !voteButtonState;
+              vote();
+            }, 300);
+          } else
+            handlePopUpMessage(
+              event as PointerEvent,
+              "Please select Base network!"
+            );
+        });
       } else if (event.type === "pointerover" || event.type === "pointerout") {
         voteButtonHover = !voteButtonHover;
       }
