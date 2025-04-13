@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, JsonRpcProvider } from "ethers";
 import { userProvider } from "../stores/auth";
 import { season } from "../stores/storyNode";
 
@@ -35,9 +35,12 @@ const abi_v2 = [
 
 let abi = abi_v1;
 
-export const contract = async (): Promise<any> => {
+export const contract = async (providerType: "user" | "alchemy" = "user"): Promise<any> => {
     let provider;
-    userProvider.subscribe((userProvider) => provider = userProvider);
+
+    if (providerType === "user")
+        userProvider.subscribe((userProvider) => provider = userProvider);
+    else provider = new JsonRpcProvider("https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep");
 
     let seasonNr: number = 1;
     season.subscribe((number) => seasonNr = number);
@@ -51,5 +54,7 @@ export const contract = async (): Promise<any> => {
     }
 
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-    return contract.connect(await provider!.getSigner());
+    return providerType === "user"
+        ? contract.connect(await provider!.getSigner())
+        : contract.connect(provider!);
 }

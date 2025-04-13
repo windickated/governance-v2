@@ -86,5 +86,5 @@ export const getPotentials = async (nftNumbers: number[], owner: string | null =
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
   if (episodeNr === -1) return;
-  return await (await contract()).getVoteOptionId(episodeNr, nftNr);
+  return await (await contract("alchemy")).getVoteOptionId(episodeNr, nftNr);
 }

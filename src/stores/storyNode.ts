@@ -41,7 +41,7 @@ export const checkingResults = writable<number>(-1);
 export const abortVotingCheck = writable<boolean>(false);
 
 export const get_nodes = async () => {
-  const count = await (await contract()).getStoryNodesCount();
+  const count = await (await contract("alchemy")).getStoryNodesCount();
   console.log("Episodes count: " + count); //
   const nodes = [];
   abortVotingCheck.set(true);
@@ -52,7 +52,7 @@ export const get_nodes = async () => {
   for (let i = 0; i < count; i++) {
     loadingStories.set(progress += storyPercent);
     console.log('Fetching Episode ' + (i + 1).toString()); //
-    let ipfs_uri = await (await contract()).storyNodeMetadata(i);
+    let ipfs_uri = await (await contract("alchemy")).storyNodeMetadata(i);
     if(ipfs_uri === "ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg") {
       ipfs_uri = "ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1";
     }
@@ -62,7 +62,7 @@ export const get_nodes = async () => {
     // const json = await fetch(`https://ipfs.io/ipfs/${slicedURI}`);
     const json = await fetch(`https://gateway.pinata.cloud/ipfs/${slicedURI}`);
     nodes.push(await json.json());
-    const {endTimestamp} = await (await contract()).storyNodes(i);
+    const {endTimestamp} = await (await contract("alchemy")).storyNodes(i);
     nodes[nodes.length - 1].endTimestamp = Number(endTimestamp);
     nodes[nodes.length - 1].ended = Number(endTimestamp) * 1000 < (new Date()).getTime();
     nodes[nodes.length - 1].duration = getDuration(endTimestamp.toString());
