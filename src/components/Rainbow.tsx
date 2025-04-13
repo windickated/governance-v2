@@ -86,7 +86,7 @@ const RainbowConnect = () => {
                   storyNodes.set(nodes)
                   if (episodeStorage) {
                     const { episodeNr } = JSON.parse(episodeStorage);
-                    episode.set(episodeNr);
+                    if (nodes.length >= episodeNr) episode.set(episodeNr);
                   }
                 });
               });
