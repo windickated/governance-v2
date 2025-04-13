@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-import { userProvider } from "../stores/auth";
+import { ethers, JsonRpcProvider } from "ethers";
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { nftApprovals, checkingDelegations, getNftNumbers } from "../stores/NFTs";
@@ -30,15 +29,13 @@ const abi = [
 
 const client = createPublicClient({
     chain: base,
-    transport: http()
+    transport: http("https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep")
 });
 
 const potentialsContract = async () => {
-    let provider;
-    userProvider.subscribe((userProvider) => provider = userProvider);
-    
+    const provider = new JsonRpcProvider("https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep");
     const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-    return contract.connect(await provider.getSigner());
+    return contract.connect(provider);
 }
 
 export const checkAddress = (address) => {
@@ -97,6 +94,7 @@ const checkNftBatches = async () => {
     for (let i = 0; i < batches.length; i++) {
         console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
         const results = await fetchNftOwnersWithRetry(batches[i]);
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         results?.forEach(result => {
         if (result.success) {
