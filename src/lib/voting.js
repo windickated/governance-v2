@@ -38,7 +38,7 @@ const abi = [
 
 const client = createPublicClient({
   chain: base,
-  transport: http()
+  transport: http("https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep")
 });
 
 async function fetchVotesWithRetry(storyNode, tokenIds) {
