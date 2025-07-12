@@ -20,34 +20,31 @@
     id: string,
     isClicked: boolean = false
   ) => {
-    if (id != "omnihub") {
-      //temporarily disabled Omnihub
-      const button: HTMLElement | null = document.getElementById(id);
-      const buttonHover: HTMLElement | null = document.getElementById(
-        `${id}-hover`
-      );
-      const buttonActive: HTMLElement | null = document.getElementById(
-        `${id}-active`
-      );
-      if (!touchscreenDevice) {
-        if (event.type === "click") {
-          button!.style.display = "none";
-          buttonHover!.style.display = "none";
-          buttonActive!.style.display = "block";
-        } else if (event.type === "mouseover" && !isClicked) {
-          button!.style.display = "none";
-          buttonHover!.style.display = "block";
-          buttonActive!.style.display = "none";
-        } else if (isClicked) {
-          clickHandle(id, button, buttonActive);
-        } else if (event.type === "mouseout") {
-          button!.style.display = "block";
-          buttonHover!.style.display = "none";
-          buttonActive!.style.display = "none";
-        }
-      } else {
-        if (event.type === "touchstart") clickHandle(id, button, buttonActive);
+    const button: HTMLElement | null = document.getElementById(id);
+    const buttonHover: HTMLElement | null = document.getElementById(
+      `${id}-hover`
+    );
+    const buttonActive: HTMLElement | null = document.getElementById(
+      `${id}-active`
+    );
+    if (!touchscreenDevice) {
+      if (event.type === "click") {
+        button!.style.display = "none";
+        buttonHover!.style.display = "none";
+        buttonActive!.style.display = "block";
+      } else if (event.type === "mouseover" && !isClicked) {
+        button!.style.display = "none";
+        buttonHover!.style.display = "block";
+        buttonActive!.style.display = "none";
+      } else if (isClicked) {
+        clickHandle(id, button, buttonActive);
+      } else if (event.type === "mouseout") {
+        button!.style.display = "block";
+        buttonHover!.style.display = "none";
+        buttonActive!.style.display = "none";
       }
+    } else {
+      if (event.type === "touchstart") clickHandle(id, button, buttonActive);
     }
 
     function clickHandle(
@@ -70,6 +67,12 @@
           case "conexus":
             window.open(
               "https://conexus.degenerousdao.com",
+              !touchscreenDevice ? "_blank" : "_self"
+            );
+            break;
+          case "omnihub":
+            window.open(
+              "https://conexus.degenerousdao.com/dashboard",
               !touchscreenDevice ? "_blank" : "_self"
             );
             break;

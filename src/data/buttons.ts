@@ -24,7 +24,7 @@ export const consolePanel = {
     },
     {
       id: "omnihub",
-      image: "/omnihub-inactive.avif", ///omnihub.avif
+      image: "/omnihub.avif",
       hover: "/omnihub-hover.avif",
       click: "/omnihub-active.avif",
       size: "big",
