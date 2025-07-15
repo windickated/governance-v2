@@ -26,12 +26,14 @@
 
 <svelte:window bind:innerWidth={width} bind:scrollY={scroll} />
 
-<Display />
-<!-- <Storynode {handlePopUpMessage} />
-<Console {handlePopUpMessage} />
-<Sidebars {handlePopUpMessage} /> -->
+<main class="fade-in" style:transform="none">
+  <Display />
+  <!-- <Storynode {handlePopUpMessage} /> -->
+  <Console />
+  <!-- <Sidebars {handlePopUpMessage} /> -->
 
-<!-- <PopUpMessage {showMessage} {messageNote} {X} {Y} /> -->
+  <!-- <PopUpMessage {showMessage} {messageNote} {X} {Y} /> -->
+</main>
 
 <div id="background-image" style:top={`max(-${scroll / 100}vh, -100vh)`}></div>
 

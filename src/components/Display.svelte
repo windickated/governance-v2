@@ -63,107 +63,70 @@
 </script>
 
 <section>
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-  <!-- svelte-ignore a11y-mouse-events-have-key-events -->
   <div>
-    <span
-      class="format"
-      role="button"
-      tabindex="0"
+    <button
+      class="void-btn format"
       on:click={switcherHandle}
       on:pointerover={switcherHandle}
       on:pointerout={switcherHandle}
     >
       <img
-        class="format-btn {!formatButtonHover
-          ? formatButtonState
-            ? 'visible'
-            : ''
-          : ''}"
+        class:visible={!formatButtonHover && formatButtonState}
         src={displayScreen.buttons[0].video}
         alt="Switcher"
         draggable="false"
       />
       <img
-        class="format-btn {!formatButtonHover
-          ? !formatButtonState
-            ? 'visible'
-            : ''
-          : ''}"
+        class:visible={!formatButtonHover && !formatButtonState}
         src={displayScreen.buttons[0].text}
         alt="Switcher"
         draggable="false"
       />
       <img
-        class="format-btn {!formatButtonState
-          ? formatButtonHover
-            ? 'visible'
-            : ''
-          : ''}"
+        class:visible={formatButtonHover && !formatButtonState}
         src={displayScreen.buttons[0].videoHover}
         alt="Switcher"
         draggable="false"
       />
       <img
-        class="format-btn {formatButtonState
-          ? formatButtonHover
-            ? 'visible'
-            : ''
-          : ''}"
+        class:visible={formatButtonHover && formatButtonState}
         src={displayScreen.buttons[0].textHover}
         alt="Switcher"
         draggable="false"
       />
-    </span>
-    <span
-      class="vote"
-      role="button"
-      tabindex="0"
+    </button>
+
+    <button
+      class="void-btn vote"
       on:click={voteButtonHandle}
       on:pointerover={voteButtonHandle}
       on:pointerout={voteButtonHandle}
     >
       <img
-        class="vote-btn {!voteIsInactive
-          ? !voteButtonHover
-            ? voteButtonState
-              ? 'visible'
-              : ''
-            : ''
-          : ''}"
+        class:visible={!voteIsInactive && !voteButtonHover && voteButtonState}
         src={displayScreen.buttons[1].image}
         alt="Vote"
         draggable="false"
       />
       <img
-        class="vote-btn {!voteIsInactive
-          ? voteButtonState
-            ? voteButtonHover
-              ? 'visible'
-              : ''
-            : ''
-          : ''}"
+        class:visible={!voteIsInactive && voteButtonState && voteButtonHover}
         src={displayScreen.buttons[1].hover}
         alt="Vote"
         draggable="false"
       />
       <img
-        class="vote-btn {!voteIsInactive
-          ? !voteButtonState
-            ? 'visible'
-            : ''
-          : ''}"
+        class:visible={!voteIsInactive && !voteButtonState}
         src={displayScreen.buttons[1].click}
         alt="Vote"
         draggable="false"
       />
       <img
-        class="vote-btn {voteIsInactive ? 'visible' : ''}"
+        class:visible={voteIsInactive}
         src={displayScreen.buttons[1].inactive}
         alt="Vote"
         draggable="false"
       />
-    </span>
+    </button>
   </div>
 
   <picture>
@@ -211,13 +174,10 @@
       background-position: top;
       background-size: contain;
 
-      span {
+      button {
         img {
-          &.format-btn,
-          &.vote-btn {
-            display: none;
-            cursor: pointer;
-          }
+          display: none;
+          cursor: pointer;
 
           &.visible {
             display: block;
@@ -227,10 +187,10 @@
     }
   }
 
-  // @media screen and (max-width: 600px) {
-  //   .format-btn,
-  //   .vote-btn {
-  //     display: none !important;
-  //   }
-  // }
+  @media screen and (max-width: 768px) {
+    .format,
+    .vote {
+      display: none !important;
+    }
+  }
 </style>

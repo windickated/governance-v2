@@ -3,7 +3,7 @@
   import { consolePanel } from "../data/buttons.ts";
   import { storyNodes, episode, selectedOption } from "../stores/storyNode.ts";
 
-  export let handlePopUpMessage: Function;
+  // export let handlePopUpMessage: Function;
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
@@ -13,7 +13,7 @@
   });
 
   let width: number;
-  let consoleBar: HTMLDivElement;
+  let consoleBar: HTMLElement;
 
   const consoleButtonsHandle = (
     event: Event,
@@ -78,15 +78,15 @@
             break;
           case "back":
             if ($episode === -1) {
-              handlePopUpMessage(
-                event as PointerEvent,
-                "There is no episode selected!"
-              );
+              // handlePopUpMessage(
+              //   event as PointerEvent,
+              //   "There is no episode selected!"
+              // );
             } else if ($episode === 0) {
-              handlePopUpMessage(
-                event as PointerEvent,
-                "You selected the first episode of this season."
-              );
+              // handlePopUpMessage(
+              //   event as PointerEvent,
+              //   "You selected the first episode of this season."
+              // );
             } else {
               $episode--;
               if ($selectedOption) $selectedOption = null;
@@ -94,15 +94,15 @@
             break;
           case "forward":
             if ($episode === -1) {
-              handlePopUpMessage(
-                event as PointerEvent,
-                "There is no episode selected!"
-              );
+              // handlePopUpMessage(
+              //   event as PointerEvent,
+              //   "There is no episode selected!"
+              // );
             } else if ($episode === $storyNodes.length - 1) {
-              handlePopUpMessage(
-                event as PointerEvent,
-                "You selected the last episode of this season."
-              );
+              // handlePopUpMessage(
+              //   event as PointerEvent,
+              //   "You selected the last episode of this season."
+              // );
             } else {
               $episode++;
               if ($selectedOption) $selectedOption = null;
@@ -116,18 +116,12 @@
 
 <svelte:window bind:outerWidth={width} />
 
-<div
-  class="console-panel"
-  bind:this={consoleBar}
-  style="
-{width <= 600 && $episode === -1 ? 'position: fixed; bottom: 0;' : ''}
-"
->
-  <div class="console-buttons">
+<section bind:this={consoleBar}>
+  <div class="flex-row">
     {#each consolePanel.buttons as button}
       <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
       <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-      <div class="{button.id} {button.size}" role="button" tabindex="0">
+      <span class="{button.id} {button.size}" role="button" tabindex="0">
         <img
           on:mouseover={() => {
             consoleButtonsHandle(event as Event, button.id);
@@ -135,7 +129,7 @@
           on:touchstart={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
-          class="console-btn visible"
+          class="visible"
           id={button.id}
           src={button.image}
           alt={button.id}
@@ -148,7 +142,6 @@
           on:mouseout={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
-          class="console-btn"
           id="{button.id}-hover"
           src={button.hover}
           alt={button.id}
@@ -158,67 +151,57 @@
           on:mouseover={() => {
             consoleButtonsHandle(event as Event, button.id, true);
           }}
-          class="console-btn"
           id="{button.id}-active"
           src={button.click}
           alt={button.id}
           draggable="false"
         />
-      </div>
+      </span>
     {/each}
   </div>
-  <picture class="console">
+
+  <picture class="flex">
     <source
       srcset={consolePanel.console.mobilesize}
-      media="(max-width: 600px)"
+      media="(max-width: 768px)"
     />
     <img src={consolePanel.console.fullsize} alt="Console" />
   </picture>
-</div>
+</section>
 
-<style>
-  .console {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+<style lang="scss">
+  @use "/src/styles/mixins" as *;
 
-  .console-panel {
-    position: relative;
-    margin-top: 5vw;
-  }
+  section {
+    position: fixed;
+    bottom: 0;
 
-  .console-buttons {
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    width: 100vw;
-  }
+    div {
+      z-index: 10;
+      position: absolute;
+      gap: 0;
+      bottom: 0;
+      width: 100%;
 
-  .console-btn {
-    display: none;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
+      img {
+        display: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
 
-  .visible {
-    display: block;
-  }
-
-  @media screen and (min-width: 600px) {
-    .console-panel {
-      margin-top: 8.5vw;
+        &.visible {
+          display: block;
+        }
+      }
     }
 
-    .big {
-      width: 20%;
-    }
+    @include respond-up(tablet) {
+      position: relative;
+      margin-top: 2.5rem;
 
-    .small {
-      width: 10%;
+      div {
+        padding-inline: 10%;
+      }
     }
   }
 </style>

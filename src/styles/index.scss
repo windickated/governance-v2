@@ -133,7 +133,7 @@ a {
 
 html {
   text-align: center;
-  padding-block: 4rem 6rem;
+  padding-top: 4rem;
   letter-spacing: 0.025rem;
   word-spacing: 0.2em;
   background-color: $dark-blue;
@@ -143,7 +143,6 @@ html {
 
   @include respond-up('small-desktop') {
     background-color: black;
-    padding-block: 4rem 2rem;
   }
 
   &::-webkit-scrollbar {
