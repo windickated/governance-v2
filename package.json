@@ -24,8 +24,12 @@
     "react": "19.0.0",
     "react-dom": "^19.0.0",
     "svelte": "5.20.5",
+    "tippy.js": "^6.3.7",
     "typescript": "5.8.2",
     "viem": "^2.23.5",
     "wagmi": "^2.14.12"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.89.2"
   }
 }

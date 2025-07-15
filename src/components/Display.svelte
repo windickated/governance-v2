@@ -5,7 +5,7 @@
   import vote from "../utils/vote.ts";
   import { userProvider } from "../stores/auth";
 
-  export let handlePopUpMessage: Function;
+  // export let handlePopUpMessage: Function;
 
   // Format button
   let formatButtonState: boolean = true; // video on, text off
@@ -16,10 +16,10 @@
       document.querySelector(".video");
     if (event.type === "click") {
       if ($episode === -1) {
-        handlePopUpMessage(
-          event as PointerEvent,
-          "There is no episode selected!"
-        );
+        // handlePopUpMessage(
+        //   event as PointerEvent,
+        //   "There is no episode selected!"
+        // );
         return;
       }
       formatButtonState = !formatButtonState;
@@ -48,11 +48,12 @@
               voteButtonState = !voteButtonState;
               vote();
             }, 300);
-          } else
-            handlePopUpMessage(
-              event as PointerEvent,
-              "Please select Base network!"
-            );
+          }
+          // else
+          //   handlePopUpMessage(
+          //     event as PointerEvent,
+          //     "Please select Base network!"
+          //   );
         });
       } else if (event.type === "pointerover" || event.type === "pointerout") {
         voteButtonHover = !voteButtonHover;
@@ -61,11 +62,11 @@
   };
 </script>
 
-<div class="display-screen">
+<section>
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
   <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-  <div class="display-buttons">
-    <div
+  <div>
+    <span
       class="format"
       role="button"
       tabindex="0"
@@ -113,8 +114,8 @@
         alt="Switcher"
         draggable="false"
       />
-    </div>
-    <div
+    </span>
+    <span
       class="vote"
       role="button"
       tabindex="0"
@@ -162,70 +163,74 @@
         alt="Vote"
         draggable="false"
       />
-    </div>
+    </span>
   </div>
-  <picture class="display">
+
+  <picture>
     <source
       srcset={displayScreen.display.mobilesize}
-      media="(max-width: 600px)"
+      media="(max-width: 768px)"
     />
     <img src={displayScreen.display.fullsize} alt="Display" />
   </picture>
+
   <picture class="display-bg">
     <source
       srcset={displayScreen.display.mobileBG}
-      media="(max-width: 600px)"
+      media="(max-width: 768px)"
     />
     <img src={displayScreen.display.BG} alt="Background" />
   </picture>
-</div>
+</section>
 
-<style>
-  .display-screen {
+<style lang="scss">
+  @use "/src/styles/mixins" as *;
+
+  section {
     position: relative;
-    width: 95vw;
-    margin-inline: 2.5vw;
-    margin-top: 2.5vw;
-  }
+    width: 100%;
+    max-width: min(95%, 80rem);
 
-  .display,
-  .display-bg {
-    height: auto;
-  }
+    picture {
+      width: 100%;
 
-  .display-bg {
-    width: 95vw;
-    z-index: -10;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+      &.display-bg {
+        z-index: -10;
+        position: absolute;
+        inset: 0;
+      }
+    }
 
-  .display-buttons {
-    z-index: 10;
-    position: absolute;
-    width: 27.5%;
-    bottom: 0;
-    right: 0;
-    background-image: url("/format.avif");
-    background-position: top;
-    background-size: contain;
-  }
+    div {
+      z-index: 10;
+      position: absolute;
+      width: 27.5%;
+      bottom: 0;
+      right: 0;
+      background-image: url("/format.avif");
+      background-position: top;
+      background-size: contain;
 
-  .format-btn,
-  .vote-btn {
-    display: none;
-    cursor: pointer;
-  }
+      span {
+        img {
+          &.format-btn,
+          &.vote-btn {
+            display: none;
+            cursor: pointer;
+          }
 
-  .visible {
-    display: block;
-  }
-
-  @media screen and (max-width: 600px) {
-    .format-btn,
-    .vote-btn {
-      display: none !important;
+          &.visible {
+            display: block;
+          }
+        }
+      }
     }
   }
+
+  // @media screen and (max-width: 600px) {
+  //   .format-btn,
+  //   .vote-btn {
+  //     display: none !important;
+  //   }
+  // }
 </style>

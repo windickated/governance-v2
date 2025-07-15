@@ -1,0 +1,195 @@
+// UTILITY CLASSES:
+// green, red, purple
+// button-anchor: apply button styling to <a></a> element
+// void-btn: no button styling
+
+@use '/src/styles/mixins' as *;
+
+button:not(.void-btn),
+.button-anchor {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  flex: none;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  outline: none;
+  text-transform: uppercase;
+  @include white-txt(0.9);
+  @include blue(0.75);
+  @include cyan-border(0.5);
+
+  @include respond-up(small-desktop) {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    @include cyan(1, text);
+    @include blue(0.9, bg, bright);
+    @include box-glow;
+    @include scale;
+    @include cyan-border;
+  }
+
+  &:disabled {
+    @include gray(0.25);
+    @include dark-blue(1, text);
+    @include dark-border;
+  }
+
+  img,
+  svg {
+    width: clamp(1.5rem, 2.5vw, 1.75rem);
+  }
+
+  img {
+    border-radius: 10%;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.button-anchor {
+  text-decoration: none !important;
+}
+
+[role='button'] {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+
+  @include respond-up(small-desktop) {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+}
+
+// COLORED STYLING
+
+// Green
+.green-btn:not(.void-btn) {
+  border-color: transparent !important;
+  @include dark-green(0.85, text);
+  @include green(0.75);
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    box-shadow: 0 0 0.5rem $green;
+    @include dark-green(1, text);
+    @include green;
+  }
+}
+
+// Red
+.red-btn:not(.void-btn) {
+  border-color: transparent !important;
+  @include dark-red(0.85, text);
+  @include red(0.75);
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    box-shadow: 0 0 0.5rem $red;
+    @include dark-red(1, text);
+    @include red;
+  }
+}
+
+// Purple
+.purple-btn:not(.void-btn) {
+  border-color: transparent !important;
+  @include purple;
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    box-shadow: 0 0 0.5rem $purple;
+    @include purple(1, bg, bright);
+    @include dark-red(1, text);
+  }
+}
+
+// Orange
+.orange-btn:not(.void-btn) {
+  border-color: transparent !important;
+  @include dark-red(0.85, text);
+  @include orange;
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    box-shadow: 0 0 0.5rem $orange;
+    @include dark-red(1, text);
+    @include orange(1, bg, bright);
+  }
+}
+
+// Rose
+.rose-btn:not(.void-btn) {
+  border-color: transparent !important;
+  @include dark-red(0.85, text);
+  @include rose(0.85);
+
+  &:hover:not(&:disabled),
+  &:active:not(&:disabled),
+  &:focus:not(&:disabled) {
+    box-shadow: 0 0 0.5rem $rose;
+    @include dark-red(1, text);
+    @include rose(1, bg, bright);
+  }
+}
+
+// ADDITIONAL STYLING
+
+.active-btn:not(.void-btn) {
+  background-color: $deep-green !important;
+  color: $white !important;
+  border-color: $green !important;
+}
+
+:where(.void-btn) {
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+
+  @include respond-up(small-desktop) {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+}
+
+.min-size-btn {
+  min-width: unset !important;
+  min-height: unset !important;
+  width: 2.75rem;
+  height: 2.75rem;
+
+  @include respond-up(small-desktop) {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+.sign-button {
+  width: 15rem;
+  justify-content: space-between !important;
+
+  p {
+    width: 100%;
+  }
+
+  @include respond-up(tablet) {
+    width: 25rem;
+  }
+}
