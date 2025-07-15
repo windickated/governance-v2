@@ -4,8 +4,7 @@
   import { selectedNFTs } from "../stores/NFTs.ts";
   import vote from "../utils/vote.ts";
   import { userProvider } from "../stores/auth";
-
-  // export let handlePopUpMessage: Function;
+  import { toastStore } from "../stores/toast.svelte";
 
   // Format button
   let formatButtonState: boolean = true; // video on, text off
@@ -16,10 +15,7 @@
       document.querySelector(".video");
     if (event.type === "click") {
       if ($episode === -1) {
-        // handlePopUpMessage(
-        //   event as PointerEvent,
-        //   "There is no episode selected!"
-        // );
+        toastStore.show("There is no episode selected!", "error");
         return;
       }
       formatButtonState = !formatButtonState;
@@ -48,12 +44,7 @@
               voteButtonState = !voteButtonState;
               vote();
             }, 300);
-          }
-          // else
-          //   handlePopUpMessage(
-          //     event as PointerEvent,
-          //     "Please select Base network!"
-          //   );
+          } else toastStore.show("Please select Base network!", "error");
         });
       } else if (event.type === "pointerover" || event.type === "pointerout") {
         voteButtonHover = !voteButtonHover;
@@ -66,9 +57,9 @@
   <div>
     <button
       class="void-btn format"
-      on:click={switcherHandle}
-      on:pointerover={switcherHandle}
-      on:pointerout={switcherHandle}
+      onclick={switcherHandle}
+      onpointerover={switcherHandle}
+      onpointerout={switcherHandle}
     >
       <img
         class:visible={!formatButtonHover && formatButtonState}
@@ -98,9 +89,9 @@
 
     <button
       class="void-btn vote"
-      on:click={voteButtonHandle}
-      on:pointerover={voteButtonHandle}
-      on:pointerout={voteButtonHandle}
+      onclick={voteButtonHandle}
+      onpointerover={voteButtonHandle}
+      onpointerout={voteButtonHandle}
     >
       <img
         class:visible={!voteIsInactive && !voteButtonHover && voteButtonState}

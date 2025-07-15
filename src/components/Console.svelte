@@ -2,8 +2,7 @@
   import { onMount } from "svelte";
   import { consolePanel } from "../data/buttons.ts";
   import { storyNodes, episode, selectedOption } from "../stores/storyNode.ts";
-
-  // export let handlePopUpMessage: Function;
+  import { toastStore } from "../stores/toast.svelte";
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
@@ -11,9 +10,6 @@
       touchscreenDevice = true;
     }
   });
-
-  let width: number;
-  let consoleBar: HTMLElement;
 
   const consoleButtonsHandle = (
     event: Event,
@@ -78,15 +74,12 @@
             break;
           case "back":
             if ($episode === -1) {
-              // handlePopUpMessage(
-              //   event as PointerEvent,
-              //   "There is no episode selected!"
-              // );
+              toastStore.show("There is no episode selected!", "error");
             } else if ($episode === 0) {
-              // handlePopUpMessage(
-              //   event as PointerEvent,
-              //   "You selected the first episode of this season."
-              // );
+              toastStore.show(
+                "You selected the first episode of this season.",
+                "error"
+              );
             } else {
               $episode--;
               if ($selectedOption) $selectedOption = null;
@@ -94,15 +87,12 @@
             break;
           case "forward":
             if ($episode === -1) {
-              // handlePopUpMessage(
-              //   event as PointerEvent,
-              //   "There is no episode selected!"
-              // );
+              toastStore.show("There is no episode selected!", "error");
             } else if ($episode === $storyNodes.length - 1) {
-              // handlePopUpMessage(
-              //   event as PointerEvent,
-              //   "You selected the last episode of this season."
-              // );
+              toastStore.show(
+                "You selected the last episode of this season.",
+                "error"
+              );
             } else {
               $episode++;
               if ($selectedOption) $selectedOption = null;
@@ -114,19 +104,18 @@
   };
 </script>
 
-<svelte:window bind:outerWidth={width} />
-
-<section bind:this={consoleBar}>
+<section>
   <div class="flex-row">
     {#each consolePanel.buttons as button}
-      <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-      <span class="{button.id} {button.size}" role="button" tabindex="0">
+      <!-- svelte-ignore a11y-click-events-have-key-events
+        a11y-no-noninteractive-element-interactions
+        a11y-mouse-events-have-key-events -->
+      <button class="void-btn">
         <img
-          on:mouseover={() => {
+          onmouseover={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
-          on:touchstart={() => {
+          ontouchstart={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
           class="visible"
@@ -136,10 +125,10 @@
           draggable="false"
         />
         <img
-          on:click={() => {
+          onclick={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
-          on:mouseout={() => {
+          onmouseout={() => {
             consoleButtonsHandle(event as Event, button.id);
           }}
           id="{button.id}-hover"
@@ -148,7 +137,7 @@
           draggable="false"
         />
         <img
-          on:mouseover={() => {
+          onmouseover={() => {
             consoleButtonsHandle(event as Event, button.id, true);
           }}
           id="{button.id}-active"
@@ -156,7 +145,7 @@
           alt={button.id}
           draggable="false"
         />
-      </span>
+      </button>
     {/each}
   </div>
 
@@ -183,14 +172,16 @@
       bottom: 0;
       width: 100%;
 
-      img {
-        display: none;
-        cursor: pointer;
-        width: 100%;
-        height: 100%;
+      button {
+        img {
+          display: none;
+          cursor: pointer;
+          width: 100%;
+          height: 100%;
 
-        &.visible {
-          display: block;
+          &.visible {
+            display: block;
+          }
         }
       }
     }

@@ -3,7 +3,6 @@ interface ConsoleBtn {
   image: string;
   hover: string;
   click: string;
-  size: "big" | "small";
 }
 
 export const consolePanel = {
@@ -13,35 +12,30 @@ export const consolePanel = {
       image: "/conexus.avif",
       hover: "/conexus-hover.avif",
       click: "/conexus-active.avif",
-      size: "big",
     },
     {
       id: "back",
       image: "/back.avif",
       hover: "/back-hover.avif",
       click: "/back-active.avif",
-      size: "small",
     },
     {
       id: "omnihub",
       image: "/omnihub.avif",
       hover: "/omnihub-hover.avif",
       click: "/omnihub-active.avif",
-      size: "big",
     },
     {
       id: "forward",
       image: "/forward.avif",
       hover: "/forward-hover.avif",
       click: "/forward-active.avif",
-      size: "small",
     },
     {
       id: "sagaverse",
       image: "/sagaverse.avif",
       hover: "/sagaverse-hover.avif",
       click: "/sagaverse-active.avif",
-      size: "big",
     },
   ],
   console: {

@@ -1,27 +1,13 @@
 <script lang="ts">
+  import ToastContainer from "./utils/ToastContainer.svelte";
+
   import Display from "../components/Display.svelte";
   import Storynode from "../components/Storynode.svelte";
   import Console from "../components/Console.svelte";
   import Sidebars from "../components/Sidebars.svelte";
-  import PopUpMessage from "./PopUpMessage.svelte";
-
-  // let showMessage: boolean;
-  // let messageNote: string;
-  // let X: number;
-  // let Y: number;
 
   let width = $state<number>(0);
   let scroll = $state<number>(0);
-
-  // const handlePopUpMessage = (event: PointerEvent, note: string) => {
-  //   showMessage = true;
-  //   messageNote = note;
-  //   X = event.clientX;
-  //   Y = event.clientY;
-  //   setTimeout(() => {
-  //     showMessage = false;
-  //   }, 650);
-  // };
 </script>
 
 <svelte:window bind:innerWidth={width} bind:scrollY={scroll} />
@@ -31,9 +17,9 @@
   <!-- <Storynode {handlePopUpMessage} /> -->
   <Console />
   <!-- <Sidebars {handlePopUpMessage} /> -->
-
-  <!-- <PopUpMessage {showMessage} {messageNote} {X} {Y} /> -->
 </main>
+
+<ToastContainer />
 
 <div id="background-image" style:top={`max(-${scroll / 100}vh, -100vh)`}></div>
 
