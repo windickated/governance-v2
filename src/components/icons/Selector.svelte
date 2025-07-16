@@ -4,13 +4,13 @@
     disabled = false,
     hideForMobiles = false,
     glowing = false,
-    color = '#33e2e6',
+    color = "#33e2e6",
     selectorSize = 1.5,
     rotate = null,
   }: {
     focused: Nullable<number | boolean>;
     disabled: boolean;
-    hideForMobiles: boolean;
+    hideForMobiles?: boolean;
     glowing?: boolean;
     color?: string;
     selectorSize?: number;
@@ -22,7 +22,6 @@
   class:focused
   class:disabled={disabled && !focused}
   class:pc-only={hideForMobiles}
-  class:inherit-color={rotate}
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
   stroke-width="20"
@@ -54,20 +53,18 @@
 </svg>
 
 <style lang="scss">
-  @use '/src/styles/mixins' as *;
+  @use "/src/styles/mixins" as *;
 
   svg {
     flex: none;
+    width: 2rem !important;
+    stroke: inherit !important;
+    fill: inherit !important;
 
     &.focused {
       polygon {
         transform: scaleX(1.5);
       }
-    }
-
-    &.inherit-color {
-      stroke: inherit !important;
-      fill: inherit !important;
     }
   }
 </style>
