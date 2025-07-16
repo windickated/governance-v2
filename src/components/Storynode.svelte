@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import {
     storyNodes,
     story,
@@ -9,22 +8,15 @@
     votingResults,
     checkingResults,
     abortVotingCheck,
-  } from "../stores/storyNode.ts";
-  import { selectedNFTs } from "../stores/NFTs.ts";
-  import { walletAddress } from "../stores/auth.ts";
-  import vote from "../utils/vote.ts";
-  import checkVote from "../lib/voting.js";
-  import { userProvider } from "../stores/auth";
-
-  export let handlePopUpMessage: Function;
+  } from "@stores/storyNode.ts";
+  import { selectedNFTs } from "@stores/NFTs.ts";
+  import { walletAddress } from "@stores/auth.ts";
+  import vote from "@utils/vote.ts";
+  import checkVote from "@lib/voting.js";
+  import { userProvider } from "@stores/auth";
+  import { toastStore } from "@stores/toast.svelte";
 
   let width: number;
-  let mobileTextVisibility: boolean = false;
-  $: optionsCounter = $story ? $story.votes_options.length : 0;
-
-  onMount(() => {
-    if (width > 600) mobileTextVisibility = true;
-  });
 
   let votingCountdown: string = "";
   let interval: NodeJS.Timeout;
@@ -78,7 +70,7 @@
   async function checkVotingResults() {
     const votes = await checkVote($episode);
     const optionsCount = $story!.votes_options.length;
-    const optionVotes = [];
+    const optionVotes: any[] = [];
     for (let i = 1; i <= optionsCount; i++) {
       const result = votes!.filter((vote) => vote == i);
       optionVotes.push({
@@ -110,28 +102,21 @@
   }
 
   function selectOption(event: Event) {
-    const target = event.target as HTMLDivElement;
+    const target = event.target as HTMLButtonElement;
     const optionContainer =
-      target.localName === "div"
+      target.localName === "button"
         ? target
-        : (target.parentElement as HTMLDivElement);
-    const optionSelector = optionContainer?.children[0] as HTMLImageElement;
+        : (target.parentElement as HTMLButtonElement);
     const optionID = Number(optionContainer?.id);
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
     if ($storyNodes[$episode].ended) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        "Voting period for this episode is ended."
-      );
+      toastStore.show("Voting period for this episode is ended", "error");
       return;
     }
     if ($selectedNFTs.length === 0) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        "Select any Potential to vote!"
-      );
+      toastStore.show("Select any Potential to vote!", "error");
       return;
     }
     if (optionContainer.dataset.class) {
@@ -141,9 +126,9 @@
       });
     }
     if (!classMatch) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        `This option is only for the ${optionContainer.dataset.class} class!`
+      toastStore.show(
+        `This option is only for the ${optionContainer.dataset.class} class!`,
+        "error"
       );
       return;
     }
@@ -154,11 +139,7 @@
         const baseNetwork: number = 8453;
         console.log(network);
         if (Number(network.chainId) === baseNetwork) vote();
-        else
-          handlePopUpMessage(
-            event as PointerEvent,
-            "Please select Base network!"
-          );
+        else toastStore.show("Please select Base network!", "error");
       });
     }
   }
@@ -166,231 +147,158 @@
 
 <svelte:window bind:innerWidth={width} />
 
-<section class="story-node-wraper">
-  <div class="legend blur">
-    {#if $story}
-      <h1 class="header">
-        {$story.season ? $story.title : $story.episodeName}
-      </h1>
-      <h1 class="season-episode-number">
-        The Dischordian Saga: Season {$season} - Episode {$episode + 1}
-      </h1>
-      <div class="voting-period">
-        {#if $storyNodes[$episode].ended}
-          <div class="voting-info">
-            <p>{$story.duration}</p>
-            <span>|</span>
-            <p style="color: rgba(255, 60, 64, 0.9);">Voting ended</p>
-          </div>
-          {#if $votingResults}
-            <p class="participation">
-              Option: <strong>{$votingResults.win}</strong>
-              | Participation:
-              <strong
-                >{Math.round(
-                  ($votingResults.participation / 1035) * 100
-                )}%</strong
-              >
-            </p>
-          {:else}
-            <div class="check-votes">
-              {#if $checkingResults !== -1}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 100 100"
-                  class="loading-svg"
-                  stroke="transparent"
-                  stroke-width="7.5"
-                  stroke-dasharray="288.5"
-                  stroke-linecap="round"
-                  fill="none"
-                >
-                  <path
-                    d="
-                      M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
-                    "
-                    transform-origin="50 50"
-                  />
-                </svg>
-                <p style="color: rgba(51, 226, 230, 0.75)">Loading...</p>
-                <div class="progress-bar">
-                  <div
-                    class="progress-thumb loading-animation"
-                    style="width: {$checkingResults}%;"
-                  ></div>
-                </div>
-                <p>{Math.round($checkingResults)}%</p>
-              {:else}
-                <button on:click={checkVotingResults}> Check Results </button>
-              {/if}
-            </div>
-          {/if}
-        {:else}
-          <div class="voting-info">
-            <p>{$story.duration}</p>
-            <span>|</span>
-            <p style="color: rgba(0, 185, 55, 0.9);">Voting active</p>
-          </div>
-          <p
-            class="countdown"
-            style={endSoon ? "color: rgba(255, 60, 64, 0.9);" : ""}
-          >
-            {votingCountdown}
-          </p>
-        {/if}
-      </div>
-      {#if $votingResults && $season == 1 && $episode == 2}
-        <p class="additional-voting-note">(+2.5% from TikTok)</p>
-      {/if}
-    {:else if $walletAddress || $storyNodes.length > 0}
-      <h1 class="empty-header" class:pulse-animation={$storyNodes.length == 0}>
-        {#if $storyNodes.length == 0}
-          Loading episodes...
-        {:else}
-          Select any episode from the tab
-        {/if}
-      </h1>
-    {:else}
-      <h1 class="empty-header">Please Sign in Your Profile</h1>
-    {/if}
-  </div>
-
-  {#if $story}
+{#if $story}
+  <section>
     <iframe
       src={$story.season
         ? `https://www.youtube.com/embed/${$story.video_url}`
         : $story.video_url}
-      class="video visible"
+      class="visible"
+      id="video"
       title="YouTube"
       allowfullscreen
     ></iframe>
 
-    <div class="text">
-      {#if width <= 600}
-        <button
-          class="story-text-visibility"
-          on:click={() => {
-            mobileTextVisibility = !mobileTextVisibility;
-          }}
-          style={mobileTextVisibility
-            ? "border-bottom: 0.1vw solid rgba(51, 226, 230, 0.5)"
-            : ""}
-        >
-          {(mobileTextVisibility ? "Hide" : "Show") + " story text"}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="-100 -100 200 200"
-            class="option-selector-svg"
-            fill="rgb(51, 226, 230)"
-            stroke="rgb(51, 226, 230)"
-            stroke-width="20"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-label={mobileTextVisibility ? "Hide" : "Show"}
-            style={mobileTextVisibility ? "transform: rotate(180deg)" : ""}
-          >
-            <polygon
-              class="option-selector-icon"
-              points="
-                -40 -90 -40 90 50 0
-              "
-              opacity="0.75"
-              transform="rotate(90)"
-            />
-          </svg>
-        </button>
-        {#if mobileTextVisibility}
-          <div class="text-wrapper">
-            {$story.description}
+    <article id="description">
+      {$story.description}
+    </article>
+  </section>
+{/if}
+
+<div class="legend blur">
+  {#if $story}
+    <h1 class="header">
+      {$story.season ? $story.title : $story.episodeName}
+    </h1>
+    <h1 class="season-episode-number">
+      The Dischordian Saga: Season {$season} - Episode {$episode + 1}
+    </h1>
+    <div class="voting-period">
+      {#if $storyNodes[$episode].ended}
+        <div class="voting-info">
+          <p>{$story.duration}</p>
+          <span>|</span>
+          <p style="color: rgba(255, 60, 64, 0.9);">Voting ended</p>
+        </div>
+        {#if $votingResults}
+          <p class="participation">
+            Option: <strong>{$votingResults.win}</strong>
+            | Participation:
+            <strong
+              >{Math.round(
+                ($votingResults.participation / 1035) * 100
+              )}%</strong
+            >
+          </p>
+        {:else}
+          <div class="check-votes">
+            {#if $checkingResults !== -1}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100 100"
+                class="loading-svg"
+                stroke="transparent"
+                stroke-width="7.5"
+                stroke-dasharray="288.5"
+                stroke-linecap="round"
+                fill="none"
+              >
+                <path
+                  d="
+                    M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
+                  "
+                  transform-origin="50 50"
+                />
+              </svg>
+              <p style="color: rgba(51, 226, 230, 0.75)">Loading...</p>
+              <div class="progress-bar">
+                <div
+                  class="progress-thumb loading-animation"
+                  style="width: {$checkingResults}%;"
+                ></div>
+              </div>
+              <p>{Math.round($checkingResults)}%</p>
+            {:else}
+              <button on:click={checkVotingResults}> Check Results </button>
+            {/if}
           </div>
         {/if}
       {:else}
-        {$story.description}
+        <div class="voting-info">
+          <p>{$story.duration}</p>
+          <span>|</span>
+          <p style="color: rgba(0, 185, 55, 0.9);">Voting active</p>
+        </div>
+        <p
+          class="countdown"
+          style={endSoon ? "color: rgba(255, 60, 64, 0.9);" : ""}
+        >
+          {votingCountdown}
+        </p>
       {/if}
     </div>
-
-    <div
-      class="options"
-      style="
-        font-size: {width > 600 && optionsCounter >= 5
-        ? `${10 / optionsCounter}vw`
-        : '2.5vw'}
-      "
-    >
-      <!-- svelte-ignore a11y_click_events_have_key_events -->
-      {#each $story.votes_options as option, index}
-        <div
-          class="option"
-          role="button"
-          tabindex="0"
-          id={(index + 1).toString()}
-          data-class={option.class}
-          on:click={selectOption}
-          style={$selectedOption == index + 1
-            ? "text-shadow: 0 0 0.1vw rgb(51, 226, 230); color: rgb(51, 226, 230);"
-            : ""}
-        >
-          {#if option.class}
-            <img
-              class="option-selector"
-              src="/{option.class}.png"
-              alt="Selector"
-              style="height: {width > 600 &&
-                (optionsCounter >= 5 ? `${12.5 / optionsCounter}vw` : '2.5vw')}
-              "
-            />
-          {:else}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="-100 -100 200 200"
-              class="option-selector-svg option-selector"
-              fill={$selectedOption == index + 1
-                ? "rgb(51, 226, 230)"
-                : "#dedede"}
-              stroke={$selectedOption == index + 1
-                ? "rgb(51, 226, 230)"
-                : "#dedede"}
-              stroke-width="20"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              style="height: {width > 600 &&
-                (optionsCounter >= 5 ? `${12.5 / optionsCounter}vw` : '2.5vw')}
-              "
-            >
-              <polygon
-                class="option-selector-icon"
-                points="-40 -90 -40 90 50 0"
-                style="transform: {$selectedOption == index + 1
-                  ? 'scaleX(1.5)'
-                  : ''}"
-              />
-            </svg>
-          {/if}
-          {#if $votingResults}
-            ({$votingResults.results[index].votes})
-          {/if}
-          {option.option}
-        </div>
-      {/each}
-    </div>
+    {#if $votingResults && $season == 1 && $episode == 2}
+      <p class="additional-voting-note">(+2.5% from TikTok)</p>
+    {/if}
+  {:else if $walletAddress || $storyNodes.length > 0}
+    <h1 class="empty-header" class:pulse-animation={$storyNodes.length == 0}>
+      {#if $storyNodes.length == 0}
+        Loading episodes...
+      {:else}
+        Select any episode from the tab
+      {/if}
+    </h1>
+  {:else}
+    <h1 class="empty-header">Please Sign in Your Profile</h1>
   {/if}
-</section>
+</div>
 
-<style>
-  .story-node-wraper {
-    width: 90vw;
-    margin-inline: 5vw;
-  }
+{#if $story}
+  <ul class="options">
+    {#each $story.votes_options as option, index}
+      <button
+        class="void-btn"
+        id={(index + 1).toString()}
+        data-class={option.class}
+        on:click={selectOption}
+        style={$selectedOption == index + 1
+          ? "text-shadow: 0 0 0.1vw rgb(51, 226, 230); color: rgb(51, 226, 230);"
+          : ""}
+      >
+        {#if option.class}
+          <img src="/{option.class}.png" alt="Selector" />
+        {:else}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-100 -100 200 200"
+            fill={$selectedOption == index + 1
+              ? "rgb(51, 226, 230)"
+              : "#dedede"}
+            stroke={$selectedOption == index + 1
+              ? "rgb(51, 226, 230)"
+              : "#dedede"}
+            stroke-width="20"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon
+              points="-40 -90 -40 90 50 0"
+              style="transform: {$selectedOption == index + 1
+                ? 'scaleX(1.5)'
+                : ''}"
+            />
+          </svg>
+        {/if}
+        {#if $votingResults}
+          ({$votingResults.results[index].votes})
+        {/if}
+        {option.option}
+      </button>
+    {/each}
+  </ul>
+{/if}
 
-  .video {
-    position: absolute;
-    height: 47.25vw;
-    width: 84.5vw;
-    top: 10.25vw;
-    left: 7.75vw;
-    display: none;
-  }
-
+<!-- <style>
   .legend {
     display: flex;
     flex-direction: column;
@@ -530,10 +438,6 @@
   .story-text-visibility:active {
     transform: none;
     filter: none;
-  }
-
-  .visible {
-    display: block;
   }
 
   .text::-webkit-scrollbar {
@@ -767,6 +671,41 @@
     }
     100% {
       opacity: 0;
+    }
+  }
+</style> -->
+
+<style lang="scss">
+  @use "/src/styles/mixins" as *;
+
+  section {
+    position: absolute;
+    top: 10.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(95%, 80rem);
+    padding-inline: 4.5rem;
+
+    iframe,
+    article {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+      display: none;
+    }
+
+    .visible {
+      display: block;
+    }
+
+    article {
+      overflow-y: scroll;
+      white-space: pre-wrap;
+      text-align: left;
+      padding: 1rem 2rem;
+      @include white-txt(soft);
+      @include font(h5);
     }
   }
 </style>

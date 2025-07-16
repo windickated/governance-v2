@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { showModal } from "../stores/modal.ts";
+  import { showModal } from "@stores/modal.ts";
   import {
     NFT,
     potentials,
@@ -9,14 +9,14 @@
     selectedNFTs,
     checkingDelegations,
     fetchingDelegations,
-  } from "../stores/NFTs.ts";
-  import { walletAddress } from "../stores/auth";
+  } from "@stores/NFTs.ts";
+  import { walletAddress } from "@stores/auth.ts";
   import {
     checkAddress,
     approveNFTs,
     claimNFTs,
     checkDelegatedWallets,
-  } from "../lib/potentials.js";
+  } from "@lib/potentials.js";
 
   let dialog: HTMLDialogElement;
   let userAddress: string = "";

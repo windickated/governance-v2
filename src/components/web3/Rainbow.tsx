@@ -12,9 +12,9 @@ import { base } from 'wagmi/chains';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { walletAddress, username, userProvider } from '../stores/auth';
-import { potentials, getNFTs } from "../stores/NFTs";
-import { storyNodes, get_nodes, activeEpisode, season, episode } from "../stores/storyNode.ts";
+import { walletAddress, username, userProvider } from '@stores/auth.ts';
+import { potentials, getNFTs } from "@stores/NFTs.ts";
+import { storyNodes, get_nodes, activeEpisode, season, episode } from "@stores/storyNode.ts";
 
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({

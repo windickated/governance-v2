@@ -1,10 +1,11 @@
 <script lang="ts">
-  import ToastContainer from "./utils/ToastContainer.svelte";
+  import ToastContainer from "@components/utils/ToastContainer.svelte";
+  import Modal from "@components/utils/Modal.svelte";
 
-  import Display from "../components/Display.svelte";
-  import Storynode from "../components/Storynode.svelte";
-  import Console from "../components/Console.svelte";
-  import Sidebars from "../components/Sidebars.svelte";
+  import Display from "@components/Display.svelte";
+  import Storynode from "@components/Storynode.svelte";
+  import Console from "@components/Console.svelte";
+  import Sidebars from "@components/Sidebars.svelte";
 
   let width = $state<number>(0);
   let scroll = $state<number>(0);
@@ -14,10 +15,12 @@
 
 <main class="fade-in" style:transform="none">
   <Display />
-  <!-- <Storynode {handlePopUpMessage} /> -->
+  <Storynode />
   <Console />
-  <!-- <Sidebars {handlePopUpMessage} /> -->
+  <Sidebars />
 </main>
+
+<Modal />
 
 <ToastContainer />
 

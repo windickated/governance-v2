@@ -10,15 +10,16 @@
   let formatButtonState: boolean = true; // video on, text off
   let formatButtonHover: boolean = false;
   const switcherHandle = (event: Event) => {
-    const storyText: HTMLDivElement | null = document.querySelector(".text");
-    const storyVideo: HTMLIFrameElement | null =
-      document.querySelector(".video");
+    const storyText = document.getElementById("description") as HTMLElement;
+    const storyVideo = document.getElementById("video") as HTMLIFrameElement;
     if (event.type === "click") {
       if ($episode === -1) {
         toastStore.show("There is no episode selected!", "error");
         return;
       }
       formatButtonState = !formatButtonState;
+      console.log(storyText);
+      console.log(storyVideo);
       storyText?.classList.toggle("visible");
       storyVideo?.classList.toggle("visible");
     } else if (event.type === "pointerover" || event.type === "pointerout") {

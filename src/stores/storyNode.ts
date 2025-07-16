@@ -49,7 +49,8 @@ export const get_nodes = async () => {
   let progress: number = 0;
   loadingStories.set(progress);
 
-  for (let i = 0; i < count; i++) {
+  // for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 1; i++) {
     loadingStories.set(progress += storyPercent);
     console.log('Fetching Episode ' + (i + 1).toString()); //
     let ipfs_uri = await (await contract("alchemy")).storyNodeMetadata(i);

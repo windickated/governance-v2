@@ -1,6 +1,6 @@
 <script>
-  import { toastStore } from "/src/stores/toast.svelte";
-  import Toast from "/src/components/utils/Toast.svelte";
+  import { toastStore } from "@stores/toast.svelte";
+  import Toast from "@components/utils/Toast.svelte";
 </script>
 
 <div class="flex">

@@ -8,20 +8,19 @@
     get_nodes,
     loadingStories,
     activeEpisode,
-  } from "../stores/storyNode.ts";
+  } from "@stores/storyNode.ts";
   import {
     potentials,
     selectedNFTs,
     nftVote,
     listedNumbers,
     fetchingDelegations,
-  } from "../stores/NFTs.ts";
-  import { walletAddress, username } from "../stores/auth";
-  import { showModal } from "../stores/modal";
-  import Modal from "./Modal.svelte";
-  import WalletConnect from "./WalletConnect.svelte";
+  } from "@stores/NFTs.ts";
+  import { walletAddress, username } from "@stores/auth";
+  import { showModal } from "@stores/modal";
+  import { toastStore } from "@stores/toast.svelte";
 
-  export let handlePopUpMessage: Function;
+  import WalletConnect from "@components/web3/WalletConnect.svelte";
 
   /* --- EPISODES --- */
 
@@ -85,37 +84,23 @@
     $potentials.map((potential) => {
       if (potential.id.toString() === nftTile?.id) {
         if ($listedNumbers.includes(Number(nftTile?.id))) {
-          handlePopUpMessage(
-            event as PointerEvent,
-            "Delist this Potential to vote!"
-          );
+          toastStore.show("Delist this Potential to vote!", "error");
           return;
         }
         if ($episode === -1) {
-          handlePopUpMessage(
-            event as PointerEvent,
-            "There is no episode selected!"
-          );
+          toastStore.show("There is no episode selected!", "error");
           return;
         }
         if ($storyNodes[$episode].ended) {
           if (vote !== 0)
-            handlePopUpMessage(
-              event as PointerEvent,
-              `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option.`
+            toastStore.show(
+              `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option`
             );
-          else
-            handlePopUpMessage(
-              event as PointerEvent,
-              "This Potential missed voting."
-            );
+          else toastStore.show("This Potential missed voting", "error");
           return;
         }
         if (vote !== 0 && !potential.selected) {
-          handlePopUpMessage(
-            event as PointerEvent,
-            `This Potential will change his decision.`
-          );
+          toastStore.show("This Potential will change his decision");
         }
         if ($selectedOption) $selectedOption = null;
         potential.selected = !potential.selected;
@@ -132,18 +117,12 @@
   let selectCondition: string;
   const selectMultipleNFTs = () => {
     if ($episode === -1) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        "There is no episode selected!"
-      );
+      toastStore.show("There is no episode selected!", "error");
       if (selectCondition) selectCondition = "";
       return;
     }
     if ($storyNodes[$episode].ended) {
-      handlePopUpMessage(
-        event as PointerEvent,
-        "Voting for this episode is finished."
-      );
+      toastStore.show("Voting for this episode is finished", "error");
       if (selectCondition) selectCondition = "";
       return;
     }
@@ -754,8 +733,6 @@
     {/if}
   {/if}
 </div>
-
-<Modal />
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions
 a11y-no-static-element-interactions -->
