@@ -152,7 +152,7 @@
   <picture class="flex">
     <source
       srcset={consolePanel.console.mobilesize}
-      media="(max-width: 768px)"
+      media="(max-width: 1024px)"
     />
     <img src={consolePanel.console.fullsize} alt="Console" />
   </picture>
@@ -186,7 +186,7 @@
       }
     }
 
-    @include respond-up(tablet) {
+    @include respond-up(small-desktop) {
       position: relative;
       margin-top: 2.5rem;
 
