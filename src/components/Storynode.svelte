@@ -19,10 +19,9 @@
   import SelectorSVG from "@components/icons/Selector.svelte";
   import LoadingSVG from "@components/icons/Loading.svelte";
 
-  let width: number;
-
   let votingCountdown: string = "";
   let interval: NodeJS.Timeout;
+
   $: if ($storyNodes.length > 0) {
     clearInterval(interval);
     votingCountdown = "0:00:00:00";
@@ -104,13 +103,10 @@
     $checkingResults = -1;
   }
 
-  function selectOption(event: Event) {
-    const target = event.target as HTMLButtonElement;
-    const optionContainer =
-      target.localName === "button"
-        ? target
-        : (target.parentElement as HTMLButtonElement);
-    const optionID = Number(optionContainer?.id);
+  function selectOption(
+    optionID: number,
+    optionClass: string | undefined = undefined
+  ) {
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
@@ -122,15 +118,15 @@
       toastStore.show("Select any Potential to vote!", "error");
       return;
     }
-    if (optionContainer.dataset.class) {
+    if (optionClass) {
       $selectedNFTs.forEach((nft) => {
-        if (optionContainer.dataset.class != nft.class && nft.class != "Ne-Yon")
+        if (optionClass != nft.class && nft.class != "Ne-Yon")
           classMatch = false;
       });
     }
     if (!classMatch) {
       toastStore.show(
-        `This option is only for the ${optionContainer.dataset.class} class!`,
+        `This option is only for the ${optionClass} class!`,
         "error"
       );
       return;
@@ -147,27 +143,6 @@
   }
 </script>
 
-<!-- <section>
-  {#if $story}
-    <div class="content">
-      <iframe
-        src={$story.season
-          ? `https://www.youtube.com/embed/${$story.video_url}`
-          : $story.video_url}
-        id="video"
-        title="YouTube"
-        allowfullscreen
-      ></iframe>
-
-      <article class="visible" id="description">
-        {$story.description}
-      </article>
-    </div>
-  {/if}
-
-
-</section> -->
-
 <header class="flex pad round-32">
   <h1 class="sr-only">Galactic Governance Hub</h1>
   {#if $story}
@@ -175,13 +150,17 @@
       {$story.season ? $story.title : $story.episodeName}
     </h2>
     <h3>The Dischordian Saga: Season {$season} - Episode {$episode + 1}</h3>
-    <div class="flex-row">
+    <section class="flex-row pad-8 round">
+      <div class="voting-info flex-row round">
+        <h5>{$story.duration}</h5>
+        <span class="dark-txt">|</span>
+        <p class="validation" class:green-txt={!$storyNodes[$episode].ended}>
+          Voting
+          {$storyNodes[$episode].ended ? "ended" : "active"}
+        </p>
+      </div>
+
       {#if $storyNodes[$episode].ended}
-        <div class="flex-row">
-          <p>{$story.duration}</p>
-          <span>|</span>
-          <p style="color: rgba(255, 60, 64, 0.9);">Voting ended</p>
-        </div>
         {#if $votingResults}
           <p>
             Option: <strong>{$votingResults.win}</strong>
@@ -205,21 +184,16 @@
               </div>
               <p>{Math.round($checkingResults)}%</p>
             {:else}
-              <button class="button-glowing" on:click={checkVotingResults}>
+              <button class="button-glowing" onclick={checkVotingResults}>
                 Check Results
               </button>
             {/if}
           </div>
         {/if}
       {:else}
-        <div class="voting-info">
-          <p>{$story.duration}</p>
-          <span>|</span>
-          <p>Voting active</p>
-        </div>
         <p style={endSoon ? "color: red;" : ""}>{votingCountdown}</p>
       {/if}
-    </div>
+    </section>
     {#if $votingResults && $season == 1 && $episode == 2}
       <p class="additional-voting-note">(+2.5% from TikTok)</p>
     {/if}
@@ -237,14 +211,16 @@
 </header>
 
 {#if $story}
+  <article>
+    {$story.description}
+  </article>
+
   <ul class="mobile-options flex pad">
     {#each $story.votes_options as option, index}
       <button
         class="void-btn flex-row"
         class:selected={$selectedOption == index + 1}
-        id={(index + 1).toString()}
-        data-class={option.class}
-        on:click={selectOption}
+        onclick={() => selectOption(index + 1, option.class)}
       >
         {#if option.class}
           <img src="/{option.class}.png" alt="Selector" />
@@ -263,68 +239,37 @@
   </ul>
 {/if}
 
-<!-- <style>
-  .voting-period {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    width: 90%;
-    color: #bebebe;
-    background-color: #07387d;
-    box-shadow: 0 0.5vw 0.5vw rgba(1, 0, 32, 0.25);
-    border: 0.1vw solid #203962;
-    border-radius: 1.5vw;
-    padding: 1vw 2vw;
-    font-size: 1.5vw;
-    line-height: 1.5vw;
-    gap: 2vw;
-  }
-
-  .voting-info {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 2vw;
-    padding: 1vw 2vw;
-    border-radius: 1vw;
-    background-color: #01204e;
-    border: 0.1vw solid #203962;
-    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.25);
-  }
-
-  .voting-info span {
-    color: #010020;
-  }
-
-  .participation {
-    color: rgba(51, 226, 230, 0.75);
-    white-space: nowrap;
-  }
-</style> -->
-
 <style lang="scss">
   @use "/src/styles/mixins" as *;
 
   header {
-    width: min(85%, 70rem);
-    justify-content: space-between;
+    width: 100%;
+    max-width: 70rem;
     background-color: #01204e;
     border: 2px solid #203962;
     @include box-shadow;
 
     h3 {
-      @include white-txt(0.5);
+      @include white-txt(soft);
+    }
+
+    section {
+      width: 100%;
+      background-color: #07387d;
+      border: 2px solid #203962;
+      @include box-shadow;
+
+      .voting-info {
+        padding: 0.5rem 1.5rem;
+        background-color: #01204e;
+        border: 0.1vw solid #203962;
+        @include box-shadow(soft, inset);
+      }
     }
   }
 
   ul {
     align-items: flex-start;
-
-    @include respond-up(small-desktop) {
-      display: none;
-    }
 
     button {
       fill: $white;
@@ -343,6 +288,13 @@
       img {
         width: 2rem;
       }
+    }
+  }
+
+  @include respond-up(small-desktop) {
+    article,
+    ul {
+      display: none;
     }
   }
 </style>

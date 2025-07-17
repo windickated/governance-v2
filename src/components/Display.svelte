@@ -17,13 +17,10 @@
   let storyVideo: HTMLIFrameElement;
   let storyText: HTMLElement;
 
-  function selectOption(event: Event) {
-    const target = event.target as HTMLButtonElement;
-    const optionContainer =
-      target.localName === "button"
-        ? target
-        : (target.parentElement as HTMLButtonElement);
-    const optionID = Number(optionContainer?.id);
+  function selectOption(
+    optionID: number,
+    optionClass: string | undefined = undefined
+  ) {
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
@@ -35,15 +32,15 @@
       toastStore.show("Select any Potential to vote!", "error");
       return;
     }
-    if (optionContainer.dataset.class) {
+    if (optionClass) {
       $selectedNFTs.forEach((nft) => {
-        if (optionContainer.dataset.class != nft.class && nft.class != "Ne-Yon")
+        if (optionClass != nft.class && nft.class != "Ne-Yon")
           classMatch = false;
       });
     }
     if (!classMatch) {
       toastStore.show(
-        `This option is only for the ${optionContainer.dataset.class} class!`,
+        `This option is only for the ${optionClass} class!`,
         "error"
       );
       return;
@@ -118,9 +115,7 @@
         <button
           class="void-btn flex-row"
           class:selected={$selectedOption == index + 1}
-          id={(index + 1).toString()}
-          data-class={option.class}
-          onclick={selectOption}
+          onclick={() => selectOption(index + 1, option.class)}
         >
           {#if option.class}
             <img src="/{option.class}.png" alt="Selector" />
@@ -257,7 +252,6 @@
         white-space: pre-wrap;
         text-align: left;
         padding: 1rem 2rem;
-        background-color: rgba(255, 255, 255, 0.25);
         @include white-txt(soft);
         @include font(h5);
       }
