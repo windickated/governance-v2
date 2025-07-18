@@ -162,8 +162,8 @@
   @use "/src/styles/mixins" as *;
 
   section {
-    position: fixed;
-    bottom: 0;
+    position: relative;
+    margin-top: 2.5rem;
 
     div {
       z-index: 10;
@@ -187,9 +187,6 @@
     }
 
     @include respond-up(small-desktop) {
-      position: relative;
-      margin-top: 2.5rem;
-
       div {
         padding-inline: 10%;
       }

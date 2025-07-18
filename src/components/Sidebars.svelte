@@ -21,6 +21,9 @@
   import { toastStore } from "@stores/toast.svelte";
 
   import WalletConnect from "@components/web3/WalletConnect.svelte";
+  import ResetSVG from "@components/icons/Reset.svelte";
+  import RefreshSVG from "@components/icons/Refresh.svelte";
+  import ContractSVG from "@components/icons/Contract.svelte";
 
   let nftIcon: HTMLSpanElement;
   let episodesIcon: HTMLSpanElement;
@@ -485,116 +488,21 @@
           <option value="Engineer">Engineer</option>
           <option value="Oracle">Oracle</option>
         </select>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="-100 -100 200 200"
-          class="reset-svg filter-image"
-          fill="#dedede"
-          stroke="#dedede"
-          stroke-width="20"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <ResetSVG
           onclick={() => {
             if (!$selectedNFTs || $selectedNFTs.length == 0) return;
             undoSelection();
             selectCondition = "";
           }}
-          style={!$selectedNFTs || $selectedNFTs.length == 0
-            ? "transform: none; fill: #010020; stroke: #010020; opacity: 0.25; cursor: not-allowed;"
-            : ""}
-          role="button"
-          tabindex="0"
-          aria-label="Undo selection"
-          aria-disabled={selectCondition !== ""}
-        >
-          <path
-            d="
-              M 70 -50
-              A 85 85 0 1 0 85 0
-            "
-            fill="none"
-          />
-          <polygon
-            points="
-              70 -50 60 -90 30 -55
-            "
-          />
-        </svg>
+          disabled={selectCondition === ""}
+        />
       </span>
     {:else}
       <p>Connect Wallet:</p>
     {/if}
     <span class="sign-button-wrapper flex-row">
       {#if $walletAddress}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="-100 -100 200 200"
-          class="contract-svg"
-          fill="#dedede"
-          stroke="#dedede"
-          stroke-width="7.5"
-          stroke-linejoin="round"
-          stroke-linecap="round"
-          onclick={() => ($showModal = true)}
-          onpointerover={() => (contractSvgFocus = true)}
-          onpointerout={() => (contractSvgFocus = false)}
-          role="button"
-          tabindex="0"
-          aria-label="Delegations"
-        >
-          <g style="opacity: {contractSvgFocus ? '0.5' : '1'}">
-            <path
-              d="
-                M -10 75
-                L -85 75
-                L -85 -85
-                L 45 -85
-                L 45 -15
-              "
-              fill="none"
-              stroke-width="12"
-            />
-            <circle r="35" cx="-20" cy="-30" fill="none" />
-            <path
-              d="
-                M -40 -30
-                L -25 -15
-                L 0 -40
-              "
-              fill="none"
-            />
-            <path
-              d="
-                M -65 25
-                L -15 25
-                M -65 45
-                L -25 45
-              "
-            />
-          </g>
-          <g
-            style={contractSvgFocus
-              ? "stroke: rgb(0, 185, 55); transform: scale(1.1) translate(-5%, -2.5%);"
-              : ""}
-          >
-            <g transform="rotate(45) translate(40 -30)">
-              <ellipse rx="35" ry="10" cx="15" cy="60" fill="none" />
-              <path
-                d="
-                  M -20 60
-                  L -20 35
-                  Q 15 20 50 35
-                  L 50 60
-                  M 0 27
-                  Q 10 10 0 -10
-                  C -15 -50 45 -50 30 -10
-                  Q 20 10 30 27
-                "
-                fill="none"
-              />
-            </g>
-          </g>
-        </svg>
+        <ContractSVG onclick={() => ($showModal = true)} />
       {/if}
       <WalletConnect />
     </span>
@@ -611,44 +519,11 @@
           {/if}
           NFTs: {$potentials.length}
         </p>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="-100 -100 200 200"
-          class="refresh-svg"
-          fill="rgb(51, 226, 230)"
-          stroke="rgb(51, 226, 230)"
-          stroke-width="20"
-          stroke-linejoin="round"
-          stroke-linecap="round"
+        <RefreshSVG
           onclick={() => {
             $potentials = $potentials;
           }}
-          onpointerover={() => (refreshSvgFocus = true)}
-          onpointerout={() => (refreshSvgFocus = false)}
-          role="button"
-          tabindex="0"
-        >
-          <g
-            id="refresh-arrow"
-            style="transform: {refreshSvgFocus
-              ? 'scale(0.75) rotate(360deg)'
-              : 'none'}"
-          >
-            <path
-              d="
-                M -75 -30
-                A 80 80 0 0 1 75 -30
-              "
-              fill="none"
-            />
-            <polygon
-              points="
-                75 -30 75 -70 40 -40
-              "
-            />
-          </g>
-          <use href="#refresh-arrow" transform="rotate(180)" />
-        </svg>
+        />
 
         <p>Selected NFTs: {$selectedNFTs.length}</p>
       </span>
