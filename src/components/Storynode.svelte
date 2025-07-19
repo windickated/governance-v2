@@ -8,23 +8,23 @@
     votingResults,
     checkingResults,
     abortVotingCheck,
-  } from "@stores/storyNode.ts";
-  import { selectedNFTs } from "@stores/NFTs.ts";
-  import { walletAddress } from "@stores/auth.ts";
-  import vote from "@utils/vote.ts";
-  import checkVote from "@lib/voting.js";
-  import { userProvider } from "@stores/auth";
-  import { toastStore } from "@stores/toast.svelte";
+  } from '@stores/storyNode.ts';
+  import { selectedNFTs } from '@stores/NFTs.ts';
+  import { walletAddress } from '@stores/auth.ts';
+  import vote from '@utils/vote.ts';
+  import checkVote from '@lib/voting.js';
+  import { userProvider } from '@stores/auth';
+  import { toastStore } from '@stores/toast.svelte';
 
-  import SelectorSVG from "@components/icons/Selector.svelte";
-  import LoadingSVG from "@components/icons/Loading.svelte";
+  import SelectorSVG from '@components/icons/Selector.svelte';
+  import LoadingSVG from '@components/icons/Loading.svelte';
 
-  let votingCountdown: string = "";
+  let votingCountdown: string = '';
   let interval: NodeJS.Timeout;
 
   $: if ($storyNodes.length > 0) {
     clearInterval(interval);
-    votingCountdown = "0:00:00:00";
+    votingCountdown = '0:00:00:00';
     if ($episode !== -1) {
       $story = $storyNodes[$episode];
       endSoon = false;
@@ -32,7 +32,7 @@
         interval = setInterval(
           () =>
             calculateVotingEnd(new Date(Number($story!.endTimestamp) * 1000)),
-          1000
+          1000,
         );
     } else {
       $story = null;
@@ -49,7 +49,7 @@
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
     );
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -59,13 +59,13 @@
     }
 
     if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
-      window.open("/", "_self");
+      window.open('/', '_self');
     }
 
     votingCountdown = `${days}:${
-      hours < 10 ? "0" + hours : hours
-    }:${minutes < 10 ? "0" + minutes : minutes}:${
-      seconds < 10 ? "0" + seconds : seconds
+      hours < 10 ? '0' + hours : hours
+    }:${minutes < 10 ? '0' + minutes : minutes}:${
+      seconds < 10 ? '0' + seconds : seconds
     }`;
   }
 
@@ -105,29 +105,29 @@
 
   function selectOption(
     optionID: number,
-    optionClass: string | undefined = undefined
+    optionClass: string | undefined = undefined,
   ) {
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
     if ($storyNodes[$episode].ended) {
-      toastStore.show("Voting period for this episode is ended", "error");
+      toastStore.show('Voting period for this episode is ended', 'error');
       return;
     }
     if ($selectedNFTs.length === 0) {
-      toastStore.show("Select any Potential to vote!", "error");
+      toastStore.show('Select any Potential to vote!', 'error');
       return;
     }
     if (optionClass) {
       $selectedNFTs.forEach((nft) => {
-        if (optionClass != nft.class && nft.class != "Ne-Yon")
+        if (optionClass != nft.class && nft.class != 'Ne-Yon')
           classMatch = false;
       });
     }
     if (!classMatch) {
       toastStore.show(
         `This option is only for the ${optionClass} class!`,
-        "error"
+        'error',
       );
       return;
     }
@@ -138,7 +138,7 @@
       const baseNetwork: number = 8453;
       console.log(network);
       if (Number(network.chainId) === baseNetwork) vote();
-      else toastStore.show("Please select Base network!", "error");
+      else toastStore.show('Please select Base network!', 'error');
     });
   }
 </script>
@@ -156,7 +156,7 @@
         <span class="dark-txt">|</span>
         <p class="validation" class:green-txt={!$storyNodes[$episode].ended}>
           Voting
-          {$storyNodes[$episode].ended ? "ended" : "active"}
+          {$storyNodes[$episode].ended ? 'ended' : 'active'}
         </p>
       </div>
 
@@ -167,7 +167,7 @@
             | Participation:
             <strong
               >{Math.round(
-                ($votingResults.participation / 1035) * 100
+                ($votingResults.participation / 1035) * 100,
               )}%</strong
             >
           </p>
@@ -191,7 +191,7 @@
           </div>
         {/if}
       {:else}
-        <p style={endSoon ? "color: red;" : ""}>{votingCountdown}</p>
+        <p style={endSoon ? 'color: red;' : ''}>{votingCountdown}</p>
       {/if}
     </section>
     {#if $votingResults && $season == 1 && $episode == 2}
@@ -240,7 +240,7 @@
 {/if}
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   header {
     width: 100%;

@@ -16,7 +16,7 @@
     stroke-width="20"
     stroke-linejoin="round"
     stroke-linecap="round"
-    transform={svgFocus ? "scale(0.75) rotate(360)" : "none"}
+    transform={svgFocus ? 'scale(0.75) rotate(360)' : 'none'}
   >
     <g id="refresh-arrow">
       <path d="M -75 -30 A 80 80 0 0 1 75 -30" fill="none" />
@@ -27,7 +27,7 @@
 </button>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   button {
     fill: $white;

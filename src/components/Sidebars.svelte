@@ -8,22 +8,22 @@
     get_nodes,
     loadingStories,
     activeEpisode,
-  } from "@stores/storyNode.ts";
+  } from '@stores/storyNode.ts';
   import {
     potentials,
     selectedNFTs,
     nftVote,
     listedNumbers,
     fetchingDelegations,
-  } from "@stores/NFTs.ts";
-  import { walletAddress, username } from "@stores/auth";
-  import { showModal } from "@stores/modal";
-  import { toastStore } from "@stores/toast.svelte";
+  } from '@stores/NFTs.ts';
+  import { walletAddress, username } from '@stores/auth';
+  import { showModal } from '@stores/modal';
+  import { toastStore } from '@stores/toast.svelte';
 
-  import WalletConnect from "@components/web3/WalletConnect.svelte";
-  import ResetSVG from "@components/icons/Reset.svelte";
-  import RefreshSVG from "@components/icons/Refresh.svelte";
-  import ContractSVG from "@components/icons/Contract.svelte";
+  import WalletConnect from '@components/web3/WalletConnect.svelte';
+  import ResetSVG from '@components/icons/Reset.svelte';
+  import RefreshSVG from '@components/icons/Refresh.svelte';
+  import ContractSVG from '@components/icons/Contract.svelte';
 
   let nftIcon: HTMLSpanElement;
   let episodesIcon: HTMLSpanElement;
@@ -43,7 +43,7 @@
       seasonNr: $season,
       episodeNr: $episode,
     };
-    localStorage.setItem("activeEpisode", JSON.stringify($activeEpisode));
+    localStorage.setItem('activeEpisode', JSON.stringify($activeEpisode));
   }
 
   const switchSeason = async (event: Event) => {
@@ -53,7 +53,7 @@
     $story = null;
     $storyNodes = [];
     $activeEpisode = null;
-    localStorage.removeItem("activeEpisode");
+    localStorage.removeItem('activeEpisode');
     try {
       $storyNodes = await get_nodes();
     } catch (error) {
@@ -73,23 +73,23 @@
     $potentials.map((potential) => {
       if (potential.id === id) {
         if ($listedNumbers.includes(id)) {
-          toastStore.show("Delist this Potential to vote!", "error");
+          toastStore.show('Delist this Potential to vote!', 'error');
           return;
         }
         if ($episode === -1) {
-          toastStore.show("There is no episode selected!", "error");
+          toastStore.show('There is no episode selected!', 'error');
           return;
         }
         if ($storyNodes[$episode].ended) {
           if (vote !== 0)
             toastStore.show(
-              `This Potential chose the ${vote}${vote == 1 ? "st" : vote == 2 ? "nd" : vote == 3 ? "rd" : "th"} option`
+              `This Potential chose the ${vote}${vote == 1 ? 'st' : vote == 2 ? 'nd' : vote == 3 ? 'rd' : 'th'} option`,
             );
-          else toastStore.show("This Potential missed voting", "error");
+          else toastStore.show('This Potential missed voting', 'error');
           return;
         }
         if (vote !== 0 && !potential.selected) {
-          toastStore.show("This Potential will change his decision");
+          toastStore.show('This Potential will change his decision');
         }
         if ($selectedOption) $selectedOption = null;
         potential.selected = !potential.selected;
@@ -117,24 +117,24 @@
   let selectCondition: string;
   const selectMultipleNFTs = () => {
     if ($episode === -1) {
-      toastStore.show("There is no episode selected!", "error");
-      if (selectCondition) selectCondition = "";
+      toastStore.show('There is no episode selected!', 'error');
+      if (selectCondition) selectCondition = '';
       return;
     }
     if ($storyNodes[$episode].ended) {
-      toastStore.show("Voting for this episode is finished", "error");
-      if (selectCondition) selectCondition = "";
+      toastStore.show('Voting for this episode is finished', 'error');
+      if (selectCondition) selectCondition = '';
       return;
     }
     undoSelection();
-    if (selectCondition === "All") {
+    if (selectCondition === 'All') {
       $potentials.map((potential) => {
         if (!potential.selected && !$listedNumbers.includes(potential.id)) {
           potential.selected = true;
           $selectedNFTs.push(potential);
         }
       });
-    } else if (selectCondition === "Remaining") {
+    } else if (selectCondition === 'Remaining') {
       $potentials.map(async (potential) => {
         if (!potential.selected && !$listedNumbers.includes(potential.id)) {
           await nftVote($episode, potential.id).then((vote) => {
@@ -158,16 +158,16 @@
       });
     }
     $selectedNFTs = $selectedNFTs;
-    if ($selectedNFTs.length == 0) selectCondition = "";
+    if ($selectedNFTs.length == 0) selectCondition = '';
   };
 
   /* --- TABS HANDLING --- */
 
-  const openTab = (tab: "nfts" | "episodes") => {
-    if (tab === "nfts") {
-      console.log("Open NFTs");
-    } else if (tab === "episodes") {
-      console.log("Open Episodes");
+  const openTab = (tab: 'nfts' | 'episodes') => {
+    if (tab === 'nfts') {
+      console.log('Open NFTs');
+    } else if (tab === 'episodes') {
+      console.log('Open Episodes');
     }
   };
 </script>
@@ -178,7 +178,7 @@
     bind:this={episodesIcon}
     class="tab-icon"
     aria-label="Episodes"
-    onclick={() => openTab("episodes")}
+    onclick={() => openTab('episodes')}
   >
     Episodes
   </button>
@@ -187,7 +187,7 @@
 
   <button
     class="button-glowing"
-    onclick={() => open("https://loredex.degenerousdao.com/", "_blank")}
+    onclick={() => open('https://loredex.degenerousdao.com/', '_blank')}
   >
     Dive into LOREDEX
   </button>
@@ -234,7 +234,7 @@
     bind:this={nftIcon}
     class="tab-icon"
     aria-label="NFTs"
-    onclick={() => openTab("nfts")}
+    onclick={() => openTab('nfts')}
   >
     NFTs
   </button>
@@ -262,9 +262,9 @@
           onclick={() => {
             if (!$selectedNFTs || $selectedNFTs.length == 0) return;
             undoSelection();
-            selectCondition = "";
+            selectCondition = '';
           }}
-          disabled={selectCondition === ""}
+          disabled={selectCondition === ''}
         />
       </span>
     {:else}
@@ -442,7 +442,7 @@
 </style> -->
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   .nfts-tab {
     .nfts-legend {

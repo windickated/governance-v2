@@ -1,6 +1,6 @@
 <script>
-  import { toastStore } from "@stores/toast.svelte";
-  import Toast from "@components/utils/Toast.svelte";
+  import { toastStore } from '@stores/toast.svelte';
+  import Toast from '@components/utils/Toast.svelte';
 </script>
 
 <div class="flex">
@@ -10,7 +10,7 @@
 </div>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   div {
     position: fixed;

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import ToastContainer from "@components/utils/ToastContainer.svelte";
-  import Modal from "@components/utils/Modal.svelte";
+  import ToastContainer from '@components/utils/ToastContainer.svelte';
+  import Modal from '@components/utils/Modal.svelte';
 
-  import Display from "@components/Display.svelte";
-  import Storynode from "@components/Storynode.svelte";
-  import Console from "@components/Console.svelte";
-  import Sidebars from "@components/Sidebars.svelte";
+  import Display from '@components/Display.svelte';
+  import Storynode from '@components/Storynode.svelte';
+  import Console from '@components/Console.svelte';
+  import Sidebars from '@components/Sidebars.svelte';
 
   let width = $state<number>(0);
   let scroll = $state<number>(0);
@@ -27,7 +27,7 @@
 <div id="background-image" style:top={`max(-${scroll / 100}vh, -100vh)`}></div>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   #background-image {
     position: fixed;
@@ -35,7 +35,7 @@
     left: 0;
     width: 100vw;
     height: 200vh;
-    background-image: url("/spaceshipBG.avif");
+    background-image: url('/spaceshipBG.avif');
     background-attachment: scroll;
     background-repeat: no-repeat;
     background-position: top;

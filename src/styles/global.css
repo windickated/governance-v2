@@ -51,7 +51,7 @@ button svg {
 }
 
 button *,
-[role="button"] * {
+[role='button'] * {
   cursor: inherit;
 }
 

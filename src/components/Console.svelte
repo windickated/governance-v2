@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { consolePanel } from "../data/buttons.ts";
-  import { storyNodes, episode, selectedOption } from "../stores/storyNode.ts";
-  import { toastStore } from "../stores/toast.svelte";
+  import { onMount } from 'svelte';
+  import { consolePanel } from '../data/buttons.ts';
+  import { storyNodes, episode, selectedOption } from '../stores/storyNode.ts';
+  import { toastStore } from '../stores/toast.svelte';
 
   let touchscreenDevice: boolean = false;
   onMount(() => {
-    if ("ontouchstart" in document.documentElement) {
+    if ('ontouchstart' in document.documentElement) {
       touchscreenDevice = true;
     }
   });
@@ -14,84 +14,84 @@
   const consoleButtonsHandle = (
     event: Event,
     id: string,
-    isClicked: boolean = false
+    isClicked: boolean = false,
   ) => {
     const button: HTMLElement | null = document.getElementById(id);
     const buttonHover: HTMLElement | null = document.getElementById(
-      `${id}-hover`
+      `${id}-hover`,
     );
     const buttonActive: HTMLElement | null = document.getElementById(
-      `${id}-active`
+      `${id}-active`,
     );
     if (!touchscreenDevice) {
-      if (event.type === "click") {
-        button!.style.display = "none";
-        buttonHover!.style.display = "none";
-        buttonActive!.style.display = "block";
-      } else if (event.type === "mouseover" && !isClicked) {
-        button!.style.display = "none";
-        buttonHover!.style.display = "block";
-        buttonActive!.style.display = "none";
+      if (event.type === 'click') {
+        button!.style.display = 'none';
+        buttonHover!.style.display = 'none';
+        buttonActive!.style.display = 'block';
+      } else if (event.type === 'mouseover' && !isClicked) {
+        button!.style.display = 'none';
+        buttonHover!.style.display = 'block';
+        buttonActive!.style.display = 'none';
       } else if (isClicked) {
         clickHandle(id, button, buttonActive);
-      } else if (event.type === "mouseout") {
-        button!.style.display = "block";
-        buttonHover!.style.display = "none";
-        buttonActive!.style.display = "none";
+      } else if (event.type === 'mouseout') {
+        button!.style.display = 'block';
+        buttonHover!.style.display = 'none';
+        buttonActive!.style.display = 'none';
       }
     } else {
-      if (event.type === "touchstart") clickHandle(id, button, buttonActive);
+      if (event.type === 'touchstart') clickHandle(id, button, buttonActive);
     }
 
     function clickHandle(
       id: string,
       button: HTMLElement | null,
-      buttonActive: HTMLElement | null
+      buttonActive: HTMLElement | null,
     ) {
-      button!.style.display = "none";
-      buttonActive!.style.display = "block";
+      button!.style.display = 'none';
+      buttonActive!.style.display = 'block';
       setTimeout(() => {
-        button!.style.display = "block";
-        buttonActive!.style.display = "none";
+        button!.style.display = 'block';
+        buttonActive!.style.display = 'none';
         switch (id) {
-          case "sagaverse":
+          case 'sagaverse':
             window.open(
-              "https://sagaverse.degenerousdao.com",
-              !touchscreenDevice ? "_blank" : "_self"
+              'https://sagaverse.degenerousdao.com',
+              !touchscreenDevice ? '_blank' : '_self',
             );
             break;
-          case "conexus":
+          case 'conexus':
             window.open(
-              "https://conexus.degenerousdao.com",
-              !touchscreenDevice ? "_blank" : "_self"
+              'https://conexus.degenerousdao.com',
+              !touchscreenDevice ? '_blank' : '_self',
             );
             break;
-          case "omnihub":
+          case 'omnihub':
             window.open(
-              "https://conexus.degenerousdao.com/dashboard",
-              !touchscreenDevice ? "_blank" : "_self"
+              'https://conexus.degenerousdao.com/dashboard',
+              !touchscreenDevice ? '_blank' : '_self',
             );
             break;
-          case "back":
+          case 'back':
             if ($episode === -1) {
-              toastStore.show("There is no episode selected!", "error");
+              toastStore.show('There is no episode selected!', 'error');
             } else if ($episode === 0) {
               toastStore.show(
-                "You selected the first episode of this season.",
-                "error"
+                'You selected the first episode of this season.',
+                'error',
               );
             } else {
               $episode--;
               if ($selectedOption) $selectedOption = null;
             }
             break;
-          case "forward":
+          case 'forward':
             if ($episode === -1) {
-              toastStore.show("There is no episode selected!", "error");
+              toastStore.show('There is no episode selected!', 'error');
             } else if ($episode === $storyNodes.length - 1) {
               toastStore.show(
-                "You selected the last episode of this season.",
-                "error"
+                'You selected the last episode of this season.',
+                'error',
               );
             } else {
               $episode++;
@@ -159,7 +159,7 @@
 </section>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   section {
     position: relative;

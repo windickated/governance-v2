@@ -18,7 +18,7 @@
     stroke-linecap="round"
     aria-label="Delegations"
   >
-    <g opacity={svgFocus ? "0.5" : "1"}>
+    <g opacity={svgFocus ? '0.5' : '1'}>
       <path
         d="M -10 75 L -85 75 L -85 -85 L 45 -85 L 45 -15"
         fill="none"
@@ -30,8 +30,8 @@
     </g>
     <g
       style={svgFocus
-        ? "stroke: rgb(0, 185, 55); transform: scale(1.1) translate(-5%, -2.5%);"
-        : ""}
+        ? 'stroke: rgb(0, 185, 55); transform: scale(1.1) translate(-5%, -2.5%);'
+        : ''}
     >
       <g transform="rotate(45) translate(40 -30)">
         <ellipse rx="35" ry="10" cx="15" cy="60" fill="none" />
@@ -54,7 +54,7 @@
 </button>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   button {
     fill: $white;

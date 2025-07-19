@@ -4,7 +4,7 @@
     disabled = false,
     hideForMobiles = false,
     glowing = false,
-    color = "#33e2e6",
+    color = '#33e2e6',
     selectorSize = 1.5,
     rotate = null,
   }: {
@@ -53,7 +53,7 @@
 </svg>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   svg {
     flex: none;

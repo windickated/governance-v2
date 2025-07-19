@@ -1,6 +1,6 @@
-import { writable } from "svelte/store";
-import { contract } from "../lib/contract";
-import { walletAddress } from "./auth";
+import { writable } from 'svelte/store';
+import { contract } from '../lib/contract';
+import { walletAddress } from './auth';
 
 export class NFT {
   id: number;
@@ -8,7 +8,7 @@ export class NFT {
   image: string;
   class: string;
   selected: boolean;
-  delegated: string | null
+  delegated: string | null;
   constructor(data: any, i: number) {
     this.id = data[i].name.match(/\d+/)[0];
     this.name = data[i].name;
@@ -25,13 +25,15 @@ export const listedNumbers = writable<Array<number>>([]);
 
 export const checkingDelegations = writable<string | null>(null);
 export const fetchingDelegations = writable<boolean>(false);
-export const nftApprovals = writable<{ owner: string, approved: boolean, nfts?: number[] }[]>([]);
+export const nftApprovals = writable<
+  { owner: string; approved: boolean; nfts?: number[] }[]
+>([]);
 
 export async function getNFTs() {
   walletAddress.subscribe(async (address) => {
     if (!address) return;
 
-    const potentialNumbers: number[] = await getNftNumbers(address)
+    const potentialNumbers: number[] = await getNftNumbers(address);
     const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
     if (potentialNFTs) potentials.set(potentialNFTs);
 
@@ -42,38 +44,48 @@ export async function getNFTs() {
     let listedNFTs: number[];
     const options = {
       method: 'GET',
-      headers: {accept: 'application/json', 'x-api-key': 'c6a6c088d5e34ca2a018f44673697f01'}
+      headers: {
+        accept: 'application/json',
+        'x-api-key': 'c6a6c088d5e34ca2a018f44673697f01',
+      },
     };
 
-    await fetch('https://cors-anywhere.herokuapp.com/https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
-    // await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
-      .then(res => res.json())
-      .then(res => {
-        listedNFTs = res.listings.map((listing: any) => listing.protocol_data.parameters.offer[0].identifierOrCriteria);
+    await fetch(
+      'https://cors-anywhere.herokuapp.com/https://api.opensea.io/api/v2/listings/collection/potentials-eth/all',
+      options,
+    )
+      // await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
+      .then((res) => res.json())
+      .then((res) => {
+        listedNFTs = res.listings.map(
+          (listing: any) =>
+            listing.protocol_data.parameters.offer[0].identifierOrCriteria,
+        );
         listedNumbers.set(Array.from(new Set(listedNFTs)));
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   });
 }
 
 export const getNftNumbers = async (wallet: string) => {
-  const json = await fetch(
-    `https://api.degenerousdao.com/nft/owner/${wallet}`
-  );
+  const json = await fetch(`https://api.degenerousdao.com/nft/owner/${wallet}`);
   const data = await json.json();
-  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId)
+  const nftNumbers = data.ownedNfts.map((nft: any) => +nft.tokenId);
   return nftNumbers;
-}
+};
 
-export const getPotentials = async (nftNumbers: number[], owner: string | null = null) => {
+export const getPotentials = async (
+  nftNumbers: number[],
+  owner: string | null = null,
+) => {
   try {
     const maskedAddress =
-    owner?.slice(0, 6) + "..." + owner?.slice(owner?.length - 4);
+      owner?.slice(0, 6) + '...' + owner?.slice(owner?.length - 4);
     const potentialNFTs: NFT[] = [];
     const metadata: any[] = [];
     for (let i in nftNumbers) {
       const response = await fetch(
-        `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`
+        `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`,
       );
       metadata[Number(i)] = await response.json();
       potentialNFTs[Number(i)] = new NFT(metadata, Number(i));
@@ -88,5 +100,5 @@ export const getPotentials = async (nftNumbers: number[], owner: string | null =
 
 export const nftVote = async (episodeNr: number, nftNr: number) => {
   if (episodeNr === -1) return;
-  return await (await contract("alchemy")).getVoteOptionId(episodeNr, nftNr);
-}
+  return await (await contract('alchemy')).getVoteOptionId(episodeNr, nftNr);
+};

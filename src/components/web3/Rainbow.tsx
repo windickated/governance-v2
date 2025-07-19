@@ -1,4 +1,4 @@
-import { BrowserProvider, type Provider } from "ethers";
+import { BrowserProvider, type Provider } from 'ethers';
 import {
   darkTheme,
   getDefaultConfig,
@@ -13,8 +13,8 @@ import { base } from 'wagmi/chains';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { walletAddress, username, userProvider } from '@stores/auth.ts';
-import { getNFTs } from "@stores/NFTs.ts";
-import { storyNodes, get_nodes, season, episode } from "@stores/storyNode.ts";
+import { getNFTs } from '@stores/NFTs.ts';
+import { storyNodes, get_nodes, season, episode } from '@stores/storyNode.ts';
 
 const Web3Provider = ({ children }: any) => {
   const config = getDefaultConfig({
@@ -63,40 +63,44 @@ const RainbowConnect = () => {
         }) => {
           const ready = mounted;
           const connected = ready && account && chain;
-          
+
           const userAccount = useAccount();
           if (userAccount.status == 'connected') {
-            const { address, connector }  = userAccount;
+            const { address, connector } = userAccount;
             userProvider.subscribe((res) => {
               if (res) return;
               console.log('Connected: ' + address); //
               walletAddress.set(address);
-              username.set(address.slice(0, 6) + "..." + address.slice(address.length - 4));
+              username.set(
+                address.slice(0, 6) + '...' + address.slice(address.length - 4),
+              );
               connector.getProvider().then((provider: any) => {
-                userProvider.set(new BrowserProvider(provider, "any") as Provider);
+                userProvider.set(
+                  new BrowserProvider(provider, 'any') as Provider,
+                );
                 getNFTs();
                 console.log(provider); //
-                const episodeStorage = localStorage.getItem("activeEpisode");
+                const episodeStorage = localStorage.getItem('activeEpisode');
                 if (episodeStorage) {
                   const { seasonNr } = JSON.parse(episodeStorage);
                   season.set(seasonNr);
-                  console.log("Active episode: " + episodeStorage); //
+                  console.log('Active episode: ' + episodeStorage); //
                 }
                 get_nodes().then((nodes) => {
-                  storyNodes.set(nodes)
+                  storyNodes.set(nodes);
                   if (episodeStorage) {
                     const { episodeNr } = JSON.parse(episodeStorage);
                     if (nodes.length >= episodeNr) episode.set(episodeNr);
                   }
                 });
               });
-            })
+            });
           } else if (userAccount.status == 'disconnected' && !connected) {
             walletAddress.subscribe((address) => {
               if (address) location.reload();
             });
           }
-          
+
           return (
             <div
               {...(!ready && {
@@ -106,10 +110,7 @@ const RainbowConnect = () => {
               {(() => {
                 if (!connected) {
                   return (
-                    <button
-                      onClick={openConnectModal}
-                      type="button"
-                    >
+                    <button onClick={openConnectModal} type="button">
                       <p className="sign-lable">Sign in</p>
                     </button>
                   );

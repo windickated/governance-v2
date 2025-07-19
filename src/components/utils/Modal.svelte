@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { showModal } from "@stores/modal.ts";
+  import { showModal } from '@stores/modal.ts';
   import {
     NFT,
     potentials,
@@ -9,17 +9,17 @@
     selectedNFTs,
     checkingDelegations,
     fetchingDelegations,
-  } from "@stores/NFTs.ts";
-  import { walletAddress } from "@stores/auth.ts";
+  } from '@stores/NFTs.ts';
+  import { walletAddress } from '@stores/auth.ts';
   import {
     checkAddress,
     approveNFTs,
     claimNFTs,
     checkDelegatedWallets,
-  } from "@lib/potentials.js";
+  } from '@lib/potentials.js';
 
   let dialog: HTMLDialogElement;
-  let userAddress: string = "";
+  let userAddress: string = '';
   let checkApproval: boolean = false;
 
   $: validation =
@@ -57,7 +57,7 @@
       try {
         const NFTs = await getPotentials(
           $nftApprovals[i].nfts!,
-          $nftApprovals[i].owner
+          $nftApprovals[i].owner,
         );
         if (NFTs && NFTs.length > 0) {
           userNFTs = userNFTs!.concat(NFTs);
@@ -65,10 +65,10 @@
         }
       } catch (error) {
         console.log(
-          "Failed to fetch delegated NFTs from " +
+          'Failed to fetch delegated NFTs from ' +
             $nftApprovals[i].owner +
-            ": " +
-            error
+            ': ' +
+            error,
         );
       }
     }
@@ -115,8 +115,8 @@
       <div
         class="address-container"
         style={checkApproval
-          ? "background-color: rgba(56, 117, 250, 0.1); color: rgba(56, 117, 250, 0.75); box-shadow: 0 0 0.5vw rgba(56, 117, 250, 0.75);"
-          : ""}
+          ? 'background-color: rgba(56, 117, 250, 0.1); color: rgba(56, 117, 250, 0.75); box-shadow: 0 0 0.5vw rgba(56, 117, 250, 0.75);'
+          : ''}
       >
         <input
           type="text"
@@ -124,10 +124,10 @@
           maxlength="42"
           bind:value={userAddress}
           style={checkApproval
-            ? "background-color: rgba(56, 117, 250, 0.1); color: rgb(56, 117, 250); border: 0.1vw solid rgba(56, 117, 250, 0.5);"
-            : ""}
+            ? 'background-color: rgba(56, 117, 250, 0.1); color: rgb(56, 117, 250); border: 0.1vw solid rgba(56, 117, 250, 0.5);'
+            : ''}
         />
-        {#if !userAddress}{:else if !userAddress.startsWith("0x")}
+        {#if !userAddress}{:else if !userAddress.startsWith('0x')}
           <p class="validation">Address should start with "0x..."</p>
         {:else if userAddress.length < 42}
           <p class="validation">Address is too short</p>
@@ -205,7 +205,7 @@
           {#if $nftApprovals && $nftApprovals.length > 0}
             Your Delegations:
             <strong>{getDelegationsCount()}</strong>
-            NFT{getDelegationsCount() == 1 ? "" : "s"}
+            NFT{getDelegationsCount() == 1 ? '' : 's'}
           {:else}
             Your Delegations
           {/if}
@@ -216,10 +216,10 @@
               <li class="wallet">
                 <p>{index + 1}</p>
                 <span
-                  >{owner.slice(0, 6) + "..." + owner.slice(owner.length - 4)}
+                  >{owner.slice(0, 6) + '...' + owner.slice(owner.length - 4)}
                   {#if nfts}
                     |
-                    {nfts.length} NFT{nfts.length == 1 ? "" : "s"}
+                    {nfts.length} NFT{nfts.length == 1 ? '' : 's'}
                   {/if}</span
                 >
                 <svg
@@ -231,7 +231,7 @@
                   stroke-linecap="round"
                   on:click={() => {
                     $nftApprovals = $nftApprovals.filter(
-                      (approval) => approval.owner !== owner
+                      (approval) => approval.owner !== owner,
                     );
                     if (!$nftApprovals || $nftApprovals.length < 1) {
                       localStorage.removeItem($walletAddress);
@@ -266,7 +266,7 @@
           <button
             on:click={checkDelegatedWallets}
             disabled={$checkingDelegations !== null}
-            style={$checkingDelegations ? "color: rgb(51, 226, 230)" : ""}
+            style={$checkingDelegations ? 'color: rgb(51, 226, 230)' : ''}
           >
             {#if $checkingDelegations}
               <svg

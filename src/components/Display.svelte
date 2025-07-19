@@ -1,47 +1,47 @@
 <script lang="ts">
-  import { displayScreen } from "@data/buttons.ts";
+  import { displayScreen } from '@data/buttons.ts';
   import {
     storyNodes,
     story,
     episode,
     selectedOption,
     votingResults,
-  } from "@stores/storyNode.ts";
-  import { selectedNFTs } from "@stores/NFTs.ts";
-  import { userProvider } from "@stores/auth";
-  import { toastStore } from "@stores/toast.svelte";
-  import vote from "@utils/vote.ts";
+  } from '@stores/storyNode.ts';
+  import { selectedNFTs } from '@stores/NFTs.ts';
+  import { userProvider } from '@stores/auth';
+  import { toastStore } from '@stores/toast.svelte';
+  import vote from '@utils/vote.ts';
 
-  import SelectorSVG from "@components/icons/Selector.svelte";
+  import SelectorSVG from '@components/icons/Selector.svelte';
 
   let storyVideo: HTMLIFrameElement;
   let storyText: HTMLElement;
 
   function selectOption(
     optionID: number,
-    optionClass: string | undefined = undefined
+    optionClass: string | undefined = undefined,
   ) {
     let classMatch: boolean = true;
     if ($selectedOption === optionID) return;
 
     if ($storyNodes[$episode].ended) {
-      toastStore.show("Voting period for this episode is ended", "error");
+      toastStore.show('Voting period for this episode is ended', 'error');
       return;
     }
     if ($selectedNFTs.length === 0) {
-      toastStore.show("Select any Potential to vote!", "error");
+      toastStore.show('Select any Potential to vote!', 'error');
       return;
     }
     if (optionClass) {
       $selectedNFTs.forEach((nft) => {
-        if (optionClass != nft.class && nft.class != "Ne-Yon")
+        if (optionClass != nft.class && nft.class != 'Ne-Yon')
           classMatch = false;
       });
     }
     if (!classMatch) {
       toastStore.show(
         `This option is only for the ${optionClass} class!`,
-        "error"
+        'error',
       );
       return;
     }
@@ -52,15 +52,15 @@
   let formatButtonState: boolean = true; // video on, text off
   let formatButtonHover: boolean = false;
   const switcherHandle = (event: Event) => {
-    if (event.type === "click") {
+    if (event.type === 'click') {
       if ($episode === -1) {
-        toastStore.show("There is no episode selected!", "error");
+        toastStore.show('There is no episode selected!', 'error');
         return;
       }
       formatButtonState = !formatButtonState;
-      storyText?.classList.toggle("visible");
-      storyVideo?.classList.toggle("visible");
-    } else if (event.type === "pointerover" || event.type === "pointerout") {
+      storyText?.classList.toggle('visible');
+      storyVideo?.classList.toggle('visible');
+    } else if (event.type === 'pointerover' || event.type === 'pointerout') {
       formatButtonHover = !formatButtonHover;
     }
   };
@@ -73,7 +73,7 @@
 
   const voteButtonHandle = (event: Event) => {
     if (!voteIsInactive && voteButtonState) {
-      if (event.type === "click") {
+      if (event.type === 'click') {
         $userProvider!.getNetwork().then((network) => {
           const baseNetwork: number = 8453;
           console.log(network);
@@ -83,9 +83,9 @@
               voteButtonState = !voteButtonState;
               vote();
             }, 300);
-          } else toastStore.show("Please select Base network!", "error");
+          } else toastStore.show('Please select Base network!', 'error');
         });
-      } else if (event.type === "pointerover" || event.type === "pointerout") {
+      } else if (event.type === 'pointerover' || event.type === 'pointerout') {
         voteButtonHover = !voteButtonHover;
       }
     }
@@ -218,7 +218,7 @@
 </section>
 
 <style lang="scss">
-  @use "/src/styles/mixins" as *;
+  @use '/src/styles/mixins' as *;
 
   section {
     position: relative;
@@ -321,7 +321,7 @@
       width: 27.5%;
       bottom: 0;
       right: 0;
-      background-image: url("/format.avif");
+      background-image: url('/format.avif');
       background-position: top;
       background-size: contain;
 
