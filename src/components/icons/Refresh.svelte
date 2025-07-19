@@ -37,8 +37,8 @@
     &:hover:not(&:disabled),
     &:active:not(&:disabled),
     &:focus:not(&:disabled) {
-      fill: $cyan;
-      stroke: $cyan;
+      fill: $orange;
+      stroke: $orange;
       @include scale;
       @include bright;
     }

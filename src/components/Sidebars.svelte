@@ -183,49 +183,49 @@
     Episodes
   </button>
 
-    <h3 class="franchise-title">The Dischordian Saga</h3>
+  <h3 class="franchise-title">The Dischordian Saga</h3>
 
-    <button
-      class="button-glowing"
-      onclick={() => open('https://loredex.degenerousdao.com/', '_blank')}
-    >
-      Dive into LOREDEX
-    </button>
+  <button
+    class="button-glowing"
+    onclick={() => open('https://loredex.degenerousdao.com/', '_blank')}
+  >
+    Dive into LOREDEX
+  </button>
 
-    <select
-      onchange={switchSeason}
-      disabled={!$storyNodes.length || $loadingStories !== -1}
-    >
-      <option value="1" selected={$season == 1}>Season 1</option>
-      <option value="2" selected={$season == 2}>Season 2</option>
-    </select>
-    {#if $storyNodes.length}
-      <ul class="flex pad round dark-glowing vert-scrollbar" bind:this={episodes}>
-        {#each $storyNodes as episodeObject, index}
-          <button
-            class="void-btn episode tile"
-            class:active={$episode == index}
-            onclick={() => switchEpisode(index)}
-          >
-            <img src={episodeObject.image_url} alt="Episode {index + 1}" />
-            <h5>
-              {episodeObject.season
-                ? episodeObject.title
-                : episodeObject.episodeName}
-            </h5>
-            <p>Episode {index + 1}</p>
-          </button>
-        {/each}
-      </ul>
-    {:else}
-      <h5>Loading Season {$season}</h5>
-      <div class="progress-bar">
-        <div
-          class="progress-thumb loading-animation"
-          style="width: {$loadingStories}%;"
-        ></div>
-      </div>
-    {/if}
+  <select
+    onchange={switchSeason}
+    disabled={!$storyNodes.length || $loadingStories !== -1}
+  >
+    <option value="1" selected={$season == 1}>Season 1</option>
+    <option value="2" selected={$season == 2}>Season 2</option>
+  </select>
+  {#if $storyNodes.length}
+    <ul class="flex pad round dark-glowing vert-scrollbar" bind:this={episodes}>
+      {#each $storyNodes as episodeObject, index}
+        <button
+          class="void-btn episode tile"
+          class:active={$episode == index}
+          onclick={() => switchEpisode(index)}
+        >
+          <img src={episodeObject.image_url} alt="Episode {index + 1}" />
+          <h5>
+            {episodeObject.season
+              ? episodeObject.title
+              : episodeObject.episodeName}
+          </h5>
+          <p>Episode {index + 1}</p>
+        </button>
+      {/each}
+    </ul>
+  {:else}
+    <h5>Loading Season {$season}</h5>
+    <div class="progress-bar">
+      <div
+        class="progress-thumb loading-animation"
+        style="width: {$loadingStories}%;"
+      ></div>
+    </div>
+  {/if}
 </section>
 
 <!-- --- NFTs tab --- -->
@@ -236,121 +236,127 @@
     aria-label="NFTs"
     onclick={() => openTab('nfts')}
   >
+    <img
+      src="/icons/selection.png"
+      alt="NFTs"
+    />
     NFTs
   </button>
 
-    <header class="flex-row pad shad" bind:this={walletContainer}>
+  <header class="flex-row pad shad" bind:this={walletContainer}>
+    {#if $walletAddress}
+      <p class="web3-address pc-only pad-8 pad-inline round-8 shad-inset">
+        {$username}
+      </p>
+      <span class="flex-row gap-8" bind:this={nftsSelector}>
+        <h5 class="pc-only">Select Potentials:</h5>
+        <select
+          bind:value={selectCondition}
+          onchange={selectMultipleNFTs}
+          disabled={$episode == -1}
+        >
+          <option value="" selected disabled hidden>Select</option>
+          <option value="All">All</option>
+          <option value="Remaining">Remaining</option>
+          <option value="Assassin">Assassin</option>
+          <option value="Soldier">Soldier</option>
+          <option value="Spy">Spy</option>
+          <option value="Engineer">Engineer</option>
+          <option value="Oracle">Oracle</option>
+        </select>
+        <ResetSVG
+          onclick={() => {
+            if (!$selectedNFTs || $selectedNFTs.length == 0) return;
+            undoSelection();
+            selectCondition = '';
+          }}
+          disabled={selectCondition === ''}
+        />
+      </span>
+    {:else}
+      <h4>Connect Web3 Wallet</h4>
+    {/if}
+    <span class="flex-row gap-8">
       {#if $walletAddress}
-        <p class="pc-only">{$username}</p>
-        <span class="flex-row gap-8" bind:this={nftsSelector}>
-          <p class="pc-only">Select Potentials:</p>
-          <select
-            bind:value={selectCondition}
-            onchange={selectMultipleNFTs}
-            disabled={$episode == -1}
-          >
-            <option value="" selected disabled hidden>Select</option>
-            <option value="All">All</option>
-            <option value="Remaining">Remaining</option>
-            <option value="Assassin">Assassin</option>
-            <option value="Soldier">Soldier</option>
-            <option value="Spy">Spy</option>
-            <option value="Engineer">Engineer</option>
-            <option value="Oracle">Oracle</option>
-          </select>
-          <ResetSVG
+        <ContractSVG onclick={() => ($showModal = true)} />
+      {/if}
+      <WalletConnect />
+    </span>
+  </header>
+
+  {#if $walletAddress || $fetchingDelegations}
+    {#if $potentials.length}
+      <div class="nfts-legend flex-row gap-8">
+        <span class="flex-row gap-8">
+          <h5>
+            {#if $fetchingDelegations}
+              Loading
+            {:else}
+              Total
+            {/if}
+            NFTs: {$potentials.length}
+          </h5>
+          <RefreshSVG
             onclick={() => {
-              if (!$selectedNFTs || $selectedNFTs.length == 0) return;
-              undoSelection();
-              selectCondition = '';
+              $potentials = $potentials;
             }}
-            disabled={selectCondition === ''}
           />
         </span>
-      {:else}
-        <p>Connect Wallet:</p>
-      {/if}
-      <span class="flex-row gap-8">
-        {#if $walletAddress}
-          <ContractSVG onclick={() => ($showModal = true)} />
-        {/if}
-        <WalletConnect />
-      </span>
-    </header>
 
-    {#if $walletAddress}
-      {#if $potentials.length}
-        <div class="nfts-legend flex-row gap-8">
-          <span class="flex-row gap-8">
-            <h5>
-              {#if $fetchingDelegations}
-                Loading
-              {:else}
-                Total
+        <h5>
+          Selected<strong class="pc-only">&nbsp;NFTs</strong>:
+          {$selectedNFTs.length}
+        </h5>
+      </div>
+
+      <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar" bind:this={nftTiles}>
+        {#each $potentials as NFT}
+          {#await nftVote($episode, NFT.id) then vote}
+            <button
+              class="void-btn nft potential-tile"
+              class:selected={selectedIDs.flat().includes(NFT.id)}
+              class:delegated={NFT.delegated}
+              class:listed={$listedNumbers.includes(NFT.id)}
+              class:used={vote > 0}
+              onclick={() => selectNFT(NFT.id, Number(vote))}
+            >
+              <img src={NFT.image} alt={NFT.name} />
+              <h5>{NFT.name}</h5>
+              {#if vote > 0}
+                <p>
+                  Selected option: <strong>{vote}</strong>
+                </p>
               {/if}
-              NFTs: {$potentials.length}
-            </h5>
-            <RefreshSVG
-              onclick={() => {
-                $potentials = $potentials;
-              }}
-            />
-          </span>
-
-          <h5>
-            Selected<strong class="pc-only">NFTs</strong>:
-            {$selectedNFTs.length}
-          </h5>
-        </div>
-
-        <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar" bind:this={nftTiles}>
-          {#each $potentials as NFT}
-            {#await nftVote($episode, NFT.id) then vote}
-              <button
-                class="void-btn nft potential-tile"
-                class:selected={selectedIDs.flat().includes(NFT.id)}
-                class:delegated={NFT.delegated}
-                class:listed={$listedNumbers.includes(NFT.id)}
-                class:used={vote > 0}
-                onclick={() => selectNFT(NFT.id, Number(vote))}
-              >
-                <img src={NFT.image} alt={NFT.name} />
-                <h5>{NFT.name}</h5>
-                {#if vote > 0}
-                  <p>
-                    Selected option: <strong>{vote}</strong>
-                  </p>
-                {/if}
-                {#if $listedNumbers.includes(NFT.id)}
-                  <p>
-                    Listed
-                    <strong class="pc-only"> on marketplace </strong>
-                  </p>
-                {/if}
-                {#if NFT.delegated}
-                  <p class="pc-only">Owner: {NFT.delegated}</p>
-                  <p class="mobile-only">Delegated</p>
-                {/if}
-              </button>
-            {/await}
-          {/each}
-        </ul>
-      {:else}
-        <p class="validation pad-inline">
-          Your wallet doesn't have any
-          <a
-            href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
-            target="_blank"
-          >
-            Potential
-          </a>... You're not allowed to enter the Galactic Governance Hub unless
-          you have any delegated NFTs
-        </p>
-      {/if}
+              {#if $listedNumbers.includes(NFT.id)}
+                <p>
+                  Listed
+                  <strong class="pc-only"> on marketplace </strong>
+                </p>
+              {/if}
+              {#if NFT.delegated}
+                <p class="pc-only">Owner: {NFT.delegated}</p>
+                <p class="mobile-only">Delegated</p>
+              {/if}
+            </button>
+          {/await}
+        {/each}
+      </ul>
+    {:else}
+      <p class="validation pad-inline">
+        Your wallet doesn't have any
+        <a
+          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+          target="_blank"
+        >
+          Potential
+        </a>... You're not allowed to enter the Galactic Governance Hub unless
+        you have any delegated NFTs
+      </p>
     {/if}
+  {/if}
 </section>
 
-<!-- <div class="bg" onclick={closeActiveTab} bind:this={BG}></div> -->
+<div id="bg" bind:this={BG}></div>
 
 <style lang="scss">
   @use '/src/styles/mixins' as *;
@@ -379,51 +385,117 @@
       @include blue;
       @include white-txt;
       @include font(h4);
+
+      img {
+        width: 1.5rem;
+      }
+    }
+
+    &.episodes-tab {
+      // display: none;
+
+      .tab-icon {
+        left: 0;
+      }
+
+      .episode {
+        width: 100%;
+        
+        img {
+          aspect-ratio: 16 / 9;
+        }
+      }
+    }
+
+    &.nfts-tab {
+      display: none;
+
+      .tab-icon {
+        right: 0;
+      }
+
+      header {
+        width: 100%;
+        justify-content: space-between;
+        background-color: $royal-purple;
+
+        h4,
+        h5 {
+          @include orange(1, text, bright);
+        }
+      }
+
+      .nfts-legend {
+        width: 90%;
+        justify-content: space-between;
+        white-space: nowrap;
+
+        h5 {
+          @include white-txt;
+        }
+      }
+
+      .nft {
+        max-width: calc(50% - 0.5rem);
+      }
+
+      .web3-address {
+        @include dark-red(0.5);
+        @include orange(1, text, bright);
+      }
+    }
+
+    @include respond-up(small-desktop) {
+      // width: min(70vw, 80rem);
+      width: 68rem;
+      height: 100vh;
+      @include box-shadow;
+
+      ul {
+        width: calc(100% - 2rem);
+      }
+
+      .tab-icon {
+        width: auto;
+        top: 0;
+      }
+
+      strong {
+        display: inline;
+      }
+
+      &.nfts-tab {
+        left: unset;
+        right: 0;
+        border-left: 0.25rem solid $royal-purple;
+
+        .tab-icon {
+          right: 100%;
+          height: 4.5rem;
+          border-bottom-left-radius: 1rem;
+          background-color: $royal-purple;
+        }
+
+        header {
+          width: calc(100% - 2rem);
+          border-bottom-left-radius: 1rem;
+          border-bottom-right-radius: 1rem;
+          padding-block: 0.5rem;
+          min-height: 4.5rem;
+        }
+      }
     }
   }
 
-  .episodes-tab {
+  #bg {
     display: none;
 
-    .tab-icon {
-      left: 0;
-    }
-
-    .episode {
-      width: 100%;
-      
-      img {
-        aspect-ratio: 16 / 9;
-      }
-    }
-  }
-
-  .nfts-tab {
-    //display: none;
-
-    .tab-icon {
-      right: 0;
-    }
-
-    header {
-      width: 100%;
-      justify-content: space-between;
-      background-color: $royal-purple;
-    }
-
-    .nfts-legend {
-      width: 90%;
-      justify-content: space-between;
-      white-space: nowrap;
-
-      h5 {
-        @include white-txt;
-      }
-    }
-
-    .nft {
-      max-width: calc(50% - 0.5rem);
-    }
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 15;
   }
 
   @media screen and (max-width: 1024px) {

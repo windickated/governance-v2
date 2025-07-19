@@ -123,7 +123,7 @@ const RainbowConnect = () => {
                   );
                 }
                 return (
-                  <button onClick={openAccountModal} type="button">
+                  <button className="orange-btn" onClick={openAccountModal} type="button">
                     Sign out
                   </button>
                 );
