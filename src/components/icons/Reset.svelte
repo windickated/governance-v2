@@ -28,6 +28,7 @@
     fill: $soft-white;
     stroke: $soft-white;
     color: $soft-white;
+    width: 1.5rem;
 
     &:hover:not(&:disabled),
     &:active:not(&:disabled),

@@ -32,6 +32,7 @@
   button {
     fill: $white;
     stroke: $white;
+    width: 1.5rem;
 
     &:hover:not(&:disabled),
     &:active:not(&:disabled),

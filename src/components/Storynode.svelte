@@ -244,7 +244,7 @@
 
   header {
     width: 100%;
-    max-width: 70rem;
+    max-width: min(95%, 70rem);
     background-color: #01204e;
     border: 2px solid #203962;
     @include box-shadow;

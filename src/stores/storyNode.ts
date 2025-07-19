@@ -43,7 +43,7 @@ export const abortVotingCheck = writable<boolean>(false);
 export const get_nodes = async () => {
   const count = await (await contract("alchemy")).getStoryNodesCount();
   console.log("Episodes count: " + count); //
-  const nodes = [];
+  const nodes: any[] = [];
   abortVotingCheck.set(true);
   const storyPercent = 100 / Number(count);
   let progress: number = 0;

@@ -69,16 +69,10 @@
   /* --- NFTs --- */
   $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
 
-  function selectNFT(event: Event) {
-    const target = event.target as HTMLDivElement;
-    const nftTile =
-      target.localName === "div"
-        ? target
-        : (target.parentElement as HTMLDivElement);
-    const vote = Number(nftTile.dataset.vote);
+  function selectNFT(id: number, vote: number) {
     $potentials.map((potential) => {
-      if (potential.id.toString() === nftTile?.id) {
-        if ($listedNumbers.includes(Number(nftTile?.id))) {
+      if (potential.id === id) {
+        if ($listedNumbers.includes(id)) {
           toastStore.show("Delist this Potential to vote!", "error");
           return;
         }
@@ -169,8 +163,6 @@
 
   /* --- TABS HANDLING --- */
 
-  // let width: number;
-
   const openTab = (tab: "nfts" | "episodes") => {
     if (tab === "nfts") {
       console.log("Open NFTs");
@@ -178,301 +170,79 @@
       console.log("Open Episodes");
     }
   };
-
-  // let nftBarState: boolean = false;
-  // let episodesBarState: boolean = false;
-
-  // let nftsBarPosition: number = nftBarState ? 80 : 0;
-  // let episodesBarPosition: number = episodesBarState ? 44 : 0;
-
-  // let nftsInterval: ReturnType<typeof setInterval>;
-  // let episodesInterval: ReturnType<typeof setInterval>;
-
-  // function closeActiveTab() {
-  //   if (episodesBarState) handleEpisodesBar();
-  //   if (nftBarState) handleNFTsBar();
-  // }
-
-  // NFTs tab opening
-  // function handleNFTsBar() {
-  //   if (episodesBarState) handleEpisodesBar();
-
-  //   if (!nftBarState) {
-  //     $potentials = $potentials; // force re-render NFTs
-  //     if (width <= 600) {
-  //       nftsInterval = setInterval(() => {
-  //         slideBarMobile(true, "nfts");
-  //       }, 5);
-  //     } else {
-  //       nftsInterval = setInterval(() => {
-  //         slideBarPC(true, "nfts");
-  //       }, 5);
-  //     }
-  //     nftBarState = true;
-  //     iconHandle("nfts");
-  //     BG.style.display = "block";
-  //   } else {
-  //     if (width <= 600) {
-  //       nftsInterval = setInterval(() => {
-  //         slideBarMobile(false, "nfts");
-  //       }, 5);
-  //     } else {
-  //       nftsInterval = setInterval(() => {
-  //         slideBarPC(false, "nfts");
-  //       }, 5);
-  //     }
-  //     nftBarState = false;
-  //     iconHandle("nfts");
-  //     BG.style.display = "none";
-  //   }
-  // }
-
-  //Episodes tab opening
-  // function handleEpisodesBar() {
-  //   if (nftBarState) handleNFTsBar();
-
-  //   if (!episodesBarState) {
-  //     if (width <= 600) {
-  //       episodesInterval = setInterval(() => {
-  //         slideBarMobile(true, "episodes");
-  //       }, 5);
-  //     } else {
-  //       episodesInterval = setInterval(() => {
-  //         slideBarPC(true, "episodes");
-  //       }, 5);
-  //     }
-  //     episodesBarState = true;
-  //     iconHandle("episodes");
-  //     BG.style.display = "block";
-  //   } else {
-  //     if (width <= 600) {
-  //       episodesInterval = setInterval(() => {
-  //         slideBarMobile(false, "episodes");
-  //       }, 5);
-  //     } else {
-  //       episodesInterval = setInterval(() => {
-  //         slideBarPC(false, "episodes");
-  //       }, 5);
-  //     }
-  //     episodesBarState = false;
-  //     iconHandle("episodes");
-  //     BG.style.display = "none";
-  //   }
-  // }
-
-  // Utility function for icons switching
-  // function iconHandle(tab: "nfts" | "episodes") {
-  //   if (width <= 600) {
-  //     if (tab === "nfts") {
-  //       if (nftBarState) {
-  //         episodesIcon.style.zIndex = "19";
-  //         episodesIcon.style.backgroundImage =
-  //           "url('/episodesMobileOpen-Inactive.avif')";
-  //         nftIcon.style.backgroundImage = "url('/sideIconMobileClose.avif')";
-  //       } else {
-  //         episodesIcon.style.zIndex = "19";
-  //         episodesIcon.style.backgroundImage =
-  //           "url('/episodesMobileOpen.avif')";
-  //         nftIcon.style.backgroundImage = "url('/sideIconMobileOpen.avif')";
-  //       }
-  //     } else if (tab === "episodes") {
-  //       if (episodesBarState) {
-  //         episodesIcon.style.zIndex = "22";
-  //         episodesIcon.style.backgroundImage =
-  //           "url('/episodesMobileClose.avif')";
-  //         nftIcon.style.backgroundImage =
-  //           "url('/sideIconMobileOpen-Inactive.avif')";
-  //       } else {
-  //         episodesIcon.style.zIndex = "19";
-  //         episodesIcon.style.backgroundImage =
-  //           "url('/episodesMobileOpen.avif')";
-  //         nftIcon.style.backgroundImage = "url('/sideIconMobileOpen.avif')";
-  //       }
-  //     }
-  //   } else {
-  //     if (tab === "nfts") {
-  //       if (nftBarState) {
-  //         nftIcon.style.backgroundImage = "url('/sideIconPCClose.avif')";
-  //       } else {
-  //         nftIcon.style.backgroundImage = "url('/sideIconPCOpen.avif')";
-  //       }
-  //     } else if (tab === "episodes") {
-  //       if (episodesBarState) {
-  //         episodesIcon.style.backgroundImage = "url('/episodesPCClose.avif')";
-  //       } else {
-  //         episodesIcon.style.backgroundImage = "url('/episodesPCOpen.avif')";
-  //       }
-  //     }
-  //   }
-  // }
-
-  // Utility function for PC tabs handling
-  // function slideBarPC(open: boolean, tab: "nfts" | "episodes") {
-  //   if (tab === "nfts") {
-  //     if (open) {
-  //       if (nftsBarPosition == 80) {
-  //         clearInterval(nftsInterval);
-  //       } else {
-  //         nftsBarPosition += 4;
-  //         nftIcon.style.right = `${nftsBarPosition}vw`;
-  //         nftBar.style.right = `${nftsBarPosition - 80}vw`;
-  //       }
-  //     } else {
-  //       if (nftsBarPosition == 0) {
-  //         clearInterval(nftsInterval);
-  //       } else {
-  //         nftsBarPosition -= 4;
-  //         nftIcon.style.right = `${nftsBarPosition}vw`;
-  //         nftBar.style.right = `${nftsBarPosition - 80}vw`;
-  //       }
-  //     }
-  //   } else if (tab === "episodes") {
-  //     if (open) {
-  //       if (episodesBarPosition == 40) {
-  //         clearInterval(episodesInterval);
-  //       } else {
-  //         episodesBarPosition += 4;
-  //         episodesIcon.style.left = `${episodesBarPosition + 4}vw`;
-  //         episodesBar.style.left = `${episodesBarPosition - 40}vw`;
-  //       }
-  //     } else {
-  //       if (episodesBarPosition == 0) {
-  //         clearInterval(episodesInterval);
-  //       } else {
-  //         episodesBarPosition -= 4;
-  //         episodesIcon.style.left = `${episodesBarPosition}vw`;
-  //         episodesBar.style.left = `${episodesBarPosition - 44}vw`;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // Utility function for Mobile tabs handling
-  // function slideBarMobile(open: boolean, tab: "nfts" | "episodes") {
-  //   if (open) {
-  //     if (tab === "nfts") {
-  //       if (nftsBarPosition == 80) {
-  //         clearInterval(nftsInterval);
-  //       } else {
-  //         nftsBarPosition += 4;
-  //         if (!episodesBarState) episodesIcon.style.top = `${nftsBarPosition}%`;
-  //         nftIcon.style.top = `${nftsBarPosition}%`;
-  //         nftBar.style.top = `${nftsBarPosition - 80}%`;
-  //       }
-  //     } else if (tab === "episodes") {
-  //       if (episodesBarPosition == 80) {
-  //         clearInterval(episodesInterval);
-  //       } else {
-  //         episodesBarPosition += 4;
-  //         if (!nftBarState) nftIcon.style.top = `${episodesBarPosition}%`;
-  //         episodesIcon.style.top = `${episodesBarPosition}%`;
-  //         episodesBar.style.top = `${episodesBarPosition - 80}%`;
-  //       }
-  //     }
-  //   } else {
-  //     if (tab === "nfts") {
-  //       if (nftsBarPosition == 0) {
-  //         clearInterval(nftsInterval);
-  //       } else {
-  //         nftsBarPosition -= 4;
-  //         if (!episodesBarState) episodesIcon.style.top = `${nftsBarPosition}%`;
-  //         nftIcon.style.top = `${nftsBarPosition}%`;
-  //         nftBar.style.top = `${nftsBarPosition - 80}%`;
-  //       }
-  //     } else if (tab === "episodes") {
-  //       if (episodesBarPosition == 0) {
-  //         clearInterval(episodesInterval);
-  //       } else {
-  //         episodesBarPosition -= 4;
-  //         if (!nftBarState) nftIcon.style.top = `${episodesBarPosition}%`;
-  //         episodesIcon.style.top = `${episodesBarPosition}%`;
-  //         episodesBar.style.top = `${episodesBarPosition - 80}%`;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // SVG Icons
-  let contractSvgFocus: boolean = false;
-  let refreshSvgFocus: boolean = false;
 </script>
 
-<!-- <svelte:window bind:outerWidth={width} /> -->
-
 <!-- --- Episodes tab --- -->
-<section class="episodes-tab" bind:this={episodesBar}>
+<section class="episodes-tab flex pad" bind:this={episodesBar}>
   <button
     bind:this={episodesIcon}
-    class="void-btn tab-icon"
+    class="tab-icon"
     aria-label="Episodes"
     onclick={() => openTab("episodes")}
   >
     Episodes
   </button>
 
-  <h4 class="franchise-title">The Dischordian Saga</h4>
+  <h3 class="franchise-title">The Dischordian Saga</h3>
 
   <button
-    class="purple-btn"
+    class="button-glowing"
     onclick={() => open("https://loredex.degenerousdao.com/", "_blank")}
   >
     Dive into LOREDEX
   </button>
 
-  {#if $walletAddress || $storyNodes.length > 0}
-    <select onchange={switchSeason} disabled={$loadingStories !== -1}>
-      <option value="1" selected={$season == 1}>Season 1</option>
-      <option value="2" selected={$season == 2}>Season 2</option>
-    </select>
-    {#if $storyNodes.length > 0}
-      <ul bind:this={episodes}>
-        {#each $storyNodes as episodeObject, index}
-          <button
-            class="void-btn episode"
-            class:active={$episode == index}
-            onclick={() => switchEpisode(index)}
-          >
-            <img src={episodeObject.image_url} alt="Episode {index + 1}" />
-            <h5>
-              {episodeObject.season
-                ? episodeObject.title
-                : episodeObject.episodeName}
-            </h5>
-            <p>Episode {index + 1}</p>
-          </button>
-        {/each}
-      </ul>
-    {:else}
-      <h5>Loading Season {$season}</h5>
-      <div class="progress-bar">
-        <div
-          class="progress-thumb loading-animation"
-          style="width: {$loadingStories}%;"
-        ></div>
-      </div>
-    {/if}
+  <select
+    onchange={switchSeason}
+    disabled={!$storyNodes.length || $loadingStories !== -1}
+  >
+    <option value="1" selected={$season == 1}>Season 1</option>
+    <option value="2" selected={$season == 2}>Season 2</option>
+  </select>
+  {#if $storyNodes.length}
+    <ul bind:this={episodes}>
+      {#each $storyNodes as episodeObject, index}
+        <button
+          class="void-btn episode tile"
+          class:active={$episode == index}
+          onclick={() => switchEpisode(index)}
+        >
+          <img src={episodeObject.image_url} alt="Episode {index + 1}" />
+          <h5>
+            {episodeObject.season
+              ? episodeObject.title
+              : episodeObject.episodeName}
+          </h5>
+          <p>Episode {index + 1}</p>
+        </button>
+      {/each}
+    </ul>
   {:else}
-    <button class="void-btn login-tip" onclick={() => openTab("nfts")}>
-      Connect web3 account to load Story Nodes
-    </button>
+    <h5>Loading Season {$season}</h5>
+    <div class="progress-bar">
+      <div
+        class="progress-thumb loading-animation"
+        style="width: {$loadingStories}%;"
+      ></div>
+    </div>
   {/if}
 </section>
 
 <!-- --- NFTs tab --- -->
-<section class="nfts-tab" bind:this={nftBar}>
+<section class="nfts-tab flex pad" bind:this={nftBar}>
   <button
     bind:this={nftIcon}
-    class="void-btn tab-icon"
+    class="tab-icon"
     aria-label="NFTs"
     onclick={() => openTab("nfts")}
   >
     NFTs
   </button>
 
-  <header class="wallet-container flex-row" bind:this={walletContainer}>
+  <header class="flex-row" bind:this={walletContainer}>
     {#if $walletAddress}
-      <p>{$username}</p>
-      <span class="nfts-selector-wrapper flex-row" bind:this={nftsSelector}>
+      <p class="pc-only">{$username}</p>
+      <span class="flex-row gap-8" bind:this={nftsSelector}>
         <p class="pc-only">Select Potentials:</p>
         <select
           bind:value={selectCondition}
@@ -500,7 +270,7 @@
     {:else}
       <p>Connect Wallet:</p>
     {/if}
-    <span class="sign-button-wrapper flex-row">
+    <span class="flex-row gap-8">
       {#if $walletAddress}
         <ContractSVG onclick={() => ($showModal = true)} />
       {/if}
@@ -509,50 +279,50 @@
   </header>
 
   {#if $walletAddress}
-    {#if $potentials.length > 0}
-      <span class="nfts-legend flex-row">
-        <p>
-          {#if $fetchingDelegations}
-            Loading
-          {:else}
-            Total
-          {/if}
-          NFTs: {$potentials.length}
-        </p>
-        <RefreshSVG
-          onclick={() => {
-            $potentials = $potentials;
-          }}
-        />
+    {#if $potentials.length}
+      <div class="nfts-legend flex-row flex-wrap gap-8">
+        <span class="flex-row gap-8">
+          <h5>
+            {#if $fetchingDelegations}
+              Loading
+            {:else}
+              Total
+            {/if}
+            NFTs: {$potentials.length}
+          </h5>
+          <RefreshSVG
+            onclick={() => {
+              $potentials = $potentials;
+            }}
+          />
+        </span>
 
-        <p>Selected NFTs: {$selectedNFTs.length}</p>
-      </span>
+        <h5>
+          Selected<strong class="pc-only">NFTs</strong>:
+          {$selectedNFTs.length}
+        </h5>
+      </div>
 
-      <ul bind:this={nftTiles}>
+      <ul class="flex-row flex-wrap" bind:this={nftTiles}>
         {#each $potentials as NFT}
           {#await nftVote($episode, NFT.id) then vote}
             <button
-              class="void-btn nft"
+              class="void-btn nft potential-tile"
+              class:selected={selectedIDs.flat().includes(NFT.id)}
               class:delegated={NFT.delegated}
-              id={NFT.id.toString()}
-              onclick={selectNFT}
-              style={selectedIDs.flat().includes(NFT.id)
-                ? `background-color: ${NFT.delegated ? "#50307b" : "#2441BD"}; color: rgba(51, 226, 230, 0.9); box-shadow: 0 0 0.5vw rgb(51, 226, 230); color = #33E2E6; opacity: 1; filter: brightness(125%);`
-                : $listedNumbers.includes(NFT.id)
-                  ? "background-color: rgb(22, 30, 95);"
-                  : `opacity: ${vote > 0 ? "0.5" : "1"}`}
-              data-vote={vote}
+              class:listed={$listedNumbers.includes(NFT.id)}
+              class:used={vote > 0}
+              onclick={() => selectNFT(NFT.id, Number(vote))}
             >
               <img src={NFT.image} alt={NFT.name} />
               <h5>{NFT.name}</h5>
-              <p>{NFT.class}</p>
               {#if vote > 0}
                 <p>
                   Selected option: <strong>{vote}</strong>
                 </p>
               {/if}
               {#if $listedNumbers.includes(NFT.id)}
-                <p class="nft-vote">
+                <p>
                   Listed
                   <strong class="pc-only"> on marketplace </strong>
                 </p>
@@ -566,10 +336,11 @@
         {/each}
       </ul>
     {:else}
-      <p class="no-nfts-title">
+      <p>
         Your wallet doesn't have any
         <a
           href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+          target="_blank"
         >
           Potential
         </a>... You're not allowed to enter the Galactic Governance Hub unless
@@ -672,4 +443,20 @@
 
 <style lang="scss">
   @use "/src/styles/mixins" as *;
+
+  .nfts-tab {
+    .nfts-legend {
+      justify-content: space-between;
+
+      h5 {
+        @include white-txt;
+      }
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    select {
+      width: 100%;
+    }
+  }
 </style>

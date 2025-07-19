@@ -36,7 +36,7 @@ const abi_v2 = [
 let abi = abi_v1;
 
 export const contract = async (providerType: "user" | "alchemy" = "user"): Promise<any> => {
-    let provider;
+    let provider: any;
 
     if (providerType === "user")
         userProvider.subscribe((userProvider) => provider = userProvider);
