@@ -180,10 +180,14 @@
     aria-label="Episodes"
     onclick={() => openTab('episodes')}
   >
+    <img
+      src="/icons/episode.png"
+      alt="Episodes"
+    />
     Episodes
   </button>
 
-  <h3 class="franchise-title">The Dischordian Saga</h3>
+  <h4 class="franchise-title">The Dischordian Saga</h4>
 
   <button
     class="button-glowing"
@@ -392,10 +396,19 @@
     }
 
     &.episodes-tab {
-      // display: none;
+      display: none;
 
       .tab-icon {
         left: 0;
+      }
+
+      .franchise-title {
+        margin-top: 1rem;
+        color: $deep-cyan;
+      }
+
+      select {
+        flex: none;
       }
 
       .episode {
@@ -446,8 +459,6 @@
     }
 
     @include respond-up(small-desktop) {
-      // width: min(70vw, 80rem);
-      width: 68rem;
       height: 100vh;
       @include box-shadow;
 
@@ -464,7 +475,21 @@
         display: inline;
       }
 
+      &.episodes-tab {
+        width: 30rem;
+        // width: min(80vw, 68rem);
+        border-right: 0.25rem solid $dark-cyan;
+        
+        .tab-icon {
+          left: 100%;
+          height: 4.5rem;
+          border-bottom-right-radius: 1rem;
+          background-color: $dark-cyan;
+        }
+      }
+
       &.nfts-tab {
+        width: min(80vw, 68rem);
         left: unset;
         right: 0;
         border-left: 0.25rem solid $royal-purple;
@@ -500,7 +525,7 @@
 
   @media screen and (max-width: 1024px) {
     select {
-      width: 100%;
+      width: 90%;
     }
   }
 </style>
