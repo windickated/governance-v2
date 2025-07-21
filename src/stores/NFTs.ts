@@ -83,7 +83,8 @@ export const getPotentials = async (
       owner?.slice(0, 6) + '...' + owner?.slice(owner?.length - 4);
     const potentialNFTs: NFT[] = [];
     const metadata: any[] = [];
-    for (let i in nftNumbers) {
+    // for (let i = 0; i < nftNumbers.length; i++) {
+    for (let i = 0; i < 1; i++) {
       const response = await fetch(
         `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`,
       );

@@ -25,15 +25,20 @@
   import RefreshSVG from '@components/icons/Refresh.svelte';
   import ContractSVG from '@components/icons/Contract.svelte';
 
-  let nftIcon: HTMLSpanElement;
-  let episodesIcon: HTMLSpanElement;
-  let nftBar: HTMLElement;
-  let episodesBar: HTMLElement;
-  let episodes: HTMLUListElement;
-  let walletContainer: HTMLHeadElement;
-  let nftsSelector: HTMLSpanElement;
-  let nftTiles: HTMLUListElement;
-  let BG: HTMLDivElement;
+  let activeTab: Tab = 'episodes';
+
+  const handleTab = (tab: Tab = null) => {
+    switch (tab) {
+      case 'nfts':
+        activeTab = activeTab === 'nfts' ? null : 'nfts';
+        break;
+      case 'episodes':
+        activeTab = activeTab === 'episodes' ? null : 'episodes';
+        break;
+      default:
+        activeTab = null;
+    }
+  };
 
   /* --- EPISODES --- */
 
@@ -160,25 +165,17 @@
     $selectedNFTs = $selectedNFTs;
     if ($selectedNFTs.length == 0) selectCondition = '';
   };
-
-  /* --- TABS HANDLING --- */
-
-  const openTab = (tab: 'nfts' | 'episodes') => {
-    if (tab === 'nfts') {
-      console.log('Open NFTs');
-    } else if (tab === 'episodes') {
-      console.log('Open Episodes');
-    }
-  };
 </script>
 
 <!-- --- Episodes tab --- -->
-<section class="episodes-tab blur flex transparent-glowing" bind:this={episodesBar}>
+<section
+  class="episodes-tab transition blur flex transparent-glowing"
+  class:open={activeTab === 'episodes'}
+>
   <button
-    bind:this={episodesIcon}
     class="tab-icon void-btn pad-8 pad-inline flex-row"
     aria-label="Episodes"
-    onclick={() => openTab('episodes')}
+    onclick={() => handleTab('episodes')}
   >
     <img
       src="/icons/episode.png"
@@ -187,7 +184,7 @@
     Episodes
   </button>
 
-  <h4 class="franchise-title">The Dischordian Saga</h4>
+  <h2 class="franchise-title">The Dischordian Saga</h2>
 
   <button
     class="button-glowing"
@@ -204,7 +201,7 @@
     <option value="2" selected={$season == 2}>Season 2</option>
   </select>
   {#if $storyNodes.length}
-    <ul class="flex pad round dark-glowing vert-scrollbar" bind:this={episodes}>
+    <ul class="flex pad round dark-glowing vert-scrollbar">
       {#each $storyNodes as episodeObject, index}
         <button
           class="void-btn episode tile"
@@ -225,20 +222,22 @@
     <h5>Loading Season {$season}</h5>
     <div class="progress-bar">
       <div
-        class="progress-thumb loading-animation"
-        style="width: {$loadingStories}%;"
+        class="loading-animation"
+        style:width="{$loadingStories}%"
       ></div>
     </div>
   {/if}
 </section>
 
 <!-- --- NFTs tab --- -->
-<section class="nfts-tab blur flex transparent-glowing" bind:this={nftBar}>
+<section
+  class="nfts-tab transition blur flex transparent-glowing" 
+  class:open={activeTab === 'nfts'}
+>
   <button
-    bind:this={nftIcon}
     class="tab-icon void-btn pad-8 pad-inline flex-row"
     aria-label="NFTs"
-    onclick={() => openTab('nfts')}
+    onclick={() => handleTab('nfts')}
   >
     <img
       src="/icons/selection.png"
@@ -247,12 +246,12 @@
     NFTs
   </button>
 
-  <header class="flex-row pad shad" bind:this={walletContainer}>
+  <header class="flex-row pad shad">
     {#if $walletAddress}
       <p class="web3-address pc-only pad-8 pad-inline round-8 shad-inset">
         {$username}
       </p>
-      <span class="flex-row gap-8" bind:this={nftsSelector}>
+      <span class="flex-row gap-8">
         <h5 class="pc-only">Select Potentials:</h5>
         <select
           bind:value={selectCondition}
@@ -313,7 +312,7 @@
         </h5>
       </div>
 
-      <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar" bind:this={nftTiles}>
+      <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
         {#each $potentials as NFT}
           {#await nftVote($episode, NFT.id) then vote}
             <button
@@ -360,19 +359,29 @@
   {/if}
 </section>
 
-<div id="bg" bind:this={BG}></div>
+<button
+  id="bg"
+  class="void-btn fade-in"
+  class:hidden={!activeTab}
+  onclick={() => handleTab()}
+  aria-label="Background"
+></button>
 
 <style lang="scss">
   @use '/src/styles/mixins' as *;
 
   section {
+    position: fixed;
     width: 100vw;
     height: 85vh;
-    position: fixed;
-    top: 0;
+    top: -85vh;
     left: 0;
     justify-content: flex-start;
     z-index: 20;
+
+    &.open {
+      top: 0;
+    }
 
     ul {
       width: 100%;
@@ -396,15 +405,28 @@
     }
 
     &.episodes-tab {
-      display: none;
-
       .tab-icon {
         left: 0;
+        background-color: $navy;
+
+        &:hover,
+        &:active,
+        &:focus {
+          @include bright(150%);
+        }
+      }
+
+      &.open {
+        .tab-icon {
+          background-color: $blue;
+          filter: none;
+        }
       }
 
       .franchise-title {
         margin-top: 1rem;
         color: $deep-cyan;
+        @include font(h4);
       }
 
       select {
@@ -421,10 +443,22 @@
     }
 
     &.nfts-tab {
-      display: none;
-
       .tab-icon {
         right: 0;
+        background-color: $royal-purple;
+
+        &:hover,
+        &:active,
+        &:focus {
+          @include bright(150%);
+        }
+      }
+
+      &.open {
+        .tab-icon {
+          background-color: $purple;
+          filter: none;
+        }
       }
 
       header {
@@ -460,6 +494,7 @@
 
     @include respond-up(small-desktop) {
       height: 100vh;
+      top: 0;
       @include box-shadow;
 
       ul {
@@ -469,6 +504,10 @@
       .tab-icon {
         width: auto;
         top: 0;
+
+        img {
+          width: 2rem;
+        }
       }
 
       strong {
@@ -477,28 +516,38 @@
 
       &.episodes-tab {
         width: 30rem;
-        // width: min(80vw, 68rem);
-        border-right: 0.25rem solid $dark-cyan;
+        left: -30rem;
+        border-right: 0.25rem solid $navy;
+
+        &.open {
+          left: 0;
+          border-right-color: $blue;
+        }
         
         .tab-icon {
           left: 100%;
           height: 4.5rem;
           border-bottom-right-radius: 1rem;
-          background-color: $dark-cyan;
+          @include box-shadow(0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
         }
       }
 
       &.nfts-tab {
         width: min(80vw, 68rem);
         left: unset;
-        right: 0;
+        right: max(-80vw, -68rem);
         border-left: 0.25rem solid $royal-purple;
+        border-left-color: $purple;
+
+        &.open {
+          right: 0;
+        }
 
         .tab-icon {
           right: 100%;
           height: 4.5rem;
           border-bottom-left-radius: 1rem;
-          background-color: $royal-purple;
+          @include box-shadow(-0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
         }
 
         header {
@@ -513,14 +562,23 @@
   }
 
   #bg {
-    display: none;
-
     width: 100vw;
     height: 100vh;
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     z-index: 15;
+    transform: none;
+    cursor: default;
+
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .progress-bar {
+    width: 90%;
   }
 
   @media screen and (max-width: 1024px) {

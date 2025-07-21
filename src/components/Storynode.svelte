@@ -178,8 +178,8 @@
               <p>Loading...</p>
               <div class="progress-bar">
                 <span
-                  class="progress-thumb loading-animation"
-                  style="width: {$checkingResults}%;"
+                  class="loading-animation"
+                  style:width="{$checkingResults}%;"
                 ></span>
               </div>
               <p>{Math.round($checkingResults)}%</p>

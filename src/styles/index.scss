@@ -612,6 +612,21 @@ html {
   }
 }
 
+.progress-bar {
+  width: 15rem;
+  height: 0.5rem;
+  border-radius: 1rem;
+  @include cyan(0.25);
+
+  div {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    transition: width 1s linear;
+    @include cyan(0.5);
+  }
+}
+
 .pc-only {
   display: none;
 
