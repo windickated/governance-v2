@@ -25,7 +25,7 @@
   import RefreshSVG from '@components/icons/Refresh.svelte';
   import ContractSVG from '@components/icons/Contract.svelte';
 
-  let activeTab: Tab = 'episodes';
+  let activeTab: Tab = null;
 
   const handleTab = (tab: Tab = null) => {
     switch (tab) {

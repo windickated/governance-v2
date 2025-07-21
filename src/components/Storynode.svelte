@@ -150,10 +150,10 @@
       {$story.season ? $story.title : $story.episodeName}
     </h2>
     <h3>The Dischordian Saga: Season {$season} - Episode {$episode + 1}</h3>
-    <section class="flex-row pad-8 round">
-      <div class="voting-info flex-row round">
+    <section class="flex-row flex-wrap pad-8 round">
+      <div class="voting-info flex-row flex-wrap round">
         <h5>{$story.duration}</h5>
-        <span class="dark-txt">|</span>
+        <span class="dark-txt pc-only">|</span>
         <p class="validation" class:green-txt={!$storyNodes[$episode].ended}>
           Voting
           {$storyNodes[$episode].ended ? 'ended' : 'active'}
@@ -162,33 +162,27 @@
 
       {#if $storyNodes[$episode].ended}
         {#if $votingResults}
-          <p>
-            Option: <strong>{$votingResults.win}</strong>
-            | Participation:
-            <strong
-              >{Math.round(
-                ($votingResults.participation / 1035) * 100,
-              )}%</strong
-            >
-          </p>
+          <span class="results flex">
+            <h5>Option: {$votingResults.win}</h5>
+            <span class="dark-txt pc-only">|</span>
+            <h5>
+              Participation:
+              {Math.round(($votingResults.participation / 1035) * 100)}%
+            </h5>
+            <p class="validation green-txt mobile-only">Check results below</p>
+          </span>
         {:else}
-          <div>
+          <span class="flex-row gap-8">
             {#if $checkingResults !== -1}
               <LoadingSVG />
-              <p>Loading...</p>
-              <div class="progress-bar">
-                <span
-                  class="loading-animation"
-                  style:width="{$checkingResults}%;"
-                ></span>
-              </div>
-              <p>{Math.round($checkingResults)}%</p>
+              <h5>{Math.round($checkingResults)}%</h5>
+              <h5>Loading...</h5>
             {:else}
               <button class="button-glowing" onclick={checkVotingResults}>
                 Check Results
               </button>
             {/if}
-          </div>
+          </span>
         {/if}
       {:else}
         <p style={endSoon ? 'color: red;' : ''}>{votingCountdown}</p>
@@ -264,6 +258,12 @@
         background-color: #01204e;
         border: 0.1vw solid #203962;
         @include box-shadow(soft, inset);
+      }
+    }
+
+    .results {
+      @include respond-up(small-desktop) {
+        flex-direction: row;
       }
     }
   }
