@@ -177,10 +177,7 @@
     aria-label="Episodes"
     onclick={() => handleTab('episodes')}
   >
-    <img
-      src="/icons/episode.png"
-      alt="Episodes"
-    />
+    <img src="/icons/episode.png" alt="Episodes" />
     Episodes
   </button>
 
@@ -221,17 +218,14 @@
   {:else}
     <h5>Loading Season {$season}</h5>
     <div class="progress-bar">
-      <div
-        class="loading-animation"
-        style:width="{$loadingStories}%"
-      ></div>
+      <div class="loading-animation" style:width="{$loadingStories}%"></div>
     </div>
   {/if}
 </section>
 
 <!-- --- NFTs tab --- -->
 <section
-  class="nfts-tab transition blur flex transparent-glowing" 
+  class="nfts-tab transition blur flex transparent-glowing"
   class:open={activeTab === 'nfts'}
 >
   <button
@@ -239,10 +233,7 @@
     aria-label="NFTs"
     onclick={() => handleTab('nfts')}
   >
-    <img
-      src="/icons/selection.png"
-      alt="NFTs"
-    />
+    <img src="/icons/selection.png" alt="NFTs" />
     NFTs
   </button>
 
@@ -435,7 +426,7 @@
 
       .episode {
         width: 100%;
-        
+
         img {
           aspect-ratio: 16 / 9;
         }
@@ -523,7 +514,7 @@
           left: 0;
           border-right-color: $blue;
         }
-        
+
         .tab-icon {
           left: 100%;
           height: 4.5rem;

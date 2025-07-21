@@ -1,12 +1,6 @@
 @use 'sass:map';
 @use './breakpoints' as *;
 
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/roboto-regular.woff2') format('woff2');
-  font-display: swap;
-}
-
 $font-scale: (
   'body': clamp(1rem, 1.5vw, 1.05rem),
   // 16–18px
