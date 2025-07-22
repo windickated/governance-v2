@@ -241,7 +241,7 @@
     max-width: min(95%, 70rem);
     background-color: #01204e;
     border: 2px solid #203962;
-    @include box-shadow;
+    // @include box-shadow;
 
     h3 {
       @include white-txt(soft);
@@ -256,7 +256,7 @@
       .voting-info {
         padding: 0.5rem 1.5rem;
         background-color: #01204e;
-        border: 0.1vw solid #203962;
+        border: 1px solid #203962;
         @include box-shadow(soft, inset);
       }
     }

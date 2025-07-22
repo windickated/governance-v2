@@ -534,9 +534,12 @@
       .tab-icon {
         width: auto;
         top: 0;
+        height: 4.5rem;
+        min-height: 4vw;
 
         img {
           width: 2rem;
+          min-width: 1.5vw;
         }
       }
 
@@ -556,7 +559,6 @@
 
         .tab-icon {
           left: 100%;
-          height: 4.5rem;
           border-bottom-right-radius: 1rem;
           @include box-shadow(0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
         }
@@ -575,7 +577,6 @@
 
         .tab-icon {
           right: 100%;
-          height: 4.5rem;
           border-bottom-left-radius: 1rem;
           @include box-shadow(-0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
         }
