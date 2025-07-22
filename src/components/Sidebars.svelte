@@ -181,7 +181,7 @@
     Episodes
   </button>
 
-  <h2 class="franchise-title">The Dischordian Saga</h2>
+  <h2 class="franchise-title text-glowing">The Dischordian Saga</h2>
 
   <button
     class="button-glowing"
@@ -416,7 +416,6 @@
 
       .franchise-title {
         margin-top: 1rem;
-        color: $deep-cyan;
         @include font(h4);
       }
 
@@ -426,6 +425,11 @@
 
       .episode {
         width: 100%;
+
+        &.active {
+          @include cyan(0.85);
+          @include dark-blue(1, text);
+        }
 
         img {
           aspect-ratio: 16 / 9;
@@ -475,6 +479,41 @@
 
       .nft {
         max-width: calc(50% - 0.5rem);
+
+        &.delegated {
+          @include gray(0.25);
+
+          &:hover:not(&:disabled),
+          &:active:not(&:disabled),
+          &:focus:not(&:disabled) {
+            @include gray(0.35);
+          }
+        }
+
+        &.listed {
+          @include deep-red(0.25);
+
+          &:hover:not(&:disabled),
+          &:active:not(&:disabled),
+          &:focus:not(&:disabled) {
+            @include deep-red(0.35);
+          }
+        }
+
+        &.used {
+          @include gray(0.75, text);
+
+          &:hover:not(&:disabled),
+          &:active:not(&:disabled),
+          &:focus:not(&:disabled) {
+            @include orange(1, text, bright);
+          }
+        }
+
+        &.selected {
+          @include purple(1, bg, bright);
+          @include dark-blue(1, text);
+        }
       }
 
       .web3-address {
