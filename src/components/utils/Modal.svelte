@@ -1,3 +1,4 @@
+<!-- LEGACY SVELTE 3/4 SYNTAX -->
 <script lang="ts">
   import { showModal } from '@stores/modal.ts';
   import {
@@ -17,6 +18,9 @@
     claimNFTs,
     checkDelegatedWallets,
   } from '@lib/potentials.js';
+
+  import LoadingSVG from '@components/icons/Loading.svelte';
+  import CloseSVG from '@components/icons/Close.svelte';
 
   let dialog: HTMLDialogElement;
   let userAddress: string = '';
@@ -92,28 +96,27 @@
     }
     return count;
   };
-
-  // SVG Icons
-  let closeSvgFocus: boolean = false;
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events
+a11y-no-noninteractive-element-interactions
+a11y_no_static_element_interactions -->
 <dialog
   class="blur"
   bind:this={dialog}
   on:close={closeDialog}
   on:click|self={closeDialog}
+  aria-label="Modal"
 >
-  <!-- svelte-ignore a11y-no-static-element-interactions a11y_no_noninteractive_element_to_interactive_role -->
   <div on:click|stopPropagation>
-    <section class="delegate-container">
-      <h2>
+    <section class="flex">
+      <h5>
         Paste the address of your choice to delegate the voting power of your
         Potentials or import delegated Potentials from another wallet.
-      </h2>
+      </h5>
 
       <div
-        class="address-container"
+        class="transparent-container"
         style={checkApproval
           ? 'background-color: rgba(56, 117, 250, 0.1); color: rgba(56, 117, 250, 0.75); box-shadow: 0 0 0.5vw rgba(56, 117, 250, 0.75);'
           : ''}
@@ -132,7 +135,7 @@
         {:else if userAddress.length < 42}
           <p class="validation">Address is too short</p>
         {:else if userAddress == $walletAddress}
-          <p class="validation">You can't use your connected address.</p>
+          <p class="validation">You can't use your connected address</p>
         {:else if !validation}
           <p class="validation">Please provide a valid address!</p>
         {/if}
@@ -141,7 +144,7 @@
           {#if approval == false}
             <p class="validation gray">Checking approval for NFTs...</p>
           {:else if validation && approval == null && userAddress !== $walletAddress}
-            <p class="validation">There is no approval for this address.</p>
+            <p class="validation">There is no approval for this address</p>
           {:else if $nftApprovals
             .map((approval) => approval.owner)
             .includes(userAddress)}
@@ -149,13 +152,14 @@
               You have already imported NFTs from this address.
             </p>
           {/if}
-          <div>
-            <p
+          <span class="flex-row">
+            <button
+              class="switcher void-btn"
               on:click={() => (checkApproval = false)}
               style="color: rgba(56, 117, 250, 0.75);"
             >
               Delegate
-            </p>
+            </button>
             <span>|</span>
             <button
               disabled={!validation ||
@@ -172,7 +176,7 @@
                 };
               }}>IMPORT POTENTIALS</button
             >
-          </div>
+          </span>
         {:else}
           {#if approval == false}
             <p class="validation gray">Checking approval for NFTs...</p>
@@ -181,7 +185,7 @@
               This address can vote with your Potentials!
             </p>
           {/if}
-          <div>
+          <span class="flex-row">
             <button
               disabled={!validation ||
                 approval ||
@@ -191,17 +195,22 @@
               }}>DELEGATE</button
             >
             <span>|</span>
-            <p on:click={() => (checkApproval = true)}>Import Potentials</p>
-          </div>
+            <button
+              class="switcher void-btn"
+              on:click={() => (checkApproval = true)}
+            >
+              Import Potentials
+            </button>
+          </span>
         {/if}
       </div>
-      <h2>
+      <h5>
         You can always
         <a href="https://revoke.cash/"> revoke your approvals</a>.
-      </h2>
+      </h5>
 
-      <div class="delegations">
-        <h2 class="delegations-count">
+      <div class="transparent-container">
+        <h4>
           {#if $nftApprovals && $nftApprovals.length > 0}
             Your Delegations:
             <strong>{getDelegationsCount()}</strong>
@@ -209,27 +218,21 @@
           {:else}
             Your Delegations
           {/if}
-        </h2>
+        </h4>
         {#if $nftApprovals && $nftApprovals.length > 0}
-          <ul>
+          <ul class="flex">
             {#each $nftApprovals as { owner, nfts }, index}
-              <li class="wallet">
-                <p>{index + 1}</p>
-                <span
-                  >{owner.slice(0, 6) + '...' + owner.slice(owner.length - 4)}
+              <li class="wallet small-orange-tile">
+                <h4>{index + 1}</h4>
+                <p>
+                  {owner.slice(0, 6) + '...' + owner.slice(owner.length - 4)}
                   {#if nfts}
                     |
                     {nfts.length} NFT{nfts.length == 1 ? '' : 's'}
-                  {/if}</span
-                >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="-100 -100 200 200"
-                  class="close-svg remove-wallet"
-                  stroke="rgba(255, 60, 64, 0.85)"
-                  stroke-width="30"
-                  stroke-linecap="round"
-                  on:click={() => {
+                  {/if}
+                </p>
+                <CloseSVG
+                  onclick={() => {
                     $nftApprovals = $nftApprovals.filter(
                       (approval) => approval.owner !== owner,
                     );
@@ -238,19 +241,9 @@
                       removeDelegations();
                     }
                   }}
-                  role="button"
-                  tabindex="0"
-                >
-                  <path
-                    d="
-                      M -65 -65
-                      L 65 65
-                      M -65 65
-                      L 65 -65
-                    "
-                    fill="none"
-                  />
-                </svg>
+                  voidBtn={true}
+                  dark={true}
+                />
               </li>
             {/each}
           </ul>
@@ -258,7 +251,7 @@
         {#if $checkingDelegations}
           <p class="validation gray">{$checkingDelegations}</p>
         {/if}
-        <div class="delegation-buttons">
+        <span class="flex-row">
           <button
             on:click={removeDelegations}
             disabled={!$nftApprovals || $nftApprovals.length == 0}>CLEAR</button
@@ -269,414 +262,33 @@
             style={$checkingDelegations ? 'color: rgb(51, 226, 230)' : ''}
           >
             {#if $checkingDelegations}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 100 100"
-                class="loading-svg"
-                stroke="transparent"
-                stroke-width="7.5"
-                stroke-dasharray="288.5"
-                stroke-linecap="round"
-                fill="none"
-              >
-                <path
-                  d="
-                  M 50 96 a 46 46 0 0 1 0 -92 46 46 0 0 1 0 92
-                "
-                  transform-origin="50 50"
-                />
-              </svg>
+              <LoadingSVG />
               Loading...
             {:else}
               FETCH
             {/if}
           </button>
-        </div>
+        </span>
       </div>
     </section>
-    <button
-      class="close-button"
-      on:click={closeDialog}
-      on:pointerover={() => (closeSvgFocus = true)}
-      on:pointerout={() => (closeSvgFocus = false)}
-      aria-label="Close"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="-100 -100 200 200"
-        class="close-svg"
-        stroke="rgba(255, 60, 64, 0.85)"
-        stroke-width="30"
-        stroke-linecap="round"
-        style="
-            transform: {closeSvgFocus ? 'scale(1.2);' : 'none'}
-            stroke: {closeSvgFocus
-          ? 'rgb(255, 60, 64)'
-          : 'rgba(255, 60, 64, 0.85)'}
-          "
-      >
-        <path
-          d="
-            M -65 -65
-            L 65 65
-            M -65 65
-            L 65 -65
-          "
-          fill="none"
-        />
-      </svg>
-    </button>
+    <CloseSVG onclick={closeDialog} hider={true} />
   </div>
 </dialog>
 
-<style>
+<style lang="scss">
+  @use '/src/styles/mixins' as *;
+
   dialog {
-    max-width: 80vw;
-    max-height: 90vh;
-    border: none;
-    color: inherit;
-    background-color: rgba(1, 0, 32, 0.75);
-    box-shadow: inset 0 0 0.5vw rgba(51, 226, 230, 0.5);
-    border-radius: 2vw;
-  }
+    width: 90%;
 
-  dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-  }
+    & > div {
+      padding: 1.5rem;
 
-  dialog[open] {
-    animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  dialog[open]::backdrop {
-    animation: fade 0.2s ease-out;
-  }
-
-  dialog::-webkit-scrollbar {
-    width: 0.5vw;
-  }
-
-  dialog::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0);
-  }
-
-  dialog::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0),
-      rgba(51, 226, 230, 0.3),
-      rgba(0, 0, 0, 0)
-    );
-    border-radius: 0.5vw;
-    cursor: pointer;
-  }
-
-  dialog::-webkit-scrollbar-thumb:hover,
-  dialog::-webkit-scrollbar-thumb:active {
-    background: rgba(51, 226, 230, 0.5);
-  }
-
-  .close-button {
-    position: absolute;
-    top: 1vw;
-    right: 1vw;
-    padding: 0.5vw;
-  }
-
-  .close-button svg {
-    height: 3vw;
-    width: 3vw;
-  }
-
-  .delegate-container {
-    width: 70vw;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 2vw;
-    padding-block: 1vw;
-  }
-
-  h2 {
-    width: 60vw;
-    text-align: center;
-    font-size: 1.5vw;
-    line-height: 2.5vw;
-  }
-
-  h2 a {
-    text-decoration: none;
-    color: white;
-  }
-
-  h2 a:hover,
-  h2 a:active {
-    text-decoration: underline;
-  }
-
-  .delegations-count {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5vw;
-  }
-
-  .address-container {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5vw;
-    padding: 1.5vw;
-    background-color: rgba(51, 226, 230, 0.1);
-    box-shadow: 0 0 0.5vw rgba(51, 226, 230, 0.5);
-    border-radius: 1.5vw;
-    color: rgba(51, 226, 230, 0.5);
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  input {
-    width: 40vw;
-    font-size: 1.5vw;
-    line-height: 1.5vw;
-    padding: 1.5vw 2vw;
-    color: rgba(51, 226, 230, 0.75);
-    border: 0.1vw solid rgba(51, 226, 230, 0.5);
-    border-radius: 1vw;
-    background-color: rgba(51, 226, 230, 0.1);
-    outline: none;
-    text-align: center;
-    cursor: text;
-  }
-
-  .address-container > div {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5vw;
-  }
-
-  .address-container > div > p {
-    color: rgba(51, 226, 230, 0.5);
-    text-shadow: 0 0 0.1vw #010020;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  .address-container > div > p:hover,
-  .address-container > div > p:active {
-    color: rgb(51, 226, 230);
-    text-decoration: underline;
-  }
-
-  .validation {
-    text-align: center;
-    font-size: 1.25vw;
-    line-height: 1.5vw;
-    color: rgba(255, 50, 50, 0.75);
-  }
-
-  .gray {
-    color: rgba(150, 150, 150, 0.75);
-  }
-
-  .green {
-    color: rgba(0, 185, 55, 0.75);
-  }
-
-  .delegations {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5vw;
-    padding: 1.5vw;
-    background-color: rgba(51, 226, 230, 0.1);
-    box-shadow: 0 0 0.5vw rgba(51, 226, 230, 0.5);
-    border-radius: 1.5vw;
-  }
-
-  .delegations h2 {
-    width: 44vw;
-  }
-
-  .delegation-buttons {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5vw;
-  }
-
-  .delegations ul {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1vw;
-  }
-
-  .delegations strong {
-    color: white;
-  }
-
-  .wallet {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1vw;
-    padding: 0.5vw 1vw;
-    font-size: 2vw;
-    background-color: rgb(36, 65, 189);
-    box-shadow: inset 0 0 0.5vw rgba(51, 226, 230, 0.25);
-    border-radius: 1vw;
-    cursor: default;
-    color: #010020;
-  }
-
-  .wallet span {
-    text-align: center;
-    padding: 1vw 2vw;
-    font-size: 1.5vw;
-    color: rgba(255, 255, 255, 0.6);
-    background-color: rgba(1, 0, 32, 0.5);
-    box-shadow: inset 0 0 0.5vw rgba(1, 0, 32, 0.5);
-    border-radius: 1vw;
-  }
-
-  .remove-wallet {
-    cursor: pointer;
-  }
-
-  .remove-wallet:hover,
-  .remove-wallet:active {
-    text-shadow: 0 0 0.5vw rgba(1, 0, 32, 0.5);
-    transform: scale(1.05);
-  }
-
-  .loading-svg {
-    height: 1.5vw;
-    width: 1.5vw;
-  }
-
-  @media only screen and (max-width: 600px) {
-    dialog {
-      max-width: 95vw;
-    }
-
-    .close-button {
-      margin: 1em;
-      padding: 0.35em;
-    }
-
-    .close-button svg {
-      height: 1.5em;
-      width: 1.5em;
-    }
-
-    .delegate-container {
-      width: 95vw;
-      gap: 1em;
-      padding-block: 1em;
-    }
-
-    h2 {
-      width: 60vw;
-      font-size: 1.15em;
-      line-height: 1.5em;
-    }
-
-    .delegations-count {
-      gap: 0.5em;
-    }
-
-    .address-container {
-      gap: 1.5em;
-      padding: 1em;
-      border-radius: 1em;
-    }
-
-    input {
-      width: 80vw;
-      max-width: 75vw;
-      font-size: 1.25em;
-      line-height: 1.5em;
-      white-space: wrap;
-    }
-
-    .address-container > div {
-      flex-direction: column;
-      gap: 1em;
-    }
-
-    .address-container > div > span {
-      display: none;
-    }
-
-    .validation {
-      font-size: 1em;
-      line-height: 1.5em;
-    }
-
-    .delegations {
-      gap: 1.5em;
-      padding: 1em;
-      border-radius: 1em;
-    }
-
-    .delegations h2 {
-      width: 80vw;
-    }
-
-    .delegation-buttons {
-      gap: 1em;
-    }
-
-    .delegations ul {
-      gap: 1em;
-    }
-
-    .wallet {
-      gap: 0.5em;
-      padding: 0.25em 0.5em;
-      font-size: 1em;
-      line-height: 1.5em;
-      width: auto;
-      border-radius: 0.5em;
-    }
-
-    .wallet span {
-      padding: 0.5em 1em;
-      font-size: 1em;
-      line-height: 1.5em;
-      border-radius: 0.5em;
-    }
-
-    .loading-svg {
-      height: 1em;
-      width: 1em;
-    }
-  }
-
-  @keyframes zoom {
-    from {
-      transform: scale(1.5);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
-
-  @keyframes fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
+      .wallet {
+        h4 {
+          @include dark-red(1, text);
+        }
+      }
     }
   }
 </style>
