@@ -118,7 +118,7 @@
           onclick={() => selectOption(index + 1, option.class)}
         >
           {#if option.class}
-            <img src="/{option.class}.png" alt="Selector" />
+            <img src="/icons/{option.class}.png" alt="Selector" />
           {:else}
             <SelectorSVG
               focused={$selectedOption == index + 1}
@@ -321,7 +321,7 @@
       width: 27.5%;
       bottom: 0;
       right: 0;
-      background-image: url('/format.avif');
+      background-image: url('/display/format.avif');
       background-position: top;
       background-size: contain;
 
