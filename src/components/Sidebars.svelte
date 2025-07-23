@@ -465,6 +465,11 @@
         h5 {
           @include orange(1, text, bright);
         }
+
+        select {
+          @include orange-border;
+          @include orange(1, text, bright);
+        }
       }
 
       .nfts-legend {

@@ -303,6 +303,12 @@
       img {
         width: 2rem;
       }
+
+      &.selected {
+        fill: $bright-purple;
+        stroke: $bright-purple;
+        @include purple(1, text, bright);
+      }
     }
   }
 

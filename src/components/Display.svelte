@@ -122,6 +122,7 @@
           {:else}
             <SelectorSVG
               focused={$selectedOption == index + 1}
+              glowing={$selectedOption == index + 1}
               disabled={false}
             />
           {/if}
@@ -288,6 +289,7 @@
       button {
         fill: $white;
         stroke: $white;
+        gap: 0.5rem;
         @include white-txt;
         @include font(h5);
 
@@ -301,6 +303,12 @@
 
         img {
           width: 2rem;
+        }
+
+        &.selected {
+          fill: $bright-purple;
+          stroke: $bright-purple;
+          @include purple(1, text, bright);
         }
       }
     }
