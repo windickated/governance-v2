@@ -177,7 +177,9 @@ a11y_no_static_element_interactions -->
           </span>
         {:else}
           {#if approval == false}
-            <p class="validation transparent-white-txt">Checking approval for NFTs...</p>
+            <p class="validation transparent-white-txt">
+              Checking approval for NFTs...
+            </p>
           {:else if approval == true}
             <p class="validation green-txt">
               This address can vote with your Potentials!
@@ -261,10 +263,7 @@ a11y_no_static_element_interactions -->
             >
               CLEAR
             </button>
-            <button
-              class="green-btn"
-              on:click={checkDelegatedWallets}
-            >
+            <button class="green-btn" on:click={checkDelegatedWallets}>
               FETCH
             </button>
           {/if}
@@ -333,7 +332,6 @@ a11y_no_static_element_interactions -->
           }
         }
       }
-
     }
   }
 </style>
