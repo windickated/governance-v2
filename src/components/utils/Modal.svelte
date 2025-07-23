@@ -32,12 +32,14 @@
     userAddress !== $walletAddress;
 
   $: if (dialog && $showModal) {
+    dialog.classList.remove('dialog-fade-out');
     dialog.showModal();
-  } else if (!$showModal) closeDialog();
+  } else if (dialog) closeDialog();
 
   const closeDialog = () => {
+    dialog.classList.add('dialog-fade-out'); // animation before close
     $showModal = false;
-    dialog?.close();
+    setTimeout(() => dialog?.close(), 300);
   };
 
   $: if (userAddress && validation) checkDelegation();
@@ -90,6 +92,7 @@
   };
 
   const getDelegationsCount = () => {
+    if (!$nftApprovals || $nftApprovals.length < 1) return 0;
     let count: number = 0;
     for (let i = 0; i < $nftApprovals.length; i++) {
       count += $nftApprovals[i].nfts!.length;
@@ -115,20 +118,12 @@ a11y_no_static_element_interactions -->
         Potentials or import delegated Potentials from another wallet.
       </h5>
 
-      <div
-        class="transparent-container"
-        style={checkApproval
-          ? 'background-color: rgba(56, 117, 250, 0.1); color: rgba(56, 117, 250, 0.75); box-shadow: 0 0 0.5vw rgba(56, 117, 250, 0.75);'
-          : ''}
-      >
+      <div class="container">
         <input
           type="text"
           placeholder="Enter Web3 Address"
           maxlength="42"
           bind:value={userAddress}
-          style={checkApproval
-            ? 'background-color: rgba(56, 117, 250, 0.1); color: rgb(56, 117, 250); border: 0.1vw solid rgba(56, 117, 250, 0.5);'
-            : ''}
         />
         {#if !userAddress}{:else if !userAddress.startsWith('0x')}
           <p class="validation">Address should start with "0x..."</p>
@@ -152,16 +147,17 @@ a11y_no_static_element_interactions -->
               You have already imported NFTs from this address.
             </p>
           {/if}
-          <span class="flex-row">
+
+          <span class="flex-row flex-wrap">
             <button
               class="switcher void-btn"
               on:click={() => (checkApproval = false)}
-              style="color: rgba(56, 117, 250, 0.75);"
             >
-              Delegate
+              Delegate Potentials
             </button>
-            <span>|</span>
+            <span class="pc-only dark-txt">|</span>
             <button
+              class="green-btn"
               disabled={!validation ||
                 !approval ||
                 userAddress == $walletAddress ||
@@ -174,27 +170,33 @@ a11y_no_static_element_interactions -->
                   owner: userAddress,
                   approved: true,
                 };
-              }}>IMPORT POTENTIALS</button
+              }}
             >
+              Import Potentials
+            </button>
           </span>
         {:else}
           {#if approval == false}
-            <p class="validation gray">Checking approval for NFTs...</p>
+            <p class="validation transparent-white-txt">Checking approval for NFTs...</p>
           {:else if approval == true}
-            <p class="validation green">
+            <p class="validation green-txt">
               This address can vote with your Potentials!
             </p>
           {/if}
-          <span class="flex-row">
+
+          <span class="flex-row flex-wrap">
             <button
+              class="green-btn"
               disabled={!validation ||
                 approval ||
                 userAddress == $walletAddress}
               on:click={() => {
                 approveNFTs(userAddress);
-              }}>DELEGATE</button
+              }}
             >
-            <span>|</span>
+              Delegate Potentials
+            </button>
+            <span class="pc-only dark-txt">|</span>
             <button
               class="switcher void-btn"
               on:click={() => (checkApproval = true)}
@@ -209,15 +211,11 @@ a11y_no_static_element_interactions -->
         <a href="https://revoke.cash/"> revoke your approvals</a>.
       </h5>
 
-      <div class="transparent-container">
+      <div class="container">
         <h4>
-          {#if $nftApprovals && $nftApprovals.length > 0}
-            Your Delegations:
-            <strong>{getDelegationsCount()}</strong>
-            NFT{getDelegationsCount() == 1 ? '' : 's'}
-          {:else}
-            Your Delegations
-          {/if}
+          Your Delegations:
+          <strong>{getDelegationsCount()}</strong>
+          NFT{getDelegationsCount() == 1 ? '' : 's'}
         </h4>
         {#if $nftApprovals && $nftApprovals.length > 0}
           <ul class="flex">
@@ -252,22 +250,24 @@ a11y_no_static_element_interactions -->
           <p class="validation gray">{$checkingDelegations}</p>
         {/if}
         <span class="flex-row">
-          <button
-            on:click={removeDelegations}
-            disabled={!$nftApprovals || $nftApprovals.length == 0}>CLEAR</button
-          >
-          <button
-            on:click={checkDelegatedWallets}
-            disabled={$checkingDelegations !== null}
-            style={$checkingDelegations ? 'color: rgb(51, 226, 230)' : ''}
-          >
-            {#if $checkingDelegations}
-              <LoadingSVG />
-              Loading...
-            {:else}
+          {#if $checkingDelegations}
+            <LoadingSVG />
+            <h5>Loading...</h5>
+          {:else}
+            <button
+              class="red-btn"
+              on:click={removeDelegations}
+              disabled={!$nftApprovals || $nftApprovals.length == 0}
+            >
+              CLEAR
+            </button>
+            <button
+              class="green-btn"
+              on:click={checkDelegatedWallets}
+            >
               FETCH
-            {/if}
-          </button>
+            </button>
+          {/if}
         </span>
       </div>
     </section>
@@ -283,12 +283,57 @@ a11y_no_static_element_interactions -->
 
     & > div {
       padding: 1.5rem;
+      padding-top: 3rem;
 
-      .wallet {
-        h4 {
-          @include dark-red(1, text);
+      @include respond-up(small-desktop) {
+        padding: 1.5rem 3rem;
+      }
+
+      a {
+        text-decoration: underline;
+        @include white-txt;
+
+        &:hover,
+        &:active,
+        &:focus {
+          text-decoration: none;
         }
       }
+
+      .container {
+        width: 100%;
+        max-width: 50rem;
+        animation: none;
+        box-shadow: none;
+        background-color: $royal-purple;
+        border: 1px solid $bright-purple;
+
+        input {
+          width: 100%;
+          @include dark-blue;
+          @include orange-border;
+          @include purple(1, text, bright);
+        }
+
+        .switcher {
+          text-transform: uppercase;
+          @include orange(1, text);
+
+          &:hover,
+          &:active,
+          &:focus {
+            text-decoration: underline;
+            @include bright;
+          }
+        }
+
+        .wallet {
+          h4 {
+            @include dark-red(1, text);
+          }
+        }
+      }
+
     }
   }
 </style>
