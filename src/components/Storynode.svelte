@@ -189,7 +189,7 @@
       {/if}
     </section>
     {#if $votingResults && $season == 1 && $episode == 2}
-      <p class="additional-voting-note">(+2.5% from TikTok)</p>
+      <p class="transparent-white-txt">(+2.5% from TikTok)</p>
     {/if}
   {:else if $walletAddress || $storyNodes.length > 0}
     <h2 class="text-glowing" class:pulse-animation={$storyNodes.length == 0}>
@@ -205,11 +205,11 @@
 </header>
 
 {#if $story}
-  <article>
+  <article class="container">
     {$story.description}
   </article>
 
-  <ul class="mobile-options flex pad">
+  <ul class="transparent-container">
     {#each $story.votes_options as option, index}
       <button
         class="void-btn flex-row"
@@ -241,7 +241,6 @@
     max-width: min(95%, 70rem);
     background-color: #01204e;
     border: 2px solid #203962;
-    // @include box-shadow;
 
     h3 {
       @include white-txt(soft);
@@ -251,7 +250,12 @@
       width: 100%;
       background-color: #07387d;
       border: 2px solid #203962;
+      gap: 0.5rem;
       @include box-shadow;
+
+      @include respond-up(tablet) {
+        gap: 1rem;
+      }
 
       .voting-info {
         padding: 0.5rem 1.5rem;
@@ -268,10 +272,21 @@
     }
   }
 
+  article {
+    width: 95%;
+    white-space: pre-wrap;
+    text-align: justify;
+    padding-inline: 2rem;
+    @include white-txt;
+  }
+
   ul {
+    width: 95%;
     align-items: flex-start;
 
     button {
+      text-align: left;
+      gap: 0.5rem;
       fill: $white;
       stroke: $white;
       @include white-txt;
