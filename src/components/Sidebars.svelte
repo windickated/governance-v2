@@ -180,6 +180,15 @@
     <img src="/icons/episode.png" alt="Episodes" />
     Episodes
   </button>
+  <button
+    class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
+    class:visible={activeTab === 'episodes'}
+    aria-label="NFTs"
+    onclick={() => handleTab('nfts')}
+  >
+    <img src="/icons/selection.png" alt="NFTs" />
+    NFTs
+  </button>
 
   <h2 class="franchise-title text-glowing">The Dischordian Saga</h2>
 
@@ -235,6 +244,15 @@
   >
     <img src="/icons/selection.png" alt="NFTs" />
     NFTs
+  </button>
+  <button
+    class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
+    class:visible={activeTab === 'nfts'}
+    aria-label="Episodes"
+    onclick={() => handleTab('episodes')}
+  >
+    <img src="/icons/episode.png" alt="NFTs" />
+    Episodes
   </button>
 
   <header class="flex-row pad shad">
@@ -372,6 +390,7 @@
 
     &.open {
       top: 0;
+      z-index: 30;
     }
 
     ul {
@@ -393,6 +412,14 @@
       img {
         width: 1.5rem;
       }
+
+      &.secondary-tab {
+        display: none;
+
+        &.visible {
+          display: flex;
+        }
+      }
     }
 
     &.episodes-tab {
@@ -405,12 +432,22 @@
         &:focus {
           @include bright(150%);
         }
+
+        &.secondary-tab {
+          left: unset;
+          right: 0;
+          background-color: $royal-purple;
+        }
       }
 
       &.open {
-        .tab-icon {
+        .tab-icon:not(.secondary-tab) {
           background-color: $blue;
           filter: none;
+        }
+
+        .secondary-tab {
+          @include bright(50%);
         }
       }
 
@@ -447,12 +484,22 @@
         &:focus {
           @include bright(150%);
         }
+
+        &.secondary-tab {
+          right: unset;
+          left: 0;
+          background-color: $navy;
+        }
       }
 
       &.open {
-        .tab-icon {
+        .tab-icon:not(.secondary-tab) {
           background-color: $purple;
           filter: none;
+        }
+
+        .secondary-tab {
+          @include bright(50%);
         }
       }
 
@@ -546,6 +593,10 @@
           width: 2rem;
           min-width: 1.5vw;
         }
+
+        &.secondary-tab {
+          display: none !important;
+        }
       }
 
       strong {
@@ -621,5 +672,10 @@
     select {
       width: 90%;
     }
+  }
+
+  // Only for mobiles
+  @media screen and (max-width: 1024px) { 
+
   }
 </style>

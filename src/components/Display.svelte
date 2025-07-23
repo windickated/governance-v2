@@ -254,6 +254,7 @@
         text-align: left;
         padding: 1rem 2rem;
         @include white-txt(soft);
+        @include text-shadow;
         @include font(h5);
       }
     }
@@ -346,6 +347,7 @@
     }
   }
 
+  // Only for mobiles
   @media screen and (max-width: 1024px) {
     .format,
     .vote {
