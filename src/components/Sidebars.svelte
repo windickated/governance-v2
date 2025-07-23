@@ -24,6 +24,7 @@
   import ResetSVG from '@components/icons/Reset.svelte';
   import RefreshSVG from '@components/icons/Refresh.svelte';
   import ContractSVG from '@components/icons/Contract.svelte';
+  import ArrowSVG from '@components/icons/Arrow.svelte';
 
   let activeTab: Tab = null;
 
@@ -190,7 +191,11 @@
     NFTs
   </button>
 
-  <h2 class="franchise-title text-glowing">The Dischordian Saga</h2>
+  <header class="flex-row pad shad">
+    <ArrowSVG onclick={() => {}} disabled={true} />
+    <h2>The Dischordian Saga</h2>
+    <ArrowSVG onclick={() => {}} rotate={true} disabled={true} />
+  </header>
 
   <button
     class="button-glowing"
@@ -451,9 +456,15 @@
         }
       }
 
-      .franchise-title {
-        margin-top: 1rem;
-        @include font(h4);
+      header {
+        width: 100%;
+        justify-content: space-between;
+        @include navy;
+
+        h2 {
+          @include cyan(1, text);
+          @include font(h4);
+        }
       }
 
       select {
@@ -603,6 +614,17 @@
         display: inline;
       }
 
+      &.episodes-tab,
+      &.nfts-tab {
+        header {
+          width: calc(100% - 2rem);
+          border-bottom-left-radius: 1rem;
+          border-bottom-right-radius: 1rem;
+          padding-block: 0.5rem;
+          min-height: 4.5rem;
+        }
+      }
+
       &.episodes-tab {
         width: 30rem;
         left: -30rem;
@@ -635,14 +657,6 @@
           right: 100%;
           border-bottom-left-radius: 1rem;
           @include box-shadow(-0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
-        }
-
-        header {
-          width: calc(100% - 2rem);
-          border-bottom-left-radius: 1rem;
-          border-bottom-right-radius: 1rem;
-          padding-block: 0.5rem;
-          min-height: 4.5rem;
         }
       }
     }
