@@ -159,7 +159,7 @@
         </p>
       </div>
 
-      {#if $storyNodes[$episode].ended}
+      {#if $storyNodes[$episode] && $storyNodes[$episode].ended}
         {#if $votingResults}
           <span class="results flex">
             <h5>Option: {$votingResults.win}</h5>
