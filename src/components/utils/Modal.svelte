@@ -210,7 +210,7 @@ a11y_no_static_element_interactions -->
       </div>
       <h5>
         You can always
-        <a href="https://revoke.cash/"> revoke your approvals</a>.
+        <a href="https://revoke.cash/" target="_blank"> revoke your approvals</a>.
       </h5>
 
       <div class="container">
@@ -289,13 +289,14 @@ a11y_no_static_element_interactions -->
       }
 
       a {
-        text-decoration: underline;
-        @include white-txt;
+        text-decoration: underline dashed $orange;
+        @include white-txt(soft);
 
         &:hover,
         &:active,
         &:focus {
-          text-decoration: none;
+          text-decoration: underline solid $bright-orange;
+          @include orange(1, text, bright);
         }
       }
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+
   import {
     storyNodes,
     story,
@@ -42,6 +44,22 @@
   };
 
   /* --- EPISODES --- */
+
+  onMount(async () => {
+    const stored = localStorage.getItem('activeEpisode');
+    if (stored) {
+      const { seasonNr } = JSON.parse(stored);
+      season.set(seasonNr);
+    }
+
+    const nodes = await get_nodes();
+    storyNodes.set(nodes);
+
+    if (stored) {
+      const { episodeNr } = JSON.parse(stored);
+      if (nodes.length >= episodeNr) episode.set(episodeNr);
+    }
+  })
 
   // Setting episode number to local memory
   $effect(() => {

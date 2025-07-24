@@ -72,22 +72,8 @@
          const provider = new BrowserProvider(raw, 'any') as Provider;
          userProvider.set(provider);
    
-         /* user‑specific data ------------------------------------------------ */
+         /* fetch Potentials ------------------------------------------- */
          getNFTs();
-   
-         const stored = localStorage.getItem('activeEpisode');
-         if (stored) {
-           const { seasonNr } = JSON.parse(stored);
-           season.set(seasonNr);
-         }
-   
-         const nodes = await get_nodes();
-         storyNodes.set(nodes);
-   
-         if (stored) {
-           const { episodeNr } = JSON.parse(stored);
-           if (nodes.length >= episodeNr) episode.set(episodeNr);
-         }
        },
    
        onDisconnect() {
