@@ -1,10 +1,17 @@
 <script lang="ts">
-  let { onclick = () => {} }: { onclick: () => void } = $props();
+  let {
+    onclick = () => {},
+    modalFocus = false,
+  }: {
+    onclick: () => void;
+    modalFocus?: boolean;
+  } = $props();
   let svgFocus = $state<boolean>(false);
 </script>
 
 <button
   class="flex void-btn"
+  class:highlighted={modalFocus}
   onpointerover={() => (svgFocus = true)}
   onpointerout={() => (svgFocus = false)}
   {onclick}
@@ -66,6 +73,12 @@
     &:focus:not(&:disabled) {
       @include scale;
       @include bright;
+    }
+
+    &.highlighted {
+      fill: $bright-orange;
+      stroke: $bright-orange;
+      @include scale;
     }
   }
 </style>

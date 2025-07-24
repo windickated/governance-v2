@@ -95,6 +95,8 @@
   /* --- NFTs --- */
   let selectedIDs = $derived($selectedNFTs.map((nft) => nft.id));
 
+  let modalFocus = $state<boolean>(false);
+
   function selectNFT(id: number, vote: number) {
     $potentials.map((potential) => {
       if (potential.id === id) {
@@ -315,7 +317,7 @@
     {/if}
     <span class="flex-row gap-8">
       {#if $walletAddress}
-        <ContractSVG onclick={() => ($showModal = true)} />
+        <ContractSVG onclick={() => ($showModal = true)} {modalFocus} />
       {/if}
       <WalletConnect />
     </span>
@@ -379,16 +381,52 @@
         {/each}
       </ul>
     {:else}
-      <p class="validation pad-inline">
-        Your wallet doesn't have any
-        <a
-          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
-          target="_blank"
-        >
-          Potential
-        </a>... You're not allowed to enter the Galactic Governance Hub unless
-        you have any delegated NFTs
-      </p>
+      <div class="potential-banner container flex-row">
+        <div class="flex">
+          <p class="validation">Your wallet doesn't have any Potential</p>
+
+          <p class="text-glowing">
+            You don’t hold any Potentials directly, but delegated NFTs may grant you voting power. Open the Delegation Panel to explore shared access.
+          </p>
+
+          <button
+            class="button-glowing"
+            onclick={() => ($showModal = true)}
+            onpointerover={() => modalFocus = true}
+            onpointerout={() => modalFocus = false}
+          >
+            Check Delegations
+          </button>
+
+          <hr />
+
+          <p class="text-glowing">
+            Or explore the Marketplace to discover a Potential that resonates with
+            your journey.
+          </p>
+
+          <span class="flex-row flex-wrap">
+            <a
+              class="button-anchor button-glowing"
+              href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+              target="_blank"
+            >
+              <img src="/icons/magiceden.png" alt="Magic Eden marketplace" />
+              Magic Eden
+            </a>
+            <a
+              class="button-anchor button-glowing"
+              href="https://opensea.io/collection/potentials-eth"
+              target="_blank"
+            >
+              <img src="/icons/opensea.png" alt="OpenSea marketplace" />
+              OpenSea
+            </a>
+          </span>
+        </div>
+
+        <img class="potential" src="/quarchon.avif" alt="Potential" />
+      </div>
     {/if}
   {/if}
 </section>
@@ -603,6 +641,12 @@
         @include dark-red(0.5);
         @include orange(1, text, bright);
       }
+
+      .potential-banner {
+        .potential {
+          display: none;
+        }
+      }
     }
 
     @include respond-up(small-desktop) {
@@ -677,6 +721,21 @@
           right: 100%;
           border-bottom-left-radius: 1rem;
           @include box-shadow(-0.1rem 0.1rem 0.25rem rgba(0, 0, 0, 0.5));
+        }
+
+        .potential-banner {
+          width: calc(100% - 2rem);
+          padding-bottom: 0;
+          align-items: flex-end;
+
+          div {
+            padding-bottom: 1rem;
+          }
+
+          .potential {
+            display: block;
+            width: 20rem;
+          }
         }
       }
     }

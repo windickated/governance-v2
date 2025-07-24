@@ -312,7 +312,7 @@ a11y_no_static_element_interactions -->
           width: 100%;
           @include dark-blue;
           @include orange-border;
-          @include purple(1, text, bright);
+          @include orange(1, text, bright);
         }
 
         .switcher {
