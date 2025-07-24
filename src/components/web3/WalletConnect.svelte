@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  
   import { createRoot } from 'react-dom/client';
 
   import RainbowConnect from '@components/web3/Rainbow';
@@ -13,5 +14,4 @@
   });
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 <div id="react-root"></div>

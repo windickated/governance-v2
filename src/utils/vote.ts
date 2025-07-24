@@ -1,18 +1,14 @@
+import { get } from 'svelte/store';
 import { episode, selectedOption } from '../stores/storyNode';
 import { potentials, NFT, selectedNFTs } from '../stores/NFTs';
 import { contract } from '../lib/contract';
 
-let _episode: number;
-let _option: number | null;
-let _potentials: NFT[];
-let _selectedNFTs: NFT[];
-
-episode.subscribe((nr) => (_episode = nr));
-selectedOption.subscribe((nr) => (_option = nr));
-potentials.subscribe((arr) => (_potentials = arr));
-selectedNFTs.subscribe((arr) => (_selectedNFTs = arr));
-
 export default async function vote() {
+  const _episode: number = get(episode);
+  const _option: number | null = get(selectedOption);
+  const _potentials: NFT[] = get(potentials);
+  const _selectedNFTs: NFT[] = get(selectedNFTs);
+  
   if (_selectedNFTs.length == 1) {
     const potentialNumber: number = _selectedNFTs[0].id;
     await (await contract()).singleVote(_episode, potentialNumber, _option);

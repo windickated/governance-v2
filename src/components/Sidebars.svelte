@@ -26,7 +26,7 @@
   import ContractSVG from '@components/icons/Contract.svelte';
   import ArrowSVG from '@components/icons/Arrow.svelte';
 
-  let activeTab: Tab = null;
+  let activeTab = $state<Tab>(null);
 
   const handleTab = (tab: Tab = null) => {
     switch (tab) {
@@ -44,13 +44,15 @@
   /* --- EPISODES --- */
 
   // Setting episode number to local memory
-  $: if ($episode !== -1) {
-    $activeEpisode = {
-      seasonNr: $season,
-      episodeNr: $episode,
-    };
-    localStorage.setItem('activeEpisode', JSON.stringify($activeEpisode));
-  }
+  $effect(() => {
+    if ($episode !== -1) {
+      $activeEpisode = {
+        seasonNr: $season,
+        episodeNr: $episode,
+      };
+      localStorage.setItem('activeEpisode', JSON.stringify($activeEpisode));
+    }
+  })
 
   const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
@@ -73,7 +75,7 @@
   };
 
   /* --- NFTs --- */
-  $: selectedIDs = $selectedNFTs.map((nft) => nft.id);
+  let selectedIDs = $derived($selectedNFTs.map((nft) => nft.id));
 
   function selectNFT(id: number, vote: number) {
     $potentials.map((potential) => {
@@ -120,7 +122,7 @@
     if ($selectedOption) $selectedOption = null;
   };
 
-  let selectCondition: string;
+  let selectCondition = $state<string>('');
   const selectMultipleNFTs = () => {
     if ($episode === -1) {
       toastStore.show('There is no episode selected!', 'error');

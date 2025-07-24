@@ -1,6 +1,8 @@
 import { ethers, JsonRpcProvider } from 'ethers';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
+import { get } from 'svelte/store';
+
 import {
   nftApprovals,
   checkingDelegations,
@@ -245,8 +247,7 @@ const getDelegatedAdresses = async (walletsList, operator) => {
 };
 
 export const checkDelegatedWallets = async () => {
-  let address;
-  walletAddress.subscribe((value) => (address = value));
+  const address = get(walletAddress);
 
   let nftNumbers = await getNftNumbers(address);
 

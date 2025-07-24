@@ -1,4 +1,6 @@
 import { ethers, JsonRpcProvider } from 'ethers';
+import { get } from 'svelte/store';
+
 import { userProvider } from '../stores/auth';
 import { season } from '../stores/storyNode';
 
@@ -38,17 +40,16 @@ let abi = abi_v1;
 export const contract = async (
   providerType: 'user' | 'alchemy' = 'user',
 ): Promise<any> => {
-  let provider: any;
+  let provider: any;;
 
   if (providerType === 'user')
-    userProvider.subscribe((userProvider) => (provider = userProvider));
+    provider = get(userProvider);
   else
     provider = new JsonRpcProvider(
       'https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep',
     );
 
-  let seasonNr: number = 1;
-  season.subscribe((number) => (seasonNr = number));
+  let seasonNr: number = get(season);
 
   if (seasonNr === 1 && CONTRACT_ADDRESS !== v1) {
     CONTRACT_ADDRESS = v1;

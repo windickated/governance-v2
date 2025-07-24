@@ -1,3 +1,4 @@
+<!-- LEGACY SVELTE 3/4 SYNTAX -->
 <script lang="ts">
   import {
     storyNodes,
@@ -98,7 +99,6 @@
       win: win.option,
       participation: votes!.length,
     };
-    console.log($votingResults); // console check
     $selectedOption = win.option;
     $checkingResults = -1;
   }
@@ -136,7 +136,6 @@
     // Immediately vote on mobiles
     $userProvider!.getNetwork().then((network) => {
       const baseNetwork: number = 8453;
-      console.log(network);
       if (Number(network.chainId) === baseNetwork) vote();
       else toastStore.show('Please select Base network!', 'error');
     });

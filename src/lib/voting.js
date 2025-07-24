@@ -1,5 +1,7 @@
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
+import { get } from 'svelte/store';
+
 import { season, checkingResults, abortVotingCheck } from '../stores/storyNode';
 
 const v1 = '0x1E2f59De3C0D51b596e0E9c80FEAa35A2cFBEe50';
@@ -70,8 +72,7 @@ async function fetchVotesWithRetry(storyNode, tokenIds) {
 }
 
 async function main(storyNode = 0) {
-  let seasonNr = 1;
-  season.subscribe((number) => (seasonNr = number));
+  const seasonNr = get(season);
 
   if (seasonNr === 1 && CONTRACT_ADDRESS !== v1) {
     CONTRACT_ADDRESS = v1;
@@ -97,8 +98,7 @@ async function main(storyNode = 0) {
   // Process batches
   for (let i = 0; i < batches.length; i++) {
     // check for abort
-    let abort = false;
-    abortVotingCheck.subscribe((value) => (abort = value));
+    const abort = get(abortVotingCheck);
     if (abort) {
       console.log('Abort fetching results.');
       checkingResults.set(-1);
@@ -126,8 +126,7 @@ async function main(storyNode = 0) {
     console.log(`Retrying ${failedTokenIds.length} failed tokens`);
     for (const tokenId of failedTokenIds) {
       // check for abort
-      let abort = false;
-      abortVotingCheck.subscribe((value) => (abort = value));
+      const abort = get(abortVotingCheck);
       if (abort) {
         console.log('Abort fetching results.');
         checkingResults.set(-1);

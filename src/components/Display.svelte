@@ -14,8 +14,8 @@
 
   import SelectorSVG from '@components/icons/Selector.svelte';
 
-  let storyVideo: HTMLIFrameElement;
-  let storyText: HTMLElement;
+  let storyVideo = $state<Nullable<HTMLIFrameElement>>(null);
+  let storyText = $state<Nullable<HTMLElement>>(null);
 
   function selectOption(
     optionID: number,
@@ -49,8 +49,8 @@
   }
 
   // Format button
-  let formatButtonState: boolean = true; // video on, text off
-  let formatButtonHover: boolean = false;
+  let formatButtonState = $state<boolean>(true); // video on, text off
+  let formatButtonHover = $state<boolean>(false);
   const switcherHandle = (event: Event) => {
     if (event.type === 'click') {
       if ($episode === -1) {
@@ -66,17 +66,15 @@
   };
 
   // Vote button
-  $: voteIsInactive =
-    $selectedOption && $selectedNFTs.length > 0 ? false : true; // TRUE prohibits voting
-  let voteButtonState: boolean = true;
-  let voteButtonHover: boolean = false;
+  let voteIsInactive = $derived($selectedOption && $selectedNFTs.length > 0 ? false : true); // TRUE prohibits voting
+  let voteButtonState = $state<boolean>(true);
+  let voteButtonHover = $state<boolean>(false);
 
   const voteButtonHandle = (event: Event) => {
     if (!voteIsInactive && voteButtonState) {
       if (event.type === 'click') {
         $userProvider!.getNetwork().then((network) => {
           const baseNetwork: number = 8453;
-          console.log(network);
           if (Number(network.chainId) === baseNetwork) {
             voteButtonState = !voteButtonState;
             setTimeout(() => {

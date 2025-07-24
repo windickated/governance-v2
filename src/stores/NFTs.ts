@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { contract } from '../lib/contract';
 import { walletAddress } from './auth';
 
@@ -30,41 +30,40 @@ export const nftApprovals = writable<
 >([]);
 
 export async function getNFTs() {
-  walletAddress.subscribe(async (address) => {
-    if (!address) return;
+  const address = get(walletAddress);
+  if (!address) return;
 
-    const potentialNumbers: number[] = await getNftNumbers(address);
-    const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
-    if (potentialNFTs) potentials.set(potentialNFTs);
+  const potentialNumbers: number[] = await getNftNumbers(address);
+  const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
+  if (potentialNFTs) potentials.set(potentialNFTs);
 
-    const delegations = localStorage.getItem(address);
-    if (delegations) nftApprovals.set(JSON.parse(delegations));
+  const delegations = localStorage.getItem(address);
+  if (delegations) nftApprovals.set(JSON.parse(delegations));
 
-    // check listed Potentials
-    let listedNFTs: number[];
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        'x-api-key': 'c6a6c088d5e34ca2a018f44673697f01',
-      },
-    };
+  // check listed Potentials
+  let listedNFTs: number[];
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      'x-api-key': 'c6a6c088d5e34ca2a018f44673697f01',
+    },
+  };
 
-    await fetch(
-      'https://cors-anywhere.herokuapp.com/https://api.opensea.io/api/v2/listings/collection/potentials-eth/all',
-      options,
-    )
-      // await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
-      .then((res) => res.json())
-      .then((res) => {
-        listedNFTs = res.listings.map(
-          (listing: any) =>
-            listing.protocol_data.parameters.offer[0].identifierOrCriteria,
-        );
-        listedNumbers.set(Array.from(new Set(listedNFTs)));
-      })
-      .catch((err) => console.error(err));
-  });
+  await fetch(
+    'https://cors-anywhere.herokuapp.com/https://api.opensea.io/api/v2/listings/collection/potentials-eth/all',
+    options,
+  )
+    // await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
+    .then((res) => res.json())
+    .then((res) => {
+      listedNFTs = res.listings.map(
+        (listing: any) =>
+          listing.protocol_data.parameters.offer[0].identifierOrCriteria,
+      );
+      listedNumbers.set(Array.from(new Set(listedNFTs)));
+    })
+    .catch((err) => console.error(err));
 }
 
 export const getNftNumbers = async (wallet: string) => {

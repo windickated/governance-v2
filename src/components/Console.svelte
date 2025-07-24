@@ -16,11 +16,11 @@
     id: string,
     isClicked: boolean = false,
   ) => {
-    const button: HTMLElement | null = document.getElementById(id);
-    const buttonHover: HTMLElement | null = document.getElementById(
+    const button: Nullable<HTMLElement> = document.getElementById(id);
+    const buttonHover: Nullable<HTMLElement> = document.getElementById(
       `${id}-hover`,
     );
-    const buttonActive: HTMLElement | null = document.getElementById(
+    const buttonActive: Nullable<HTMLElement> = document.getElementById(
       `${id}-active`,
     );
     if (!touchscreenDevice) {
