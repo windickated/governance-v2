@@ -45,7 +45,7 @@ export const contract = async (
   if (providerType === 'user') provider = get(userProvider);
   else
     provider = new JsonRpcProvider(
-      'https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep',
+      `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
     );
 
   let seasonNr: number = get(season);

@@ -37,13 +37,13 @@ const abi = [
 const client = createPublicClient({
   chain: base,
   transport: http(
-    'https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep',
+    `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
   ),
 });
 
 const potentialsContract = async () => {
   const provider = new JsonRpcProvider(
-    'https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep',
+    `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
   );
   const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
   return contract.connect(provider);
