@@ -19,6 +19,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 /* ---- Svelte stores & helpers ------------------------------------ */
 import { walletAddress, username, userProvider } from '@stores/auth';
 import { getNFTs } from '@stores/NFTs';
+import { ClearCache, POTENTIALS_KEY } from '@constants/cache';
 
 /* ------------------------------------------------------------------ */
 /* 1.  Global wagmi / RainbowKit config (must not re‑create on render) */
@@ -77,6 +78,7 @@ function useSyncStores() {
 
     onDisconnect() {
       /* ensure surrounding Svelte UI notices logout */
+      ClearCache(POTENTIALS_KEY);
       location.reload();
     },
   });

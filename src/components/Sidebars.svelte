@@ -380,7 +380,7 @@
         {#each $potentials as NFT}
           {#await nftVote($episode, NFT.id) then vote}
             <button
-              class="void-btn nft potential-tile"
+              class="void-btn nft potential-tile fade-in"
               class:selected={selectedIDs.flat().includes(NFT.id)}
               class:delegated={NFT.delegated}
               class:listed={$listedNumbers.includes(NFT.id)}

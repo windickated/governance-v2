@@ -2,7 +2,12 @@ import { get, writable } from 'svelte/store';
 import { contract } from '../lib/contract';
 import { walletAddress } from './auth';
 
-import { GetCache } from '@constants/cache';
+import {
+  GetCache,
+  SetCache,
+  POTENTIALS_KEY,
+  TTL_SHORT,
+} from '@constants/cache';
 
 export class NFT {
   id: number;
@@ -33,9 +38,17 @@ export async function getNFTs() {
   const address = get(walletAddress);
   if (!address) return;
 
-  const potentialNumbers: number[] = await getNftNumbers(address);
-  const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
-  if (potentialNFTs) potentials.set(potentialNFTs);
+  const storedNFTs = GetCache<NFT[]>(POTENTIALS_KEY);
+  if (storedNFTs) {
+    potentials.set(storedNFTs);
+  } else {
+    const potentialNumbers: number[] = await getNftNumbers(address);
+    const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
+    if (potentialNFTs) {
+      potentials.set(potentialNFTs);
+      SetCache(POTENTIALS_KEY, potentialNFTs, TTL_SHORT);
+    }
+  }
 
   const delegations = GetCache<Delegation[]>(address);
   if (delegations) nftApprovals.set(delegations);
