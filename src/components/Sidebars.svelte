@@ -33,6 +33,7 @@
   import RefreshSVG from '@components/icons/Refresh.svelte';
   import ContractSVG from '@components/icons/Contract.svelte';
   import ArrowSVG from '@components/icons/Arrow.svelte';
+  import LoadingSVG from '@components/icons/Loading.svelte';
 
   let activeTab = $state<Tab>(null);
 
@@ -257,11 +258,23 @@
         </button>
       {/each}
     </ul>
-  {:else}
-    <h5>Loading Season {$season}</h5>
+  {:else if $loadingStories !== -1}
+    <span class="flex-row">
+      <LoadingSVG />
+      <h5>Loading...</h5>
+    </span>
     <div class="progress-bar">
       <div class="loading-animation" style:width="{$loadingStories}%"></div>
     </div>
+  {:else}
+    <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
+      {#each Array(2) as _}
+        <div class="loading-tile">
+          <div class="loading-animation"></div>
+          <span class="loading-animation"></span>
+        </div>
+      {/each}
+    </ul>
   {/if}
 </section>
 
@@ -355,7 +368,7 @@
 
     {#if $loadingNFTs}
       <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
-        {#each Array(2) as _}
+        {#each Array(Math.floor(Math.random() * 2) + 2) as _}
           <div class="potential-tile loading-tile">
             <div class="loading-animation"></div>
             <span class="loading-animation"></span>
@@ -555,6 +568,14 @@
         }
 
         img {
+          aspect-ratio: 16 / 9;
+        }
+      }
+
+      .loading-tile {
+        width: 100%;
+
+        div {
           aspect-ratio: 16 / 9;
         }
       }

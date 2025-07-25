@@ -30,6 +30,11 @@ type Result = {
   participation: number;
 };
 
+type Franchise = {
+  season: number;
+  episodes: StoryNode[];
+}[];
+
 type ActiveEpisode = {
   seasonNr: number;
   episodeNr: number;

@@ -1,5 +1,7 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { contract } from '../lib/contract.ts';
+
+import { GetCache, SetCache, DISCHORDIAN_SAGA_KEY } from '@constants/cache.ts';
 
 export const storyNodes = writable<StoryNode[]>([]);
 export const loadingStories = writable<number>(-1);
@@ -15,9 +17,22 @@ export const votingResults = writable<Result | null>(null);
 export const checkingResults = writable<number>(-1);
 export const abortVotingCheck = writable<boolean>(false);
 
-export const get_nodes = async () => {
+export const get_nodes = async (): Promise<StoryNode[]> => {
   const count = await (await contract('alchemy')).getStoryNodesCount();
-  const nodes: any[] = [];
+  const activeSeason = get(season);
+
+  const storedFranchise = GetCache<Franchise>(DISCHORDIAN_SAGA_KEY);
+  if (storedFranchise) {
+    const storedSeason = storedFranchise.find(
+      (franchise) => franchise.season === activeSeason,
+    );
+    if (storedSeason) {
+      const storedEpisodes = storedSeason.episodes;
+      if (storedEpisodes.length === Number(count)) return storedEpisodes;
+    }
+  }
+
+  const nodes: StoryNode[] = [];
   abortVotingCheck.set(true);
   const storyPercent = 100 / Number(count);
   let progress: number = 0;
@@ -62,8 +77,26 @@ export const get_nodes = async () => {
     }
   }
 
+  if (storedFranchise) {
+    const existingSeasonIndex = storedFranchise.findIndex(
+      (franchise) => franchise.season === activeSeason,
+    );
+    if (existingSeasonIndex !== -1) {
+      storedFranchise[existingSeasonIndex].episodes = nodes;
+    } else {
+      storedFranchise.push({
+        season: activeSeason,
+        episodes: nodes,
+      });
+    }
+    SetCache<Franchise>(DISCHORDIAN_SAGA_KEY, storedFranchise);
+  } else
+    SetCache<Franchise>(DISCHORDIAN_SAGA_KEY, [
+      { season: activeSeason, episodes: nodes },
+    ]);
+
   loadingStories.set(-1);
-  return nodes as StoryNode[];
+  return nodes;
 };
 
 function getDuration(timestamp: number): string {
