@@ -210,7 +210,9 @@ a11y_no_static_element_interactions -->
       </div>
       <h5>
         You can always
-        <a href="https://revoke.cash/" target="_blank"> revoke your approvals</a>.
+        <a href="https://revoke.cash/" target="_blank">
+          revoke your approvals</a
+        >.
       </h5>
 
       <div class="container">
@@ -306,7 +308,7 @@ a11y_no_static_element_interactions -->
         animation: none;
         box-shadow: none;
         background-color: $royal-purple;
-        border: 1px solid $bright-purple;
+        border: 1px solid $dark-blue;
 
         input {
           width: 100%;

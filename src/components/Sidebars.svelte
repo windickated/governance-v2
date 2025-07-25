@@ -17,6 +17,7 @@
     nftVote,
     listedNumbers,
     fetchingDelegations,
+    loadingNFTs,
   } from '@stores/NFTs.ts';
   import { walletAddress, username } from '@stores/auth';
   import { showModal } from '@stores/modal';
@@ -59,7 +60,7 @@
       const { episodeNr } = JSON.parse(stored);
       if (nodes.length >= episodeNr) episode.set(episodeNr);
     }
-  })
+  });
 
   // Setting episode number to local memory
   $effect(() => {
@@ -70,7 +71,7 @@
       };
       localStorage.setItem('activeEpisode', JSON.stringify($activeEpisode));
     }
-  })
+  });
 
   const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;
@@ -323,31 +324,40 @@
     </span>
   </header>
 
-  {#if $walletAddress || $fetchingDelegations}
-    {#if $potentials.length}
-      <div class="nfts-legend flex-row gap-8">
-        <span class="flex-row gap-8">
-          <h5>
-            {#if $fetchingDelegations}
-              Loading
-            {:else}
-              Total
-            {/if}
-            NFTs: {$potentials.length}
-          </h5>
-          <RefreshSVG
-            onclick={() => {
-              $potentials = $potentials;
-            }}
-          />
-        </span>
-
+  {#if $walletAddress}
+    <div class="nfts-legend flex-row gap-8">
+      <span class="flex-row gap-8">
         <h5>
-          Selected<strong class="pc-only">&nbsp;NFTs</strong>:
-          {$selectedNFTs.length}
+          {#if $loadingNFTs}
+            Loading
+          {:else}
+            Total
+          {/if}
+          NFTs: {$potentials.length}
         </h5>
-      </div>
+        <RefreshSVG
+          onclick={() => {
+            $potentials = $potentials;
+          }}
+        />
+      </span>
 
+      <h5>
+        Selected<strong class="pc-only">&nbsp;NFTs</strong>:
+        {$selectedNFTs.length}
+      </h5>
+    </div>
+
+    {#if $loadingNFTs}
+      <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
+        {#each Array(2) as _}
+          <div class="potential-tile loading-tile">
+            <div class="loading-animation"></div>
+            <span class="loading-animation"></span>
+          </div>
+        {/each}
+      </ul>
+    {:else if $potentials.length}
       <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
         {#each $potentials as NFT}
           {#await nftVote($episode, NFT.id) then vote}
@@ -386,14 +396,16 @@
           <p class="validation">Your wallet doesn't have any Potential</p>
 
           <p class="text-glowing">
-            You don’t hold any Potentials directly, but delegated NFTs may grant you voting power. Open the Delegation Panel to explore shared access.
+            You don’t hold any Potentials directly, but delegated NFTs may grant
+            you voting power. Open the Delegation Panel to explore shared
+            access.
           </p>
 
           <button
             class="button-glowing"
             onclick={() => ($showModal = true)}
-            onpointerover={() => modalFocus = true}
-            onpointerout={() => modalFocus = false}
+            onpointerover={() => (modalFocus = true)}
+            onpointerout={() => (modalFocus = false)}
           >
             Check Delegations
           </button>
@@ -401,8 +413,8 @@
           <hr />
 
           <p class="text-glowing">
-            Or explore the Marketplace to discover a Potential that resonates with
-            your journey.
+            Or explore the Marketplace to discover a Potential that resonates
+            with your journey.
           </p>
 
           <span class="flex-row flex-wrap">
@@ -634,6 +646,14 @@
         &.selected {
           @include purple(1, bg, bright);
           @include dark-blue(1, text);
+        }
+      }
+
+      .loading-tile {
+        max-width: calc(50% - 0.5rem);
+
+        div {
+          aspect-ratio: 2 / 2.5;
         }
       }
 

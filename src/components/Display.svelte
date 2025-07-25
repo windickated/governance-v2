@@ -66,7 +66,9 @@
   };
 
   // Vote button
-  let voteIsInactive = $derived($selectedOption && $selectedNFTs.length > 0 ? false : true); // TRUE prohibits voting
+  let voteIsInactive = $derived(
+    $selectedOption && $selectedNFTs.length > 0 ? false : true,
+  ); // TRUE prohibits voting
   let voteButtonState = $state<boolean>(true);
   let voteButtonHover = $state<boolean>(false);
 

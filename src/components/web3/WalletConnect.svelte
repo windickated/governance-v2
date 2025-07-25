@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  
+
   import { createRoot } from 'react-dom/client';
 
   import RainbowConnect from '@components/web3/Rainbow';

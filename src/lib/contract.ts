@@ -40,10 +40,9 @@ let abi = abi_v1;
 export const contract = async (
   providerType: 'user' | 'alchemy' = 'user',
 ): Promise<any> => {
-  let provider: any;;
+  let provider: any;
 
-  if (providerType === 'user')
-    provider = get(userProvider);
+  if (providerType === 'user') provider = get(userProvider);
   else
     provider = new JsonRpcProvider(
       'https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep',

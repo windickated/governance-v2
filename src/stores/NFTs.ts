@@ -22,6 +22,7 @@ export class NFT {
 export const potentials = writable<NFT[]>([]);
 export const selectedNFTs = writable<NFT[]>([]);
 export const listedNumbers = writable<Array<number>>([]);
+export const loadingNFTs = writable<boolean>(true);
 
 export const checkingDelegations = writable<string | null>(null);
 export const fetchingDelegations = writable<boolean>(false);
@@ -64,6 +65,8 @@ export async function getNFTs() {
       listedNumbers.set(Array.from(new Set(listedNFTs)));
     })
     .catch((err) => console.error(err));
+
+  loadingNFTs.set(false);
 }
 
 export const getNftNumbers = async (wallet: string) => {

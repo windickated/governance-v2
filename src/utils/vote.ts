@@ -8,7 +8,7 @@ export default async function vote() {
   const _option: number | null = get(selectedOption);
   const _potentials: NFT[] = get(potentials);
   const _selectedNFTs: NFT[] = get(selectedNFTs);
-  
+
   if (_selectedNFTs.length == 1) {
     const potentialNumber: number = _selectedNFTs[0].id;
     await (await contract()).singleVote(_episode, potentialNumber, _option);
