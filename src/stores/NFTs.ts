@@ -2,6 +2,8 @@ import { get, writable } from 'svelte/store';
 import { contract } from '../lib/contract';
 import { walletAddress } from './auth';
 
+import { GetCache } from '@constants/cache';
+
 export class NFT {
   id: number;
   name: string;
@@ -25,10 +27,7 @@ export const listedNumbers = writable<Array<number>>([]);
 export const loadingNFTs = writable<boolean>(true);
 
 export const checkingDelegations = writable<string | null>(null);
-export const fetchingDelegations = writable<boolean>(false);
-export const nftApprovals = writable<
-  { owner: string; approved: boolean; nfts?: number[] }[]
->([]);
+export const nftApprovals = writable<Delegation[]>([]);
 
 export async function getNFTs() {
   const address = get(walletAddress);
@@ -38,8 +37,8 @@ export async function getNFTs() {
   const potentialNFTs: NFT[] | null = await getPotentials(potentialNumbers);
   if (potentialNFTs) potentials.set(potentialNFTs);
 
-  const delegations = localStorage.getItem(address);
-  if (delegations) nftApprovals.set(JSON.parse(delegations));
+  const delegations = GetCache<Delegation[]>(address);
+  if (delegations) nftApprovals.set(delegations);
 
   // check listed Potentials
   let listedNFTs: number[];
@@ -85,8 +84,7 @@ export const getPotentials = async (
       owner?.slice(0, 6) + '...' + owner?.slice(owner?.length - 4);
     const potentialNFTs: NFT[] = [];
     const metadata: any[] = [];
-    // for (let i = 0; i < nftNumbers.length; i++) {
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < nftNumbers.length; i++) {
       const response = await fetch(
         `https://api.degenerousdao.com/nft/data/${nftNumbers[i]}`,
       );
@@ -96,7 +94,7 @@ export const getPotentials = async (
     }
     return potentialNFTs;
   } catch (error) {
-    console.log('Failed to fetch Potentials # ' + nftNumbers + ': ' + error);
+    console.error('Failed to fetch Potentials # ' + nftNumbers + ': ' + error);
     return null;
   }
 };

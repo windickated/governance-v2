@@ -9,6 +9,7 @@ import {
   getNftNumbers,
 } from '../stores/NFTs';
 import { walletAddress } from '../stores/auth';
+import { SetCache, TTL_MONTH } from '@constants/cache';
 
 const CONTRACT_ADDRESS = '0x111e0861baa9d479cff55d542e5a9e4205012bbe';
 const abi = [
@@ -100,9 +101,7 @@ const checkNftBatches = async () => {
   }
 
   // Process batches
-  console.log('Checking Potentials ownership...');
   for (let i = 0; i < batches.length; i++) {
-    console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
     const results = await fetchNftOwnersWithRetry(batches[i]);
     await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -120,7 +119,6 @@ const checkNftBatches = async () => {
 
   // Retry failed tokens individually
   if (failedTokenIds.length > 0) {
-    console.log(`Retrying ${failedTokenIds.length} failed tokens`);
     for (const tokenId of failedTokenIds) {
       try {
         const result = await client.readContract({
@@ -194,9 +192,7 @@ const getDelegatedAdresses = async (walletsList, operator) => {
   }
 
   // Process batches
-  console.log('Searching for delegated Potentials...');
   for (let i = 0; i < batches.length; i++) {
-    console.log(`Processing wallets batch ${i + 1}/${batches.length}`);
     const results = await fetchDelegatedWalletsWithRetry(batches[i], operator);
 
     results?.forEach((result) => {
@@ -218,7 +214,6 @@ const getDelegatedAdresses = async (walletsList, operator) => {
     checkingDelegations.set(
       `Checking ${failedTokenIds.length} wallets one more time...`,
     );
-    console.log(`Retrying ${failedTokenIds.length} failed addresses`);
     for (const owner of failedTokenIds) {
       checkingDelegations.set(
         `Checking ${nextWalletCount()}/${failedTokenIds.length} wallets one more time...`,
@@ -258,8 +253,7 @@ export const checkDelegatedWallets = async () => {
       ? allNFTs.filter((nft) => !nftNumbers.includes(nft.tokenId))
       : allNFTs;
   const ownersList = filteredNFTs.map((nft) => nft.owner);
-  const filteredOwners = Array.from(new Set(ownersList));
-  console.log(filteredOwners.length + ' unique NFT owners.');
+  const filteredOwners = Array.from(new Set(ownersList)); // unique NFT owners
   checkingDelegations.set('Searching for delegated Potentials...');
   const delegatedWallets = (
     await getDelegatedAdresses(filteredOwners, address)
@@ -271,7 +265,7 @@ export const checkDelegatedWallets = async () => {
     );
     delegatedWallets[i].nfts = await getNftNumbers(delegatedWallets[i].owner);
   }
-  localStorage.setItem(address, JSON.stringify(delegatedWallets));
+  SetCache(address, delegatedWallets, TTL_MONTH);
   nftApprovals.set(delegatedWallets);
   checkingDelegations.set(null);
 };

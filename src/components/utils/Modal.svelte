@@ -9,7 +9,6 @@
     nftApprovals,
     selectedNFTs,
     checkingDelegations,
-    fetchingDelegations,
   } from '@stores/NFTs.ts';
   import { walletAddress } from '@stores/auth.ts';
   import {
@@ -18,6 +17,7 @@
     claimNFTs,
     checkDelegatedWallets,
   } from '@lib/potentials.js';
+  import { ClearCache } from '@constants/cache.js';
 
   import LoadingSVG from '@components/icons/Loading.svelte';
   import CloseSVG from '@components/icons/Close.svelte';
@@ -55,7 +55,6 @@
   $: if ($nftApprovals && $nftApprovals.length > 0) getDelegatedNFTs();
 
   const getDelegatedNFTs = async () => {
-    $fetchingDelegations = true;
     const userNftNumbers = await getNftNumbers($walletAddress);
     let userNFTs = await getPotentials(userNftNumbers);
     for (let i = 0; i < $nftApprovals.length; i++) {
@@ -70,7 +69,7 @@
           $potentials = userNFTs;
         }
       } catch (error) {
-        console.log(
+        console.error(
           'Failed to fetch delegated NFTs from ' +
             $nftApprovals[i].owner +
             ': ' +
@@ -79,7 +78,6 @@
       }
     }
     if (userNFTs) $potentials = userNFTs;
-    $fetchingDelegations = false;
   };
 
   const removeDelegations = async () => {
@@ -88,7 +86,7 @@
     if (potentialNFTs) potentials.set(potentialNFTs);
     nftApprovals.set([]);
     selectedNFTs.set([]);
-    localStorage.removeItem($walletAddress);
+    ClearCache($walletAddress);
   };
 
   const getDelegationsCount = () => {
@@ -239,7 +237,7 @@ a11y_no_static_element_interactions -->
                       (approval) => approval.owner !== owner,
                     );
                     if (!$nftApprovals || $nftApprovals.length < 1) {
-                      localStorage.removeItem($walletAddress);
+                      ClearCache($walletAddress);
                       removeDelegations();
                     }
                   }}
@@ -251,7 +249,7 @@ a11y_no_static_element_interactions -->
           </ul>
         {/if}
         {#if $checkingDelegations}
-          <p class="validation gray">{$checkingDelegations}</p>
+          <p class="validation transparent-white-txt">{$checkingDelegations}</p>
         {/if}
         <span class="flex-row">
           {#if $checkingDelegations}
@@ -263,10 +261,10 @@ a11y_no_static_element_interactions -->
               on:click={removeDelegations}
               disabled={!$nftApprovals || $nftApprovals.length == 0}
             >
-              CLEAR
+              Clear
             </button>
             <button class="green-btn" on:click={checkDelegatedWallets}>
-              FETCH
+              Check
             </button>
           {/if}
         </span>

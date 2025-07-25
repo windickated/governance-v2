@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { displayScreen } from '@data/buttons.ts';
+  import { displayScreen } from 'src/constants/buttons';
   import {
     storyNodes,
     story,

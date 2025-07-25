@@ -1,37 +1,9 @@
 import { writable } from 'svelte/store';
 import { contract } from '../lib/contract.ts';
 
-export type StoryNode = {
-  season?: number;
-  title: string | undefined;
-  episodeName: string | undefined;
-  description: string;
-  image_url: string;
-  video_url: string;
-  endTimestamp: number;
-  ended: boolean;
-  duration: string;
-  votes_options: {
-    option: string;
-    class?: string;
-  }[];
-};
-
-interface Result {
-  results: {
-    option: number;
-    votes: number;
-  }[];
-  win: number;
-  participation: number;
-}
-
 export const storyNodes = writable<StoryNode[]>([]);
 export const loadingStories = writable<number>(-1);
-export const activeEpisode = writable<{
-  seasonNr: number;
-  episodeNr: number;
-} | null>(null);
+export const activeEpisode = writable<Nullable<ActiveEpisode>>(null);
 
 export const story = writable<StoryNode | null>(null);
 
@@ -45,31 +17,28 @@ export const abortVotingCheck = writable<boolean>(false);
 
 export const get_nodes = async () => {
   const count = await (await contract('alchemy')).getStoryNodesCount();
-  console.log('Episodes count: ' + count); //
   const nodes: any[] = [];
   abortVotingCheck.set(true);
   const storyPercent = 100 / Number(count);
   let progress: number = 0;
   loadingStories.set(progress);
 
-  // for (let i = 0; i < count; i++) {
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < count; i++) {
     loadingStories.set((progress += storyPercent));
-    console.log('Fetching Episode ' + (i + 1).toString()); //
     let ipfs_uri = await (await contract('alchemy')).storyNodeMetadata(i);
     if (ipfs_uri === 'ipfs://QmYutAynNJwoE88LxthGdA2iH8n2CGJygz8ZkoA1WACsNg') {
       ipfs_uri = 'ipfs://QmP2c7vULMkbaChCkUiQ6PDsHLBt3WcSEYax4SSvugbZb1';
     }
     const slicedURI = ipfs_uri.match('ipfs://') ? ipfs_uri.slice(7) : ipfs_uri;
     try {
-      console.log('ipfs URI: https://gateway.pinata.cloud/ipfs/' + slicedURI);
+      // console.log('ipfs URI: https://gateway.pinata.cloud/ipfs/' + slicedURI);
       const json = await fetch(
         `https://gateway.pinata.cloud/ipfs/${slicedURI}`,
       );
       nodes.push(await json.json());
     } catch (error) {
       console.error(error);
-      console.log('ipfs URI: https://ipfs.io/ipfs/' + slicedURI);
+      // console.log('ipfs URI: https://ipfs.io/ipfs/' + slicedURI);
       const json = await fetch(`https://ipfs.io/ipfs/${slicedURI}`);
       nodes.push(await json.json());
     }

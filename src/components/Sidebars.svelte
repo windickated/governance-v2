@@ -16,12 +16,17 @@
     selectedNFTs,
     nftVote,
     listedNumbers,
-    fetchingDelegations,
     loadingNFTs,
   } from '@stores/NFTs.ts';
   import { walletAddress, username } from '@stores/auth';
   import { showModal } from '@stores/modal';
   import { toastStore } from '@stores/toast.svelte';
+  import {
+    GetCache,
+    SetCache,
+    ClearCache,
+    ACTIVE_EPISODE_KEY,
+  } from '@constants/cache.js';
 
   import WalletConnect from '@components/web3/WalletConnect.svelte';
   import ResetSVG from '@components/icons/Reset.svelte';
@@ -47,9 +52,9 @@
   /* --- EPISODES --- */
 
   onMount(async () => {
-    const stored = localStorage.getItem('activeEpisode');
+    const stored = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
     if (stored) {
-      const { seasonNr } = JSON.parse(stored);
+      const { seasonNr } = stored;
       season.set(seasonNr);
     }
 
@@ -57,7 +62,7 @@
     storyNodes.set(nodes);
 
     if (stored) {
-      const { episodeNr } = JSON.parse(stored);
+      const { episodeNr } = stored;
       if (nodes.length >= episodeNr) episode.set(episodeNr);
     }
   });
@@ -69,7 +74,7 @@
         seasonNr: $season,
         episodeNr: $episode,
       };
-      localStorage.setItem('activeEpisode', JSON.stringify($activeEpisode));
+      SetCache(ACTIVE_EPISODE_KEY, $activeEpisode);
     }
   });
 
@@ -80,11 +85,11 @@
     $story = null;
     $storyNodes = [];
     $activeEpisode = null;
-    localStorage.removeItem('activeEpisode');
+    ClearCache(ACTIVE_EPISODE_KEY);
     try {
       $storyNodes = await get_nodes();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -235,7 +240,7 @@
     <option value="2" selected={$season == 2}>Season 2</option>
   </select>
   {#if $storyNodes.length}
-    <ul class="flex pad round dark-glowing vert-scrollbar">
+    <ul class="flex-row flex-wrap pad round dark-glowing vert-scrollbar">
       {#each $storyNodes as episodeObject, index}
         <button
           class="void-btn episode tile"

@@ -100,13 +100,11 @@ async function main(storyNode = 0) {
     // check for abort
     const abort = get(abortVotingCheck);
     if (abort) {
-      console.log('Abort fetching results.');
       checkingResults.set(-1);
       return;
     }
 
     checkingResults.set((checkingStatus += 9));
-    console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
     const results = await fetchVotesWithRetry(storyNode, batches[i]);
 
     results.forEach((result) => {
@@ -123,12 +121,10 @@ async function main(storyNode = 0) {
 
   // Retry failed tokens individually
   if (failedTokenIds.length > 0) {
-    console.log(`Retrying ${failedTokenIds.length} failed tokens`);
     for (const tokenId of failedTokenIds) {
       // check for abort
       const abort = get(abortVotingCheck);
       if (abort) {
-        console.log('Abort fetching results.');
         checkingResults.set(-1);
         return;
       }
