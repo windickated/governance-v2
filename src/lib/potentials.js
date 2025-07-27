@@ -8,7 +8,7 @@ import {
   checkingDelegations,
   getNftNumbers,
 } from '../stores/NFTs';
-import { walletAddress } from '../stores/auth';
+import { walletAddress, userProvider } from '../stores/auth';
 import { SetCache, TTL_MONTH } from '@constants/cache';
 
 const CONTRACT_ADDRESS = '0x111e0861baa9d479cff55d542e5a9e4205012bbe';
@@ -41,12 +41,19 @@ const client = createPublicClient({
   ),
 });
 
-const potentialsContract = async () => {
-  const provider = new JsonRpcProvider(
-    `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
-  );
+const potentialsContract = async (providerType = 'alchemy') => {
+  let provider;
+
+  if (providerType === 'user') provider = get(userProvider);
+  else
+    provider = new JsonRpcProvider(
+      `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
+    );
+
   const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
-  return contract.connect(provider);
+  return providerType === 'user'
+    ? contract.connect(await provider.getSigner())
+    : contract.connect(provider);
 };
 
 export const checkAddress = (address) => {
@@ -54,7 +61,9 @@ export const checkAddress = (address) => {
 };
 
 export const approveNFTs = async (address) => {
-  return await (await potentialsContract()).setApprovalForAll(address, true);
+  return await (
+    await potentialsContract('user')
+  ).setApprovalForAll(address, true);
 };
 
 const fetchNftOwnersWithRetry = async (tokenIds) => {

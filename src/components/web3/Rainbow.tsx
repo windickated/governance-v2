@@ -41,7 +41,6 @@ export const Web3Providers: FC<PropsWithChildren> = ({ children }) => (
   <WagmiProvider config={wagmiConfig}>
     <QueryClientProvider client={queryClient}>
       <RainbowKitProvider
-        coolMode
         modalSize="wide"
         theme={darkTheme({
           accentColor: 'rgb(51, 226, 230)',

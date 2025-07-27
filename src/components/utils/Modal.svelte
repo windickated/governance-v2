@@ -141,8 +141,8 @@ a11y_no_static_element_interactions -->
           {:else if $nftApprovals
             .map((approval) => approval.owner)
             .includes(userAddress)}
-            <p class="validation">
-              You have already imported NFTs from this address.
+            <p class="validation green-txt">
+              You have already imported NFTs from this address
             </p>
           {/if}
 
@@ -191,7 +191,7 @@ a11y_no_static_element_interactions -->
                 approval ||
                 userAddress == $walletAddress}
               on:click={() => {
-                approveNFTs(userAddress);
+                approveNFTs(userAddress).then(() => (userAddress = ''));
               }}
             >
               Delegate Potentials
