@@ -34,6 +34,7 @@
     switch (tab) {
       case 'nfts':
         activeTab = activeTab === 'nfts' ? null : 'nfts';
+        $potentials = $potentials; // to trigger reactivity
         break;
       case 'episodes':
         activeTab = activeTab === 'episodes' ? null : 'episodes';
@@ -294,7 +295,7 @@
             undoSelection();
             selectCondition = '';
           }}
-          disabled={selectCondition === ''}
+          disabled={!$selectedNFTs || $selectedNFTs.length == 0}
         />
       </span>
     {:else}
@@ -625,18 +626,12 @@
           }
         }
 
-        &.used {
-          @include gray(0.75, text);
-
-          &:hover:not(&:disabled),
-          &:active:not(&:disabled),
-          &:focus:not(&:disabled) {
-            @include orange(1, text, bright);
-          }
+        &.used:not(&.selected) {
+          @include bright(50%);
         }
 
         &.selected {
-          @include purple(1, bg, bright);
+          background-color: $bright-purple !important;
           @include dark-blue(1, text);
         }
       }

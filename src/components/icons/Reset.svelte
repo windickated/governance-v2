@@ -27,15 +27,13 @@
   button {
     fill: $soft-white;
     stroke: $soft-white;
-    color: $soft-white;
     width: 1.5rem;
 
     &:hover:not(&:disabled),
     &:active:not(&:disabled),
     &:focus:not(&:disabled) {
-      fill: $cyan;
-      stroke: $cyan;
-      color: $cyan;
+      fill: $orange;
+      stroke: $orange;
       opacity: 1 !important;
 
       svg {
@@ -46,7 +44,6 @@
     &:disabled {
       fill: $dark-blue;
       stroke: $dark-blue;
-      color: $dark-blue;
     }
   }
 </style>

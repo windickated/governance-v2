@@ -320,9 +320,9 @@
       &:hover,
       &:active,
       &:focus {
-        fill: $cyan;
-        stroke: $cyan;
-        @include cyan(1, text);
+        fill: $light-blue;
+        stroke: $light-blue;
+        @include light-blue(1, text);
       }
 
       img {
@@ -330,9 +330,9 @@
       }
 
       &.selected {
-        fill: $bright-purple;
-        stroke: $bright-purple;
-        @include purple(1, text, bright);
+        fill: $cyan;
+        stroke: $cyan;
+        @include cyan(1, text);
       }
     }
   }
