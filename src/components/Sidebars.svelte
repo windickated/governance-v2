@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import {
     storyNodes,
     story,
@@ -22,8 +20,6 @@
   import { showModal } from '@stores/modal';
   import { toastStore } from '@stores/toast.svelte';
   import {
-    GetCache,
-    SetCache,
     ClearCache,
     ACTIVE_EPISODE_KEY,
   } from '@constants/cache.js';
@@ -51,33 +47,6 @@
   };
 
   /* --- EPISODES --- */
-
-  onMount(async () => {
-    const stored = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
-    if (stored) {
-      const { seasonNr } = stored;
-      season.set(seasonNr);
-    }
-
-    const nodes = await get_nodes();
-    storyNodes.set(nodes);
-
-    if (stored) {
-      const { episodeNr } = stored;
-      if (nodes.length >= episodeNr) episode.set(episodeNr);
-    }
-  });
-
-  // Setting episode number to local memory
-  $effect(() => {
-    if ($episode !== -1) {
-      $activeEpisode = {
-        seasonNr: $season,
-        episodeNr: $episode,
-      };
-      SetCache(ACTIVE_EPISODE_KEY, $activeEpisode);
-    }
-  });
 
   const switchSeason = async (event: Event) => {
     const seasonSelector = event.target as HTMLSelectElement;

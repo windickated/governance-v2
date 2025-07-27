@@ -1,5 +1,7 @@
 <!-- LEGACY SVELTE 3/4 SYNTAX -->
 <script lang="ts">
+  import { onMount } from 'svelte';
+  
   import {
     storyNodes,
     story,
@@ -9,6 +11,8 @@
     votingResults,
     checkingResults,
     abortVotingCheck,
+    activeEpisode,
+    get_nodes,
   } from '@stores/storyNode.ts';
   import { selectedNFTs } from '@stores/NFTs.ts';
   import { walletAddress } from '@stores/auth.ts';
@@ -16,6 +20,11 @@
   import checkVote from '@lib/voting.js';
   import { userProvider } from '@stores/auth';
   import { toastStore } from '@stores/toast.svelte';
+  import {
+    GetCache,
+    SetCache,
+    ACTIVE_EPISODE_KEY,
+  } from '@constants/cache.js';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';
@@ -23,11 +32,32 @@
   let votingCountdown: string = '';
   let interval: NodeJS.Timeout;
 
+  onMount(async () => {
+    const stored = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
+    if (stored) {
+      const { seasonNr } = stored;
+      season.set(seasonNr);
+    }
+
+    const nodes = await get_nodes();
+    storyNodes.set(nodes);
+
+    if (stored) {
+      const { episodeNr } = stored;
+      if (nodes.length >= episodeNr) episode.set(episodeNr);
+    }
+  });
+
   $: if ($storyNodes.length > 0) {
     clearInterval(interval);
     votingCountdown = '0:00:00:00';
     if ($episode !== -1) {
       $story = $storyNodes[$episode];
+      $activeEpisode = {
+        seasonNr: $season,
+        episodeNr: $episode,
+      };
+      SetCache(ACTIVE_EPISODE_KEY, $activeEpisode);
       endSoon = false;
       if (!$story.ended)
         interval = setInterval(
@@ -216,7 +246,7 @@
         onclick={() => selectOption(index + 1, option.class)}
       >
         {#if option.class}
-          <img src="/{option.class}.png" alt="Selector" />
+          <img src="/icons/{option.class}.png" alt="Selector" />
         {:else}
           <SelectorSVG
             focused={$selectedOption == index + 1}

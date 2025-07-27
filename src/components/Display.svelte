@@ -300,6 +300,7 @@
           fill: $cyan;
           stroke: $cyan;
           @include cyan(1, text);
+          @include bright;
         }
 
         img {
