@@ -67,7 +67,10 @@ export async function getNFTs() {
   //   'https://cors-anywhere.herokuapp.com/https://api.opensea.io/api/v2/listings/collection/potentials-eth/all',
   //   options,
   // )
-  await fetch('https://api.opensea.io/api/v2/listings/collection/potentials-eth/all', options)
+  await fetch(
+    'https://api.opensea.io/api/v2/listings/collection/potentials-eth/all',
+    options,
+  )
     .then((res) => res.json())
     .then((res) => {
       listedNFTs = res.listings.map(

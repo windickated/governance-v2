@@ -19,10 +19,7 @@
   import { walletAddress, username } from '@stores/auth';
   import { showModal } from '@stores/modal';
   import { toastStore } from '@stores/toast.svelte';
-  import {
-    ClearCache,
-    ACTIVE_EPISODE_KEY,
-  } from '@constants/cache.js';
+  import { ClearCache, ACTIVE_EPISODE_KEY } from '@constants/cache.js';
 
   import WalletConnect from '@components/web3/WalletConnect.svelte';
   import ResetSVG from '@components/icons/Reset.svelte';

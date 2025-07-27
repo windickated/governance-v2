@@ -1,7 +1,7 @@
 <!-- LEGACY SVELTE 3/4 SYNTAX -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  
+
   import {
     storyNodes,
     story,
@@ -20,11 +20,7 @@
   import checkVote from '@lib/voting.js';
   import { userProvider } from '@stores/auth';
   import { toastStore } from '@stores/toast.svelte';
-  import {
-    GetCache,
-    SetCache,
-    ACTIVE_EPISODE_KEY,
-  } from '@constants/cache.js';
+  import { GetCache, SetCache, ACTIVE_EPISODE_KEY } from '@constants/cache.js';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';
