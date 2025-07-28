@@ -1,0 +1,692 @@
+// UTILITY CLASSES:
+// flex, flex-row, flex-wrap, blur, validation, transition, gap-8
+// Padding: pad-# 8, 16 (none); Padding-Inline: pad-inline
+// Border-radius: round-# 8, 12, 16 (none), 24, 32
+// Margin: mar, mar-inline (16), mar-auto
+// (# - pixel value)
+
+@use 'mixins' as *;
+@use 'components';
+
+// Tippy.js tooltips - https://atomiks.github.io/tippyjs/
+@import 'tippy.js/dist/tippy.css';
+@import 'tippy.js/animations/scale.css';
+// Use like this:
+// import { tippy } from 'svelte-tippy';
+// use:tippy={{ content: 'Start your story', animation: 'scale' }}
+
+.tippy-box {
+  background-color: $deep-green;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  @include box-shadow(0 0 0.5rem rgba(0, 0, 0, 0.75));
+  @include font(caption);
+}
+
+.tippy-arrow {
+  color: $deep-green;
+}
+
+/* RESET */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:
+    PT Serif Caption,
+    serif-sans;
+}
+
+*::before,
+*::after {
+  color: inherit;
+}
+
+a,
+button,
+[role='button'],
+svg,
+select {
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+}
+
+a *,
+button *,
+[role='button'] *,
+svg * {
+  cursor: inherit;
+  transition: all 0.3s ease-in-out;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+label {
+  cursor: pointer;
+}
+
+input:disabled,
+textarea:disabled {
+  opacity: 1 !important; // for iOS
+}
+
+ul:not(.default-ul),
+ol:not(.default-ol) {
+  list-style-type: none;
+}
+
+.default-ul,
+.default-ol {
+  text-align: left;
+  list-style-position: inside;
+}
+
+:where(h1, h2, h3, h4, h5, p) {
+  cursor: default;
+}
+
+:where(img) {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: initial;
+}
+
+:where(hr) {
+  width: 100%;
+  @include gray-border(0.25);
+}
+
+:where(code) {
+  font-family: monospace;
+  @include gray(0.1);
+}
+
+:where(b) {
+  font-weight: bold;
+  color: $white;
+  @include text-shadow;
+}
+
+/* GENERAL STYLING */
+
+a {
+  color: rgba(51, 226, 230, 0.9);
+  text-decoration: none;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: $cyan;
+    text-decoration: underline;
+  }
+}
+
+html {
+  text-align: center;
+  padding-top: 4rem;
+  letter-spacing: 0.025rem;
+  word-spacing: 0.2em;
+  background-color: $dark-blue;
+
+  @include cyan(0.85, 'text');
+  @include font;
+
+  @include respond-up('small-desktop') {
+    background-color: black;
+  }
+
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
+
+  // UTILITY CLASSES
+
+  main,
+  :where(.flex) {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .flex-row {
+    @extend .flex;
+    flex-direction: row;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap-8 {
+    gap: 0.5rem;
+  }
+
+  .blur {
+    -webkit-backdrop-filter: blur(1rem);
+    backdrop-filter: blur(1rem);
+  }
+
+  .pad-8 {
+    padding: 0.5rem;
+  }
+
+  .pad {
+    padding: 1rem;
+  }
+
+  .pad-inline {
+    padding-inline: 1rem;
+  }
+
+  .round-8 {
+    border-radius: 0.5rem;
+  }
+
+  .round-12 {
+    border-radius: 0.75rem;
+  }
+
+  .round {
+    border-radius: 1rem;
+  }
+
+  .round-24 {
+    border-radius: 1.5rem;
+  }
+
+  .round-32 {
+    border-radius: 2rem;
+  }
+
+  .mar {
+    margin: 1rem;
+  }
+
+  .mar-inline {
+    margin-inline: 1rem;
+  }
+
+  .mar-auto {
+    margin-inline: auto;
+  }
+
+  .validation {
+    text-transform: uppercase;
+    @include font(small);
+
+    a {
+      color: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      filter: brightness(125%);
+      text-decoration: underline;
+
+      &:hover,
+      &:active {
+        text-decoration: none;
+      }
+    }
+  }
+
+  .transition {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .vert-scrollbar {
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0),
+        rgba(51, 226, 230, 0.25),
+        rgba(0, 0, 0, 0)
+      );
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+
+    &::-webkit-scrollbar-thumb:hover,
+    &::-webkit-scrollbar-thumb:active {
+      background: rgba(51, 226, 230, 0.25);
+    }
+  }
+
+  .drag-handle {
+    cursor: grab;
+    user-select: none;
+    padding-inline: 0.25rem;
+    font-size: 1.25rem;
+  }
+
+  .container {
+    @extend .flex;
+    @extend .blur;
+    @extend .pad;
+    @extend .round;
+    width: clamp(250px, 90%, 50rem);
+    box-shadow: $shadow-plus-inset-glow;
+    animation: dark-glowing 10s ease-in-out infinite;
+    margin-inline: auto;
+  }
+
+  .transparent-container {
+    @extend .container;
+    animation: transparent-glowing 10s ease-in-out infinite;
+  }
+
+  .opaque-container {
+    @extend .container;
+    animation: dark-glowing-opaque 10s ease-in-out infinite;
+  }
+
+  .mobile-text-wrapper {
+    @extend .transparent-container;
+    display: block;
+
+    @include respond-up(small-desktop) {
+      box-shadow: none;
+      animation: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      width: auto;
+      padding: 0;
+    }
+  }
+
+  .wide-container {
+    width: clamp(250px, 95%, 70rem);
+  }
+
+  // DREAM SECTION STYLING
+
+  .dream-container {
+    @extend .transparent-container;
+    width: 95%;
+    max-width: 100rem;
+
+    &,
+    * {
+      animation-duration: 36s !important;
+    }
+
+    input:not(input[type='range']),
+    textarea,
+    select {
+      animation: dark-glowing 10s ease-in-out infinite;
+      @include white-txt;
+      @include box-shadow(0 0 0.5rem rgba(0, 0, 0, 0.75));
+
+      &:hover:not(&:disabled),
+      &:active:not(&:disabled),
+      &:focus:not(&:disabled) {
+        transform: none;
+        @include white-txt;
+        @include box-shadow;
+        @include cyan-border;
+        @include bright;
+        @include scale(1.005, x);
+      }
+    }
+
+    h4,
+    h5 {
+      @include text-shadow;
+    }
+
+    div {
+      width: 100%;
+      flex-flow: row wrap;
+      justify-content: space-around;
+
+      @include respond-up(small-desktop) {
+        flex-wrap: nowrap;
+
+        h4 {
+          width: 18rem;
+          text-align: right;
+        }
+      }
+
+      &.container {
+        @include box-shadow(deep, inset);
+      }
+
+      &.input-container {
+        flex-flow: column nowrap;
+        margin-top: 0;
+
+        label {
+          position: static;
+
+          &::after {
+            content: '';
+          }
+        }
+      }
+
+      .dream-radio-btn {
+        text-transform: uppercase;
+        @include light-blue(1, text);
+        @include font(h4);
+
+        &:hover,
+        &:active,
+        &:focus {
+          @include scale;
+          @include bright;
+        }
+
+        &.active {
+          @include cyan(1, text);
+        }
+      }
+    }
+  }
+
+  // BLOG SECTION STYLING
+
+  .blog-pages {
+    @extend .flex;
+
+    a {
+      @extend .transparent-container;
+      width: 95%;
+      max-width: 80rem;
+
+      img {
+        border-radius: 0.5rem;
+      }
+
+      article {
+        @extend .flex;
+        align-items: flex-start;
+
+        h5 {
+          @include white-txt;
+        }
+
+        p {
+          @include white-txt(soft);
+        }
+      }
+
+      @include respond-up(tablet) {
+        flex-direction: row;
+
+        img {
+          width: 10rem;
+        }
+
+        article {
+          h5,
+          p {
+            text-align: left;
+          }
+        }
+      }
+
+      &:hover,
+      &:active,
+      &:focus {
+        text-decoration: none;
+        @include bright;
+        @include scale-up(soft);
+
+        article {
+          h5 {
+            @include cyan(1, text);
+          }
+
+          p {
+            @include cyan(0.75, text);
+          }
+        }
+      }
+    }
+  }
+
+  .blog-title {
+    @extend .container;
+    width: 95%;
+    max-width: 80rem;
+
+    img {
+      width: 100%;
+      border-radius: 0.5rem;
+      mask: radial-gradient(20px at 20px 20px, #0000 98%, #000) -20px -20px;
+    }
+
+    h3 {
+      background-clip: text;
+      color: transparent;
+      background-image: linear-gradient(to right, $deep-red, $blue);
+      filter: brightness(125%)
+        drop-shadow(0 0.25rem 0.25rem rgba(0, 0, 0, 0.75));
+      @include white-txt(0.5);
+    }
+
+    @include respond-up(tablet) {
+      flex-direction: row;
+      justify-content: space-between;
+
+      img {
+        max-width: 20rem;
+      }
+
+      h3 {
+        text-align: left;
+      }
+    }
+  }
+
+  .blog-page {
+    @extend .transparent-container;
+    width: 95%;
+    max-width: 80rem;
+    margin-top: 1rem;
+    @include white-txt;
+
+    h5 {
+      @include cyan(1, text);
+    }
+
+    .cards-list {
+      @extend .container;
+      width: 100%;
+      @include box-shadow(deep, inset);
+
+      .card {
+        @extend .gray-tile;
+        width: 100%;
+        padding: 1rem;
+        gap: 1rem;
+
+        &.green-card {
+          @extend .green-tile;
+          width: 100%;
+          padding: 1rem;
+          gap: 1rem;
+        }
+
+        h4 {
+          @include cyan(1, text);
+        }
+
+        .details {
+          @extend .container;
+          animation: none !important;
+          width: 100%;
+          align-items: flex-start;
+          @include white-txt(0.5);
+          @include dark-blue(0.75);
+          @include box-shadow(soft, inset);
+
+          p {
+            text-align: left;
+
+            strong {
+              @include white-txt;
+            }
+          }
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+          p {
+            @include cyan(1, text);
+          }
+
+          .details {
+            p,
+            p strong {
+              @include white-txt(1);
+            }
+          }
+        }
+      }
+
+      @include respond-up(small-desktop) {
+        flex-flow: row wrap;
+
+        .card,
+        .card.green-card {
+          width: 49%;
+        }
+      }
+    }
+  }
+
+  // NAVIGATION ICONS
+
+  .top-left-icon,
+  .top-right-icon {
+    width: 2.75rem;
+    border-radius: 50%;
+    z-index: 150;
+    flex: none;
+    filter: drop-shadow(0 0.25rem 0.25rem rgba(0, 0, 0, 0.75));
+
+    svg {
+      border-radius: inherit;
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+      @include scale;
+    }
+
+    @include respond-up(small-desktop) {
+      position: fixed;
+      top: 1rem;
+      width: 4rem;
+    }
+  }
+
+  .top-left-icon {
+    left: 1rem;
+  }
+
+  .top-right-icon {
+    right: 1rem;
+  }
+}
+
+.progress-bar {
+  width: 15rem;
+  height: 0.5rem;
+  border-radius: 1rem;
+  @include cyan(0.25);
+
+  div {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    transition: width 1s linear;
+    @include cyan(0.5);
+  }
+}
+
+.pc-only {
+  display: none;
+
+  @include respond-up(tablet) {
+    display: block;
+  }
+}
+
+.mobile-only {
+  display: block;
+
+  @include respond-up(tablet) {
+    display: none;
+  }
+}
+
+// For screen readers
+.sr-only {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+
+// For game instructions
+.keyboard-instructions {
+  @extend .transparent-container;
+  width: auto !important;
+  align-items: flex-start;
+  padding-inline: 10rem !important;
+
+  li {
+    @extend .flex-row;
+
+    .keyboard-btn {
+      font-family: Verdana, sans-serif;
+      font-weight: bold;
+      min-width: 3rem;
+      min-height: 2rem;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      @include gray;
+      @include dark-blue(1, text);
+    }
+  }
+}
+
+// Prevent accidental navigation while dragging
+.dnd-dragging {
+  a.tile {
+    pointer-events: none;
+  }
+}
+
+// Prevent scroll
+.no-scroll {
+  overflow: hidden;
+  overscroll-behavior: none; // iOS/Android: blocks pull‑to‑refresh bounce
+}

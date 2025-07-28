@@ -1,6 +1,8 @@
-import { createPublicClient, http } from 'viem'
-import { base } from 'viem/chains'
-import { season, checkingResults, abortVotingCheck } from "../stores/storyNode";
+import { createPublicClient, http } from 'viem';
+import { base } from 'viem/chains';
+import { get } from 'svelte/store';
+
+import { season, checkingResults, abortVotingCheck } from '../stores/storyNode';
 
 const v1 = '0x1E2f59De3C0D51b596e0E9c80FEAa35A2cFBEe50';
 const v2 = '0x8dC749360eA4f408C438C4FC7A272EE1f1250A89'; // prod
@@ -16,7 +18,7 @@ const abi = [
     inputs: [{ type: 'uint256' }, { type: 'uint256' }],
     outputs: [{ type: 'uint8' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     name: 'storyNodes',
@@ -26,27 +28,29 @@ const abi = [
         components: [
           { name: 'endTimestamp', type: 'uint40' },
           { name: 'optionCount', type: 'uint8' },
-          { name: 'optionRestrictions', type: 'uint8[]' }
+          { name: 'optionRestrictions', type: 'uint8[]' },
         ],
-        type: 'tuple'
-      }
+        type: 'tuple',
+      },
     ],
     stateMutability: 'view',
-    type: 'function'
-  }
+    type: 'function',
+  },
 ];
 
 const client = createPublicClient({
   chain: base,
-  transport: http("https://base-mainnet.g.alchemy.com/v2/awGeW_wSOyFZCQbSHJhl0sIOxs2ww4Ep")
+  transport: http(
+    `https://base-mainnet.g.alchemy.com/v2/${import.meta.env.PUBLIC_ALCHEMY_API_KEY}`,
+  ),
 });
 
 async function fetchVotesWithRetry(storyNode, tokenIds) {
-  const calls = tokenIds.map(tokenId => ({
+  const calls = tokenIds.map((tokenId) => ({
     address: CONTRACT_ADDRESS,
     abi,
     functionName: 'getVoteOptionId',
-    args: [storyNode, tokenId]
+    args: [storyNode, tokenId],
   }));
 
   let retries = 3;
@@ -55,31 +59,31 @@ async function fetchVotesWithRetry(storyNode, tokenIds) {
       const results = await client.multicall({ contracts: calls });
       return results.map((result, index) => ({
         tokenId: tokenIds[index],
-        votingOption: result.status === 'success' ? Number(result.result) : null,
-        success: result.status === 'success'
+        votingOption:
+          result.status === 'success' ? Number(result.result) : null,
+        success: result.status === 'success',
       }));
     } catch (error) {
       retries--;
       if (retries === 0) throw error;
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 }
 
 async function main(storyNode = 0) {
-  let seasonNr = 1;
-  season.subscribe((number) => seasonNr = number);
+  const seasonNr = get(season);
 
   if (seasonNr === 1 && CONTRACT_ADDRESS !== v1) {
     CONTRACT_ADDRESS = v1;
-  } else if (seasonNr !==1 && CONTRACT_ADDRESS !== v2) {
+  } else if (seasonNr !== 1 && CONTRACT_ADDRESS !== v2) {
     CONTRACT_ADDRESS = v2;
   }
 
   // Generate array of token IDs
   const tokenIds = Array.from({ length: TOTAL_SUPPLY }, (_, i) => i + 1);
   const batches = [];
-  
+
   for (let i = 0; i < tokenIds.length; i += BATCH_SIZE) {
     const batch = tokenIds.slice(i, i + BATCH_SIZE);
     batches.push(batch);
@@ -94,23 +98,20 @@ async function main(storyNode = 0) {
   // Process batches
   for (let i = 0; i < batches.length; i++) {
     // check for abort
-    let abort = false;
-    abortVotingCheck.subscribe((value) => abort = value);
+    const abort = get(abortVotingCheck);
     if (abort) {
-      console.log('Abort fetching results.');
       checkingResults.set(-1);
       return;
     }
 
-    checkingResults.set(checkingStatus += 9);
-    console.log(`Processing NFTs batch ${i + 1}/${batches.length}`);
+    checkingResults.set((checkingStatus += 9));
     const results = await fetchVotesWithRetry(storyNode, batches[i]);
-    
-    results.forEach(result => {
+
+    results.forEach((result) => {
       if (result.success && result.votingOption !== 0) {
         allResults.push({
           tokenId: result.tokenId,
-          votingOption: result.votingOption
+          votingOption: result.votingOption,
         });
       } else if (!result.success) {
         failedTokenIds.push(result.tokenId);
@@ -120,30 +121,27 @@ async function main(storyNode = 0) {
 
   // Retry failed tokens individually
   if (failedTokenIds.length > 0) {
-    console.log(`Retrying ${failedTokenIds.length} failed tokens`);
     for (const tokenId of failedTokenIds) {
-          // check for abort
-          let abort = false;
-          abortVotingCheck.subscribe((value) => abort = value);
-          if (abort) {
-            console.log('Abort fetching results.');
-            checkingResults.set(-1);
-            return;
-          }
+      // check for abort
+      const abort = get(abortVotingCheck);
+      if (abort) {
+        checkingResults.set(-1);
+        return;
+      }
 
-      checkingResults.set(checkingStatus += (10 / failedTokenIds.length));
+      checkingResults.set((checkingStatus += 10 / failedTokenIds.length));
       try {
         const result = await client.readContract({
           address: CONTRACT_ADDRESS,
           abi,
           functionName: 'getVoteOptionId',
-          args: [storyNode, tokenId]
+          args: [storyNode, tokenId],
         });
-        
+
         if (result !== 0n) {
           allResults.push({
             tokenId,
-            votingOption: Number(result)
+            votingOption: Number(result),
           });
         }
       } catch (error) {
@@ -157,7 +155,7 @@ async function main(storyNode = 0) {
     if (result.votingOption) {
       if (result.tokenId <= 10) {
         for (let i = 0; i < 10; i++) {
-         allVotes.push(result.votingOption);
+          allVotes.push(result.votingOption);
         }
       } else {
         allVotes.push(result.votingOption);
