@@ -104,7 +104,7 @@
   };
 </script>
 
-<section>
+<section class:fixed={$episode === -1}>
   <div class="flex-row">
     {#each consolePanel.buttons as button}
       <!-- svelte-ignore a11y-click-events-have-key-events
@@ -165,6 +165,13 @@
     position: relative;
     margin-top: 2.5rem;
 
+    &.fixed {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
     div {
       z-index: 10;
       position: absolute;
@@ -187,6 +194,13 @@
     }
 
     @include respond-up(small-desktop) {
+      &.fixed {
+        position: relative;
+        bottom: unset;
+        left: unset;
+        right: unset;
+      }
+
       div {
         padding-inline: 10%;
       }
