@@ -169,7 +169,7 @@
   }
 </script>
 
-<header class="flex pad round-32">
+<header class="flex pad round-24">
   <h1 class="sr-only">Galactic Governance Hub</h1>
   {#if $story}
     <h2 class="text-glowing">
@@ -217,16 +217,14 @@
     {#if $votingResults && $season == 1 && $episode == 2}
       <p class="transparent-white-txt">(+2.5% from TikTok)</p>
     {/if}
-  {:else if $walletAddress || $storyNodes.length > 0}
+  {:else}
     <h2 class="text-glowing" class:pulse-animation={$storyNodes.length == 0}>
       {#if $storyNodes.length == 0}
         Loading episodes...
       {:else}
-        Select any episode from the tab
+        Pick an Episode to Watch
       {/if}
     </h2>
-  {:else}
-    <h2 class="text-glowing">Please Sign in Your Profile</h2>
   {/if}
 </header>
 
@@ -257,6 +255,12 @@
       </button>
     {/each}
   </ul>
+{:else}
+  <div class="open-episodes-wrapper">
+    <button class="blur" onclick={() => activeTab.set('episodes')}>
+      Open Episodes Tab
+    </button>
+  </div>
 {/if}
 
 <style lang="scss">
@@ -341,6 +345,10 @@
   @include respond-up(small-desktop) {
     article,
     ul {
+      display: none;
+    }
+
+    .open-episodes-wrapper {
       display: none;
     }
   }

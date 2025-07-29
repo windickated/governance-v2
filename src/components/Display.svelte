@@ -135,6 +135,13 @@
         </button>
       {/each}
     </ul>
+  {:else}
+    <div class="open-episodes-wrapper content">
+      <h5>There is no episode selected</h5>
+      <button class="blur" onclick={() => activeTab.set('episodes')}>
+        Open Episodes Tab
+      </button>
+    </div>
   {/if}
 
   <span>
@@ -228,6 +235,20 @@
     width: 100%;
     max-width: min(95%, 80rem);
 
+    .open-episodes-wrapper {
+      display: none;
+      padding-top: 1rem;
+
+      button {
+        margin-inline: auto;
+        margin-top: 1rem;
+      }
+
+      @include respond-up(small-desktop) {
+        display: block;
+      }
+    }
+
     .content {
       position: absolute;
       top: 12.4%;
@@ -294,7 +315,7 @@
         stroke: $white;
         gap: 0.5rem;
         @include white-txt;
-        @include font(h5);
+        @include font(h4);
 
         &:hover,
         &:active {
