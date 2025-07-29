@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { consolePanel } from '../constants/buttons.ts';
-  import { storyNodes, episode, selectedOption } from '../stores/storyNode.ts';
-  import { toastStore } from '../stores/toast.svelte';
+  import { consolePanel } from '@constants/buttons';
+  import { storyNodes, episode, selectedOption } from '@stores/storyNode';
+  import { toastStore } from '@stores/toast.svelte';
 
   let touchscreenDevice: boolean = false;
   onMount(() => {

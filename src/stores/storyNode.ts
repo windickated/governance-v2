@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import { contract } from '../lib/contract.ts';
+import { contract } from '@lib/contract';
 
 import { GetCache, SetCache, DISCHORDIAN_SAGA_KEY } from '@constants/cache.ts';
 

@@ -17,7 +17,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@rainbow-me/rainbowkit/styles.css';
 
 /* ---- Svelte stores & helpers ------------------------------------ */
-import { walletAddress, username, userProvider } from '@stores/auth';
+import { walletAddress, username, userProvider } from '@stores/auth.svelte';
 import { getNFTs } from '@stores/NFTs';
 import { ClearCache, POTENTIALS_KEY } from '@constants/cache';
 

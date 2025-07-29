@@ -2,7 +2,7 @@ import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { get } from 'svelte/store';
 
-import { season, checkingResults, abortVotingCheck } from '../stores/storyNode';
+import { season, checkingResults, abortVotingCheck } from '@stores/storyNode';
 
 const v1 = '0x1E2f59De3C0D51b596e0E9c80FEAa35A2cFBEe50';
 const v2 = '0x8dC749360eA4f408C438C4FC7A272EE1f1250A89'; // prod

@@ -6,11 +6,11 @@
     episode,
     selectedOption,
     votingResults,
-  } from '@stores/storyNode.ts';
-  import { selectedNFTs } from '@stores/NFTs.ts';
-  import { userProvider } from '@stores/auth';
+  } from '@stores/storyNode';
+  import { selectedNFTs } from '@stores/NFTs';
+  import { userProvider } from '@stores/auth.svelte';
   import { toastStore } from '@stores/toast.svelte';
-  import vote from '@utils/vote.ts';
+  import vote from '@utils/vote';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
 

@@ -13,14 +13,13 @@
     abortVotingCheck,
     activeEpisode,
     get_nodes,
-  } from '@stores/storyNode.ts';
-  import { selectedNFTs } from '@stores/NFTs.ts';
-  import { walletAddress } from '@stores/auth.ts';
-  import vote from '@utils/vote.ts';
-  import checkVote from '@lib/voting.js';
-  import { userProvider } from '@stores/auth';
+  } from '@stores/storyNode';
+  import { selectedNFTs } from '@stores/NFTs';
+  import { walletAddress, userProvider } from '@stores/auth.svelte';
+  import vote from '@utils/vote';
+  import checkVote from '@lib/voting';
   import { toastStore } from '@stores/toast.svelte';
-  import { GetCache, SetCache, ACTIVE_EPISODE_KEY } from '@constants/cache.js';
+  import { GetCache, SetCache, ACTIVE_EPISODE_KEY } from '@constants/cache';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';

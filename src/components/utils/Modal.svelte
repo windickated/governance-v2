@@ -1,6 +1,6 @@
 <!-- LEGACY SVELTE 3/4 SYNTAX -->
 <script lang="ts">
-  import { showModal } from '@stores/modal.ts';
+  import { showModal } from '@stores/modal.svelte';
   import {
     NFT,
     potentials,
@@ -9,15 +9,15 @@
     nftApprovals,
     selectedNFTs,
     checkingDelegations,
-  } from '@stores/NFTs.ts';
-  import { walletAddress } from '@stores/auth.ts';
+  } from '@stores/NFTs';
+  import { walletAddress } from '@stores/auth.svelte';
   import {
     checkAddress,
     approveNFTs,
     claimNFTs,
     checkDelegatedWallets,
-  } from '@lib/potentials.js';
-  import { ClearCache } from '@constants/cache.js';
+  } from '@lib/potentials';
+  import { ClearCache } from '@constants/cache';
 
   import LoadingSVG from '@components/icons/Loading.svelte';
   import CloseSVG from '@components/icons/Close.svelte';

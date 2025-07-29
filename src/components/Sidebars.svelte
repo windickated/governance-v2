@@ -8,18 +8,18 @@
     get_nodes,
     loadingStories,
     activeEpisode,
-  } from '@stores/storyNode.ts';
+  } from '@stores/storyNode';
   import {
     potentials,
     selectedNFTs,
     nftVote,
     listedNumbers,
     loadingNFTs,
-  } from '@stores/NFTs.ts';
-  import { walletAddress, username } from '@stores/auth';
-  import { showModal } from '@stores/modal';
+  } from '@stores/NFTs';
+  import { walletAddress, username } from '@stores/auth.svelte';
+  import { showModal, activeTab } from '@stores/modal.svelte';
   import { toastStore } from '@stores/toast.svelte';
-  import { ClearCache, ACTIVE_EPISODE_KEY } from '@constants/cache.js';
+  import { ClearCache, ACTIVE_EPISODE_KEY } from '@constants/cache';
 
   import WalletConnect from '@components/web3/WalletConnect.svelte';
   import ResetSVG from '@components/icons/Reset.svelte';
@@ -28,19 +28,17 @@
   import ArrowSVG from '@components/icons/Arrow.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';
 
-  let activeTab = $state<Tab>(null);
-
   const handleTab = (tab: Tab = null) => {
     switch (tab) {
       case 'nfts':
-        activeTab = activeTab === 'nfts' ? null : 'nfts';
+        $activeTab = $activeTab === 'nfts' ? null : 'nfts';
         $potentials = $potentials; // to trigger reactivity
         break;
       case 'episodes':
-        activeTab = activeTab === 'episodes' ? null : 'episodes';
+        $activeTab = $activeTab === 'episodes' ? null : 'episodes';
         break;
       default:
-        activeTab = null;
+        $activeTab = null;
     }
   };
 
@@ -167,7 +165,7 @@
 <!-- --- Episodes tab --- -->
 <section
   class="episodes-tab transition blur flex transparent-glowing"
-  class:open={activeTab === 'episodes'}
+  class:open={$activeTab === 'episodes'}
 >
   <button
     class="tab-icon void-btn pad-8 pad-inline flex-row"
@@ -179,7 +177,7 @@
   </button>
   <button
     class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
-    class:visible={activeTab === 'episodes'}
+    class:visible={$activeTab === 'episodes'}
     aria-label="NFTs"
     onclick={() => handleTab('nfts')}
   >
@@ -248,7 +246,7 @@
 <!-- --- NFTs tab --- -->
 <section
   class="nfts-tab transition blur flex transparent-glowing"
-  class:open={activeTab === 'nfts'}
+  class:open={$activeTab === 'nfts'}
 >
   <button
     class="tab-icon void-btn pad-8 pad-inline flex-row"
@@ -260,7 +258,7 @@
   </button>
   <button
     class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
-    class:visible={activeTab === 'nfts'}
+    class:visible={$activeTab === 'nfts'}
     aria-label="Episodes"
     onclick={() => handleTab('episodes')}
   >
@@ -431,7 +429,7 @@
 <button
   id="bg"
   class="void-btn fade-in"
-  class:hidden={!activeTab}
+  class:hidden={!$activeTab}
   onclick={() => handleTab()}
   aria-label="Background"
 ></button>

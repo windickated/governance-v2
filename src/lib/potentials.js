@@ -3,12 +3,8 @@ import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { get } from 'svelte/store';
 
-import {
-  nftApprovals,
-  checkingDelegations,
-  getNftNumbers,
-} from '../stores/NFTs';
-import { walletAddress, userProvider } from '../stores/auth';
+import { nftApprovals, checkingDelegations, getNftNumbers } from '@stores/NFTs';
+import { walletAddress, userProvider } from '@stores/auth.svelte';
 import { SetCache, TTL_MONTH } from '@constants/cache';
 
 const CONTRACT_ADDRESS = '0x111e0861baa9d479cff55d542e5a9e4205012bbe';

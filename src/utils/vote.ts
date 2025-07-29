@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
-import { episode, selectedOption } from '../stores/storyNode';
-import { potentials, NFT, selectedNFTs } from '../stores/NFTs';
-import { contract } from '../lib/contract';
+import { episode, selectedOption } from '@stores/storyNode';
+import { potentials, NFT, selectedNFTs } from '@stores/NFTs';
+import { contract } from '@lib/contract';
 
 export default async function vote() {
   const _episode: number = get(episode);

@@ -1,6 +1,6 @@
 import { get, writable } from 'svelte/store';
-import { contract } from '../lib/contract';
-import { walletAddress } from './auth';
+import { contract } from '@lib/contract';
+import { walletAddress } from '@stores/auth.svelte';
 
 import {
   GetCache,
