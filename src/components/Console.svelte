@@ -74,7 +74,7 @@
             break;
           case 'back':
             if ($episode === -1) {
-              toastStore.show('There is no episode selected!', 'error');
+              toastStore.show('There is no episode selected', 'error');
             } else if ($episode === 0) {
               toastStore.show(
                 'You selected the first episode of this season.',
@@ -87,7 +87,7 @@
             break;
           case 'forward':
             if ($episode === -1) {
-              toastStore.show('There is no episode selected!', 'error');
+              toastStore.show('There is no episode selected', 'error');
             } else if ($episode === $storyNodes.length - 1) {
               toastStore.show(
                 'You selected the last episode of this season.',

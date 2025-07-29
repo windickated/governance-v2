@@ -141,7 +141,7 @@
       return;
     }
     if ($selectedNFTs.length === 0) {
-      toastStore.show('Select any Potential to vote!', 'error');
+      toastStore.show('Select any Potential to vote', 'error');
       activeTab.set('nfts');
       return;
     }
@@ -153,7 +153,7 @@
     }
     if (!classMatch) {
       toastStore.show(
-        `This option is only for the ${optionClass} class!`,
+        `This option is only for the ${optionClass} class`,
         'error',
       );
       return;
@@ -164,7 +164,7 @@
     $userProvider!.getNetwork().then((network) => {
       const baseNetwork: number = 8453;
       if (Number(network.chainId) === baseNetwork) vote();
-      else toastStore.show('Please select Base network!', 'error');
+      else toastStore.show('Please select Base network', 'error');
     });
   }
 </script>
@@ -258,7 +258,10 @@
 {:else}
   <div class="open-episodes-wrapper container">
     <p class="white-txt">
-      The Galactic Governance Hub enables community-driven franchises to evolve through participatory IP development, facilitated by decentralized voting. We provide creators with secure, transparent results on their story nodes to propel the plot that their community wants. 
+      The Galactic Governance Hub enables community-driven franchises to evolve
+      through participatory IP development, facilitated by decentralized voting.
+      We provide creators with secure, transparent results on their story nodes
+      to propel the plot that their community wants.
     </p>
     <button class="blur" onclick={() => activeTab.set('episodes')}>
       Open Episodes Tab

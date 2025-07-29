@@ -76,11 +76,11 @@
     $potentials.map((potential) => {
       if (potential.id === id) {
         if ($listedNumbers.includes(id)) {
-          toastStore.show('Delist this Potential to vote!', 'error');
+          toastStore.show('Delist this Potential to vote', 'error');
           return;
         }
         if ($episode === -1) {
-          toastStore.show('There is no episode selected!', 'error');
+          toastStore.show('There is no episode selected', 'error');
           return;
         }
         if ($storyNodes[$episode].ended) {
@@ -439,13 +439,20 @@
   {:else}
     <div class="container white-txt">
       <p class="pc-only">
-        The Galactic Governance Hub enables community-driven franchises to evolve through participatory IP development, facilitated by decentralized voting. We provide creators with secure, transparent results on their story nodes to propel the plot that their community wants. 
+        The Galactic Governance Hub enables community-driven franchises to
+        evolve through participatory IP development, facilitated by
+        decentralized voting. We provide creators with secure, transparent
+        results on their story nodes to propel the plot that their community
+        wants.
       </p>
 
       <hr class="pc-only" />
 
       <p>
-        Our Proof-of-Concept is The Dischordian Saga - a pioneering sci-fi franchise that has delivered several hours of AI-generated videos to millions, serving as Hollywood-grade episodes with a 75% community participation rate in this hub.
+        Our Proof-of-Concept is The Dischordian Saga - a pioneering sci-fi
+        franchise that has delivered several hours of AI-generated videos to
+        millions, serving as Hollywood-grade episodes with a 75% community
+        participation rate in this hub.
       </p>
 
       <hr />
@@ -709,6 +716,9 @@
       }
 
       .potential-banner {
+        margin-bottom: 1rem;
+        overflow: auto;
+
         .potential {
           display: none;
         }

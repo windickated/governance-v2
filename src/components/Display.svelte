@@ -30,7 +30,7 @@
       return;
     }
     if ($selectedNFTs.length === 0) {
-      toastStore.show('Select any Potential to vote!', 'error');
+      toastStore.show('Select any Potential to vote', 'error');
       activeTab.set('nfts');
       return;
     }
@@ -42,7 +42,7 @@
     }
     if (!classMatch) {
       toastStore.show(
-        `This option is only for the ${optionClass} class!`,
+        `This option is only for the ${optionClass} class`,
         'error',
       );
       return;
@@ -136,7 +136,7 @@
       {/each}
     </ul>
   {:else}
-    <div class="open-episodes-wrapper content">
+    <div class="open-episodes-wrapper content fade-in">
       <h5>There is no episode selected</h5>
       <button class="blur" onclick={() => activeTab.set('episodes')}>
         Open Episodes Tab
