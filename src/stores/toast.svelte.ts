@@ -17,7 +17,7 @@ function createToastStore() {
     show: (
       message: string,
       type: ToastType = 'info',
-      duration: number = 10000,
+      duration: number = 3000,
     ) => {
       const id = Date.now();
       update((toasts) => [...toasts, { id, message, type, duration }]);

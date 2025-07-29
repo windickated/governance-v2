@@ -295,8 +295,7 @@
         @include font(h5);
 
         &:hover,
-        &:active,
-        &:focus {
+        &:active {
           fill: $light-blue;
           stroke: $light-blue;
           @include light-blue(1, text);

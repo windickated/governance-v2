@@ -4,7 +4,7 @@
 
   export let message: string = '';
   export let type: 'info' | 'error' = 'info';
-  export let duration: number = 10000;
+  export let duration: number = 3000;
   export let onClose = () => {};
 
   let fading: number;
