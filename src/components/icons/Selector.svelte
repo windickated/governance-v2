@@ -8,8 +8,8 @@
     selectorSize = 1.5,
     rotate = null,
   }: {
-    focused: Nullable<number | boolean>;
-    disabled: boolean;
+    focused?: Nullable<number | boolean>;
+    disabled?: boolean;
     hideForMobiles?: boolean;
     glowing?: boolean;
     color?: string;

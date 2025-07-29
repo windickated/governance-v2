@@ -27,6 +27,9 @@
   import ContractSVG from '@components/icons/Contract.svelte';
   import ArrowSVG from '@components/icons/Arrow.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';
+  import EpisodeSVG from '@components/icons/Episode.svelte';
+  import ProfileSVG from '@components/icons/Profile.svelte';
+  import SelectorSVG from '@components/icons/Selector.svelte';
 
   const handleTab = (tab: Tab = null) => {
     switch (tab) {
@@ -172,8 +175,13 @@
     aria-label="Episodes"
     onclick={() => handleTab('episodes')}
   >
-    <img src="/icons/episode.png" alt="Episodes" />
+    <EpisodeSVG />
     Episodes
+    <SelectorSVG
+      hideForMobiles={true}
+      selectorSize={1.25}
+      rotate={$activeTab === 'episodes' ? '180' : '0'}
+    />
   </button>
   <button
     class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
@@ -181,8 +189,8 @@
     aria-label="NFTs"
     onclick={() => handleTab('nfts')}
   >
-    <img src="/icons/selection.png" alt="NFTs" />
-    NFTs
+    Profile
+    <ProfileSVG />
   </button>
 
   <header class="flex-row pad shad">
@@ -253,8 +261,13 @@
     aria-label="NFTs"
     onclick={() => handleTab('nfts')}
   >
-    <img src="/icons/selection.png" alt="NFTs" />
-    NFTs
+    <SelectorSVG
+      hideForMobiles={true}
+      selectorSize={1.25}
+      rotate={$activeTab === 'nfts' ? '0' : '180'}
+    />
+    Profile
+    <ProfileSVG />
   </button>
   <button
     class="secondary-tab tab-icon void-btn pad-8 pad-inline flex-row"
@@ -262,7 +275,7 @@
     aria-label="Episodes"
     onclick={() => handleTab('episodes')}
   >
-    <img src="/icons/episode.png" alt="NFTs" />
+    <EpisodeSVG />
     Episodes
   </button>
 
@@ -463,13 +476,12 @@
       position: absolute;
       top: 100%;
       width: 50vw;
+      gap: 0.5rem;
+      fill: $white;
+      stroke: $white;
       @include blue;
-      @include white-txt;
+      @include white-txt(1);
       @include font(h4);
-
-      img {
-        width: 1.5rem;
-      }
 
       &.secondary-tab {
         display: none;
@@ -488,6 +500,9 @@
         &:hover,
         &:active,
         &:focus {
+          fill: $cyan;
+          stroke: $cyan;
+          @include cyan(1, text);
           @include bright(150%);
         }
 
@@ -500,8 +515,11 @@
 
       &.open {
         .tab-icon:not(.secondary-tab) {
-          background-color: $blue;
           filter: none;
+          background-color: $blue;
+          fill: $cyan;
+          stroke: $cyan;
+          @include cyan(1, text);
         }
 
         .secondary-tab {
@@ -554,6 +572,9 @@
         &:hover,
         &:active,
         &:focus {
+          fill: $orange;
+          stroke: $orange;
+          @include orange(1, text);
           @include bright(150%);
         }
 
@@ -566,8 +587,11 @@
 
       &.open {
         .tab-icon:not(.secondary-tab) {
-          background-color: $purple;
           filter: none;
+          background-color: $purple;
+          fill: $bright-orange;
+          stroke: $bright-orange;
+          @include orange(1, text, bright);
         }
 
         .secondary-tab {
@@ -668,11 +692,6 @@
         top: 0;
         height: 4.5rem;
         min-height: 4vw;
-
-        img {
-          width: 2rem;
-          min-width: 1.5vw;
-        }
 
         &.secondary-tab {
           display: none !important;
