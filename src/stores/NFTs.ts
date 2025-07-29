@@ -33,6 +33,7 @@ export const loadingNFTs = writable<boolean>(true);
 
 export const checkingDelegations = writable<string | null>(null);
 export const nftApprovals = writable<Delegation[]>([]);
+export const afterCheckMessage = writable<string | null>(null);
 
 export async function getNFTs() {
   const address = get(walletAddress);

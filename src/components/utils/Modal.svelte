@@ -9,6 +9,7 @@
     nftApprovals,
     selectedNFTs,
     checkingDelegations,
+    afterCheckMessage,
   } from '@stores/NFTs';
   import { walletAddress } from '@stores/auth.svelte';
   import {
@@ -86,6 +87,7 @@
     if (potentialNFTs) potentials.set(potentialNFTs);
     nftApprovals.set([]);
     selectedNFTs.set([]);
+    afterCheckMessage.set(null);
     ClearCache($walletAddress);
   };
 
@@ -248,9 +250,18 @@ a11y_no_static_element_interactions -->
             {/each}
           </ul>
         {/if}
+
         {#if $checkingDelegations}
           <p class="validation transparent-white-txt">{$checkingDelegations}</p>
+        {:else if $afterCheckMessage}
+          <p
+            class="validation"
+            class:transparent-white-txt={$nftApprovals.length}
+          >
+            {$afterCheckMessage}
+          </p>
         {/if}
+
         <span class="flex-row">
           {#if $checkingDelegations}
             <LoadingSVG />

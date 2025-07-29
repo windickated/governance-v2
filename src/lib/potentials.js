@@ -3,7 +3,12 @@ import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { get } from 'svelte/store';
 
-import { nftApprovals, checkingDelegations, getNftNumbers } from '@stores/NFTs';
+import {
+  nftApprovals,
+  checkingDelegations,
+  getNftNumbers,
+  afterCheckMessage,
+} from '@stores/NFTs';
 import { walletAddress, userProvider } from '@stores/auth.svelte';
 import { SetCache, TTL_MONTH } from '@constants/cache';
 
@@ -251,6 +256,7 @@ export const checkDelegatedWallets = async () => {
 
   let nftNumbers = await getNftNumbers(address);
 
+  afterCheckMessage.set(null);
   checkingDelegations.set('Checking Potentials ownership...');
   const allNFTs = await checkNftBatches();
   const filteredNFTs =
@@ -273,4 +279,11 @@ export const checkDelegatedWallets = async () => {
   SetCache(address, delegatedWallets, TTL_MONTH);
   nftApprovals.set(delegatedWallets);
   checkingDelegations.set(null);
+
+  if (delegatedWallets.length)
+    afterCheckMessage.set(`
+      We found delegated Potentials from
+      ${delegatedWallets.length} wallet${delegatedWallets.length > 1 ? 's' : ''}
+    `);
+  else afterCheckMessage.set('You have no delegated Potentials');
 };

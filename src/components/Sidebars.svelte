@@ -285,7 +285,7 @@
         {$username}
       </p>
       <span class="flex-row gap-8">
-        <h5 class="pc-only">Select Potentials:</h5>
+        <h5 class="pc-only">Pick Potentials:</h5>
         <select
           bind:value={selectCondition}
           onchange={selectMultipleNFTs}
@@ -481,6 +481,7 @@
       stroke: $white;
       @include blue;
       @include white-txt(1);
+      @include box-glow(inset, 0.1);
       @include font(h4);
 
       &.secondary-tab {
