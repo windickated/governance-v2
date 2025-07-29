@@ -10,6 +10,7 @@
   import { selectedNFTs } from '@stores/NFTs';
   import { userProvider } from '@stores/auth.svelte';
   import { toastStore } from '@stores/toast.svelte';
+  import { activeTab } from '@stores/modal.svelte';
   import vote from '@utils/vote';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
@@ -30,6 +31,7 @@
     }
     if ($selectedNFTs.length === 0) {
       toastStore.show('Select any Potential to vote!', 'error');
+      activeTab.set('nfts');
       return;
     }
     if (optionClass) {

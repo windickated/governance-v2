@@ -20,6 +20,7 @@
   import checkVote from '@lib/voting';
   import { toastStore } from '@stores/toast.svelte';
   import { GetCache, SetCache, ACTIVE_EPISODE_KEY } from '@constants/cache';
+  import { activeTab } from '@stores/modal.svelte';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
   import LoadingSVG from '@components/icons/Loading.svelte';
@@ -141,6 +142,7 @@
     }
     if ($selectedNFTs.length === 0) {
       toastStore.show('Select any Potential to vote!', 'error');
+      activeTab.set('nfts');
       return;
     }
     if (optionClass) {
