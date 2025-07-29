@@ -213,7 +213,7 @@
   <picture>
     <source
       srcset={displayScreen.display.mobilesize}
-      media="(max-width: 1024px)"
+      media="(max-width: 1023px)"
     />
     <img src={displayScreen.display.fullsize} alt="Display" />
   </picture>
@@ -221,7 +221,7 @@
   <picture class="display-bg">
     <source
       srcset={displayScreen.display.mobileBG}
-      media="(max-width: 1024px)"
+      media="(max-width: 1023px)"
     />
     <img src={displayScreen.display.BG} alt="Background" />
   </picture>
@@ -371,7 +371,7 @@
   }
 
   // Only for mobiles
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1023px) {
     .format,
     .vote {
       display: none !important;

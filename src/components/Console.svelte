@@ -152,7 +152,7 @@
   <picture class="flex">
     <source
       srcset={consolePanel.console.mobilesize}
-      media="(max-width: 1024px)"
+      media="(max-width: 1023px)"
     />
     <img src={consolePanel.console.fullsize} alt="Console" />
   </picture>

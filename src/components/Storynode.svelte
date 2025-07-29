@@ -256,7 +256,10 @@
     {/each}
   </ul>
 {:else}
-  <div class="open-episodes-wrapper">
+  <div class="open-episodes-wrapper container">
+    <p class="white-txt">
+      The Galactic Governance Hub enables community-driven franchises to evolve through participatory IP development, facilitated by decentralized voting. We provide creators with secure, transparent results on their story nodes to propel the plot that their community wants. 
+    </p>
     <button class="blur" onclick={() => activeTab.set('episodes')}>
       Open Episodes Tab
     </button>
@@ -271,6 +274,7 @@
     max-width: min(95%, 70rem);
     background-color: #01204e;
     border: 2px solid #203962;
+    @include box-shadow;
 
     h3 {
       @include white-txt(soft);
@@ -342,7 +346,15 @@
     }
   }
 
+  .open-episodes-wrapper {
+    margin-bottom: 7.5rem;
+  }
+
   @include respond-up(small-desktop) {
+    header {
+      box-shadow: none;
+    }
+
     article,
     ul {
       display: none;

@@ -436,6 +436,42 @@
         <img class="potential" src="/quarchon.avif" alt="Potential" />
       </div>
     {/if}
+  {:else}
+    <div class="container white-txt">
+      <p class="pc-only">
+        The Galactic Governance Hub enables community-driven franchises to evolve through participatory IP development, facilitated by decentralized voting. We provide creators with secure, transparent results on their story nodes to propel the plot that their community wants. 
+      </p>
+
+      <hr class="pc-only" />
+
+      <p>
+        Our Proof-of-Concept is The Dischordian Saga - a pioneering sci-fi franchise that has delivered several hours of AI-generated videos to millions, serving as Hollywood-grade episodes with a 75% community participation rate in this hub.
+      </p>
+
+      <hr />
+
+      <p>
+        Unlock Your Potential to become a strategic showrunner of the franchise:
+      </p>
+      <span class="flex-row flex-wrap">
+        <a
+          class="button-anchor button-glowing"
+          href="https://magiceden.io/collections/ethereum/0xfa511d5c4cce10321e6e86793cc083213c36278e"
+          target="_blank"
+        >
+          <img src="/icons/magiceden.png" alt="Magic Eden marketplace" />
+          Magic Eden
+        </a>
+        <a
+          class="button-anchor button-glowing"
+          href="https://opensea.io/collection/potentials-eth"
+          target="_blank"
+        >
+          <img src="/icons/opensea.png" alt="OpenSea marketplace" />
+          OpenSea
+        </a>
+      </span>
+    </div>
   {/if}
 </section>
 
@@ -786,13 +822,10 @@
     width: 90%;
   }
 
-  @media screen and (max-width: 1024px) {
+  // Only for mobiles
+  @media screen and (max-width: 1023px) {
     select {
       width: 90%;
     }
-  }
-
-  // Only for mobiles
-  @media screen and (max-width: 1024px) {
   }
 </style>
