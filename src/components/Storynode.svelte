@@ -15,11 +15,16 @@
     get_nodes,
   } from '@stores/storyNode';
   import { selectedNFTs } from '@stores/NFTs';
-  import { walletAddress, userProvider } from '@stores/auth.svelte';
+  import { userProvider } from '@stores/auth.svelte';
   import vote from '@utils/vote';
   import checkVote from '@lib/voting';
   import { toastStore } from '@stores/toast.svelte';
-  import { GetCache, SetCache, ACTIVE_EPISODE_KEY } from '@constants/cache';
+  import {
+    GetCache,
+    SetCache,
+    ACTIVE_EPISODE_KEY,
+    DISCHORDIAN_SAGA_KEY,
+  } from '@constants/cache';
   import { activeTab } from '@stores/modal.svelte';
 
   import SelectorSVG from '@components/icons/Selector.svelte';
@@ -85,8 +90,24 @@
       endSoon = true;
     }
 
-    if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
-      window.open('/', '_self');
+    if (distance <= 0) {
+      // Update the selected episode as ended and cache the franchise
+      const storedFranchise = GetCache<Franchise>(DISCHORDIAN_SAGA_KEY);
+      if (storedFranchise) {
+        const updatedFranchise = storedFranchise.map((f) => {
+          if (f.season == $season) {
+            f.episodes.map((ep, i) => {
+              if (i == $episode) {
+                ep.ended = true;
+              }
+              return ep;
+            });
+          }
+          return f;
+        })
+        SetCache(DISCHORDIAN_SAGA_KEY, updatedFranchise);
+        window.open('/', '_self');
+      }
     }
 
     votingCountdown = `${days}:${
@@ -211,7 +232,7 @@
           </span>
         {/if}
       {:else}
-        <p style={endSoon ? 'color: red;' : ''}>{votingCountdown}</p>
+        <p class:red-txt={endSoon}>{votingCountdown}</p>
       {/if}
     </section>
     {#if $votingResults && $season == 1 && $episode == 2}
