@@ -34,19 +34,21 @@
   let interval: NodeJS.Timeout;
 
   onMount(async () => {
-    const stored = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
-    if (stored) {
-      const { seasonNr } = stored;
+    const lastSeason: number = 2; // temp last season Nr
+
+    const storedNode = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
+    if (storedNode) {
+      const { seasonNr } = storedNode;
       season.set(seasonNr);
-    }
+    } else season.set(lastSeason);
 
     const nodes = await get_nodes();
     storyNodes.set(nodes);
 
-    if (stored) {
-      const { episodeNr } = stored;
+    if (storedNode) {
+      const { episodeNr } = storedNode;
       if (nodes.length >= episodeNr) episode.set(episodeNr);
-    }
+    } else episode.set(nodes.length - 1);
   });
 
   $: if ($storyNodes.length > 0) {
