@@ -22,6 +22,7 @@
   import {
     GetCache,
     SetCache,
+    ClearCache,
     ACTIVE_EPISODE_KEY,
     DISCHORDIAN_SAGA_KEY,
   } from '@constants/cache';
@@ -36,10 +37,29 @@
   onMount(async () => {
     const lastSeason: number = 2; // temp last season Nr
 
+    const paramsString = window.location.search;
+    const searchParams = new URLSearchParams(paramsString);
+
+    if (searchParams.has("season") && searchParams.has("season")) {
+      SetCache(ACTIVE_EPISODE_KEY, {
+        seasonNr: Number(searchParams.get("season")),
+        episodeNr: Number(searchParams.get("episode")) - 1,
+      });
+    }
+
     const storedNode = GetCache<ActiveEpisode>(ACTIVE_EPISODE_KEY);
     if (storedNode) {
       const { seasonNr } = storedNode;
-      season.set(seasonNr);
+      if (seasonNr > 0 && seasonNr <= lastSeason) season.set(seasonNr);
+      else {
+        toastStore.show(
+          `Season ${seasonNr} does not exist. Last season is ${lastSeason}`,
+          'error',
+        );
+        storedNode.seasonNr = lastSeason;
+        ClearCache(ACTIVE_EPISODE_KEY);
+        season.set(lastSeason);
+      }
     } else season.set(lastSeason);
 
     const nodes = await get_nodes();
@@ -48,6 +68,15 @@
     if (storedNode) {
       const { episodeNr } = storedNode;
       if (nodes.length >= episodeNr) episode.set(episodeNr);
+      else
+      {
+        toastStore.show(
+          `Episode ${episodeNr + 1} does not exist. Last episode is ${nodes.length}`,
+          'error',
+        );
+        ClearCache(ACTIVE_EPISODE_KEY);
+        episode.set(nodes.length - 1);
+      }
     } else episode.set(nodes.length - 1);
   });
 
