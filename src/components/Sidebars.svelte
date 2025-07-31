@@ -522,6 +522,9 @@
       gap: 0.5rem;
       fill: $white;
       stroke: $white;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-family: $font-sans;
       @include blue;
       @include white-txt(1);
       @include box-glow(inset, 0.1);

@@ -104,7 +104,7 @@
             });
           }
           return f;
-        })
+        });
         SetCache(DISCHORDIAN_SAGA_KEY, updatedFranchise);
         window.open('/', '_self');
       }

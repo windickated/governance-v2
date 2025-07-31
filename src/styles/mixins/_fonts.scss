@@ -1,6 +1,35 @@
 @use 'sass:map';
 @use './breakpoints' as *;
 
+// Font families
+
+$font-sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+$font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+:global(html),
+:global(body) {
+  font-family: $font-sans;
+}
+
+:global(h5),
+:global(button.void-btn),
+:global(label),
+:global(input),
+:global(select),
+:global(textarea),
+:global(p),
+:global(article) {
+  font-family: $font-serif;
+}
+
+:global(strong),
+:global(span),
+:global(a) {
+  font-family: inherit;
+}
+
+// Font sizes
+
 $font-scale: (
   'body': clamp(1rem, 1.5vw, 1.05rem),
   // 16–18px
@@ -118,20 +147,168 @@ $font-scale: (
   @include font(h1);
 }
 
-// PT Serif Caption font
+// Hanken Grotesk
+// 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 
 @font-face {
-  font-family: 'PT Serif Caption';
-  src: url('/fonts/PTSerifCaption-Regular.woff2') format('woff2');
-  font-weight: normal;
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Light.woff2') format('woff2');
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'PT Serif Caption';
-  src: url('/fonts/PTSerifCaption-Italic.woff2') format('woff2');
-  font-weight: normal;
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('/fonts/HankenGrotesk-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+// Source Serif 4
+// 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  src: url('/fonts/SourceSerif4-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
   font-style: italic;
   font-display: swap;
 }

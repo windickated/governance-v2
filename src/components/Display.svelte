@@ -112,7 +112,7 @@
       </article>
     </div>
 
-    <ul class="flex pad">
+    <ul class="flex pad horiz-scrollbar">
       {#each $story.votes_options as option, index}
         <button
           class="void-btn flex-row"

@@ -208,6 +208,10 @@
   @include white-txt;
   @include box-shadow;
 
+  * {
+    font-family: $font-sans;
+  }
+
   &:hover:not(.loading-tile),
   &:active:not(.loading-tile),
   &:focus:not(.loading-tile) {
@@ -414,6 +418,7 @@
     width: 100%;
     padding: 0.5rem;
     border-radius: 0.5rem;
+    font-family: $font-sans;
     @include dark-blue(0.5);
     @include box-shadow(soft, inset);
   }
