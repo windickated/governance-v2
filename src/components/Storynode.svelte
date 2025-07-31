@@ -40,10 +40,10 @@
     const paramsString = window.location.search;
     const searchParams = new URLSearchParams(paramsString);
 
-    if (searchParams.has("season") && searchParams.has("season")) {
+    if (searchParams.has('season') && searchParams.has('season')) {
       SetCache(ACTIVE_EPISODE_KEY, {
-        seasonNr: Number(searchParams.get("season")),
-        episodeNr: Number(searchParams.get("episode")) - 1,
+        seasonNr: Number(searchParams.get('season')),
+        episodeNr: Number(searchParams.get('episode')) - 1,
       });
     }
 
@@ -68,8 +68,7 @@
     if (storedNode) {
       const { episodeNr } = storedNode;
       if (nodes.length >= episodeNr) episode.set(episodeNr);
-      else
-      {
+      else {
         toastStore.show(
           `Episode ${episodeNr + 1} does not exist. Last episode is ${nodes.length}`,
           'error',
