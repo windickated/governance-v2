@@ -1,11 +1,12 @@
-FROM docker.io/node
+FROM node:20
 
 WORKDIR /app
+
 COPY package.json .
-COPY bun.lockb .
+COPY bun.lockb . 
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-COPY . /app
+COPY . .
 
 RUN npm run build

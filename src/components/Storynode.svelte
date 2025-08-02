@@ -32,7 +32,7 @@
   import LoadingSVG from '@components/icons/Loading.svelte';
 
   let votingCountdown: string = '';
-  let interval: NodeJS.Timeout;
+  let interval: any;
 
   onMount(async () => {
     const lastSeason: number = 2; // temp last season Nr
